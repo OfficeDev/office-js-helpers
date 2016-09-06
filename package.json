@@ -9,7 +9,7 @@
     "postinstall": "typings install",
     "build": "rimraf dist && tsc -p tsconfig.json && npm run browserify && npm run uglify",
     "browserify": "node browserify.js",
-    "uglify": "uglifyjs dist/umd.js --compress --source-map --output dist/umd.min.js",
+    "uglify": "uglifyjs dist/umd.js --compress --mangle --source-map --output dist/umd.min.js",
     "lint": "tslint 'src/**/*.ts'"
   },
   "version": "1.0.0",
