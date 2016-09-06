@@ -1,6 +1,6 @@
 {
   "name": "office-js-helpers",
-  "description": "An open-source library of helpers for developing Office Add-ins",
+  "description": "An open-source collection of helpers for developing Office Add-ins",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
