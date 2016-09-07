@@ -53,9 +53,9 @@ export class Authenticator {
      * 
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
-     * @return {Promise<IToken>} Returns a promise of the token.
+     * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
      */
-    authenticate(provider: string, force: boolean = false): Promise<IToken> {
+    authenticate(provider: string, force: boolean = false): Promise<IToken | ICode | IError> {
         let token = this._tokenManager.get(provider);
         if (token != null && !force) return Promise.resolve(token);
 
@@ -74,6 +74,11 @@ export class Authenticator {
         }
     }
 
+    /**
+     * POST Helper for exchanging the code with a given url.
+     *           
+     * @return {Promise<IToken|IError>} Returns a promise of the token or error.
+     */
     exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken | IError> {
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
@@ -156,13 +161,13 @@ export class Authenticator {
         Authenticator._isAddin = value;
     }
 
-    private _openInWindowPopup(endpoint: IEndpoint) {
+    private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken | ICode | IError> {
         let url = EndpointManager.getLoginUrl(endpoint);
         let windowSize = endpoint.windowSize || "width=400,height=600";
         let windowFeatures = windowSize + ",menubar=no,toolbar=no,location=no,resizable=no,scrollbars=yes,status=no";
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
-        return new Promise<IToken>((resolve, reject) => {
+        return new Promise<IToken | ICode | IError>((resolve, reject) => {
             try {
                 let interval = setInterval(() => {
                     try {
@@ -202,16 +207,15 @@ export class Authenticator {
         });
     }
 
-    private _openInDialog(endpoint: IEndpoint) {
+    private _openInDialog(endpoint: IEndpoint): Promise<IToken | ICode | IError> {
         let url = EndpointManager.getLoginUrl(endpoint);
 
         var options: Office.DialogOptions = {
             height: 35,
-            width: 35,
-            requireHTTPS: true
+            width: 35
         };
 
-        return new Promise<IToken>((resolve, reject) => {
+        return new Promise<IToken | IError>((resolve, reject) => {
             Office.context.ui.displayDialogAsync(url, options, result => {
                 var dialog = result.value;
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {

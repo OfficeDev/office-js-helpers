@@ -1,4 +1,4 @@
-import { EndpointManager, TokenManager, IToken, IError } from '../authentication';
+import { EndpointManager, TokenManager, IToken, ICode, IError } from '../authentication';
 /**
  * Enumeration for the supported modes of Authentication.
  * Either dialog or redirection.
@@ -43,9 +43,14 @@ export declare class Authenticator {
      *
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
-     * @return {Promise<IToken>} Returns a promise of the token.
+     * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
      */
-    authenticate(provider: string, force?: boolean): Promise<IToken>;
+    authenticate(provider: string, force?: boolean): Promise<IToken | ICode | IError>;
+    /**
+     * POST Helper for exchanging the code with a given url.
+     *
+     * @return {Promise<IToken|IError>} Returns a promise of the token or error.
+     */
     exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken | IError>;
     /**
      * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.

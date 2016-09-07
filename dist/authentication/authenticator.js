@@ -54,7 +54,7 @@
          *
          * @param {string} provider Link to the provider.
          * @param {boolean} force Force re-authentication.
-         * @return {Promise<IToken>} Returns a promise of the token.
+         * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
          */
         Authenticator.prototype.authenticate = function (provider, force) {
             if (force === void 0) { force = false; }
@@ -76,6 +76,11 @@
                 return auth.catch(function (error) { return console.error(error); });
             }
         };
+        /**
+         * POST Helper for exchanging the code with a given url.
+         *
+         * @return {Promise<IToken|IError>} Returns a promise of the token or error.
+         */
         Authenticator.prototype.exchangeCodeForToken = function (url, data, headers) {
             return new Promise(function (resolve, reject) {
                 var xhr = new XMLHttpRequest();
@@ -201,8 +206,7 @@
             var url = authentication_1.EndpointManager.getLoginUrl(endpoint);
             var options = {
                 height: 35,
-                width: 35,
-                requireHTTPS: true
+                width: 35
             };
             return new Promise(function (resolve, reject) {
                 Office.context.ui.displayDialogAsync(url, options, function (result) {
