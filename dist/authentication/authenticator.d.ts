@@ -55,7 +55,7 @@ export declare class Authenticator {
      * Returns false if the code is running inside of a dialog without the requried information
      * or is not running inside of a dialog at all.
      */
-    static isDialog: boolean;
+    static isAuthDialog: boolean;
     /**
      * Check if the code is running inside of an Addin or Web Context.
      * The checks for Office and Word, Excel or OneNote objects.

@@ -110,7 +110,7 @@
                 xhr.send(JSON.stringify(data));
             });
         };
-        Object.defineProperty(Authenticator, "isDialog", {
+        Object.defineProperty(Authenticator, "isAuthDialog", {
             /**
              * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
              * If true then it calls messageParent by extracting the token information.

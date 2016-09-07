@@ -122,7 +122,7 @@ export class Authenticator {
      * Returns false if the code is running inside of a dialog without the requried information
      * or is not running inside of a dialog at all.
      */
-    static get isDialog(): boolean {
+    static get isAuthDialog(): boolean {
         if (!Authenticator.isAddin) return false;
         else {
             if (!TokenManager.isTokenUrl(location.href)) return false;
