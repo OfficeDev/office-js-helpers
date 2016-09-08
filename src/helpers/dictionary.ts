@@ -4,8 +4,8 @@
  */
 export class Dictionary<T> {
     /**
-     * @constructor     
-     * @param {object} items Initial seed of items.        
+     * @constructor
+     * @param {object} items Initial seed of items.
     */
     constructor(protected items?: { [index: string]: T }) {
         if (this.items == null) {
@@ -42,7 +42,7 @@ export class Dictionary<T> {
     };
 
     /**
-     * Inserts an item into the dictionary.     
+     * Inserts an item into the dictionary.
      * If an item already exists with the same key, it will be overridden by the new value
      *
      * @param {string} key The key of the item.
@@ -71,7 +71,7 @@ export class Dictionary<T> {
     };
 
     /**
-     * Clears the dictionary.                    
+     * Clears the dictionary.
      */
     clear() {
         this.items = {};
@@ -92,7 +92,7 @@ export class Dictionary<T> {
 
     /**
      * Lists all the keys in the dictionary.
-     *     
+     *
      * @return {array} Returns all the keys.
      */
     keys(): string[] {
@@ -101,7 +101,7 @@ export class Dictionary<T> {
 
     /**
      * Lists all the values in the dictionary.
-     *     
+     *
      * @return {array} Returns all the values.
      */
     values(): T[] {
@@ -110,7 +110,7 @@ export class Dictionary<T> {
 
     /**
      * Get the dictionary.
-     *     
+     *
      * @return {object} Returns the dictionary if it contains data, null otherwise.
      */
     lookup(): { [key: string]: T } {
@@ -119,7 +119,7 @@ export class Dictionary<T> {
 
     /**
      * Number of items in the dictionary.
-     *     
+     *
      * @return {number} Returns the number of items in the dictionary
      */
     get count(): number {

@@ -47,7 +47,7 @@ export interface IEndpoint {
  */
 export class EndpointManager extends Storage<IEndpoint> {
     /**
-     * @constructor                  
+     * @constructor
     */
     constructor() {
         super('OAuth2Endpoints', StorageType.LocalStorage);
@@ -55,7 +55,7 @@ export class EndpointManager extends Storage<IEndpoint> {
 
     private _currentHost: string;
     /**
-     * Gets the current url to be specified as the default redirect url.          
+     * Gets the current url to be specified as the default redirect url.
      */
     get currentHost(): string {
         if (this._currentHost == null) {
@@ -85,9 +85,9 @@ export class EndpointManager extends Storage<IEndpoint> {
     /**
      * Register Google Implicit OAuth
      * If overrides is left empty, the default scope is limited to basic profile information
-     * 
+     *
      * @param {string} clientId ClientID for the Google App
-     * @param {object} config Valid Endpoint configuration to override the defaults     
+     * @param {object} config Valid Endpoint configuration to override the defaults
      * @return {object} Returns the added endpoint.
      */
     registerGoogleAuth(clientId: string, overrides?: IEndpoint) {
@@ -107,9 +107,9 @@ export class EndpointManager extends Storage<IEndpoint> {
     /**
      * Register Microsoft Implicit OAuth
      * If overrides is left empty, the default scope is limited to basic profile information
-     * 
+     *
      * @param {string} clientId ClientID for the Microsoft App
-     * @param {object} config Valid Endpoint configuration to override the defaults     
+     * @param {object} config Valid Endpoint configuration to override the defaults
      * @return {object} Returns the added endpoint.
      */
     registerMicrosoftAuth(clientId: string, overrides?: IEndpoint) {
@@ -132,9 +132,9 @@ export class EndpointManager extends Storage<IEndpoint> {
     /**
      * Register Facebook Implicit OAuth
      * If overrides is left empty, the default scope is limited to basic profile information
-     * 
+     *
      * @param {string} clientId ClientID for the Facebook App
-     * @param {object} config Valid Endpoint configuration to override the defaults     
+     * @param {object} config Valid Endpoint configuration to override the defaults
      * @return {object} Returns the added endpoint.
      */
     registerFacebookAuth(clientId: string, overrides?: IEndpoint) {
@@ -155,8 +155,8 @@ export class EndpointManager extends Storage<IEndpoint> {
 
     /**
      * Helper to generate the OAuth login url
-     *      
-     * @param {object} config Valid Endpoint configuration     
+     *
+     * @param {object} config Valid Endpoint configuration
      * @return {object} Returns the added endpoint.
      */
     static getLoginUrl(endpointConfig: IEndpoint): string {

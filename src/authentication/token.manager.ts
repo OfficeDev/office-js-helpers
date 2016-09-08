@@ -29,14 +29,14 @@ export interface IError {
  */
 export class TokenManager extends Storage<IToken> {
     /**
-     * @constructor                  
+     * @constructor
     */
     constructor() {
         super('OAuth2Tokens', StorageType.LocalStorage);
     }
 
     /**
-     * Compute the expiration date based on the expires_in field in a OAuth token.          
+     * Compute the expiration date based on the expires_in field in a OAuth token.
      */
     setExpiry(token: IToken) {
         var expire = seconds => new Date(new Date().getTime() + ~~seconds * 1000);
@@ -87,7 +87,7 @@ export class TokenManager extends Storage<IToken> {
     }
 
     /**
-     * Check if the supplied url has either access_token or code or error 
+     * Check if the supplied url has either access_token or code or error
      */
     static isTokenUrl(url: string) {
         var regex = /(access_token|code|error)/gi;

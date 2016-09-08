@@ -22,7 +22,7 @@ export enum AuthenticationMode {
 export class Authenticator {
     /**
      * @constructor
-     * 
+     *
      * @param endpointManager Depends on an instance of EndpointManager
      * @param TokenManager Depends on an instance of TokenManager
     */
@@ -45,10 +45,10 @@ export class Authenticator {
      * Authenticate based on the given provider
      * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
-     * 
+     *
      * WARNING: you have to manually check the expires_in or expires_at property to determine
      * if the token has expired. Not all OAuth providers support refresh token flows.
-     * 
+     *
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
      * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
@@ -77,7 +77,7 @@ export class Authenticator {
 
     /**
      * POST Helper for exchanging the code with a given url.
-     * 
+     *
      * @return {Promise<IToken|IError>} Returns a promise of the token or error.
      */
     exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken | IError> {
@@ -128,7 +128,7 @@ export class Authenticator {
      * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
-    static get isAuthDialog(): boolean {
+    static tryCloseDialog(): boolean {
         if (!Authenticator.isAddin) {
             return false;
         }
