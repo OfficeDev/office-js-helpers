@@ -78,14 +78,15 @@ var __extends = (this && this.__extends) || function (d, b) {
          * @return {object} Returns the added endpoint.
          */
         EndpointManager.prototype.add = function (provider, config) {
-            if (config.redirectUrl == null)
+            if (config.redirectUrl == null) {
                 config.redirectUrl = this.currentHost;
+            }
             config.provider = provider;
             return _super.prototype.add.call(this, provider, config);
         };
         /**
          * Register Google Implicit OAuth
-         * The default scope is limited to basic profile
+         * If overrides is left empty, the default scope is limited to basic profile information
          *
          * @param {string} clientId ClientID for the Google App
          * @param {object} config Valid Endpoint configuration to override the defaults
@@ -106,7 +107,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         ;
         /**
          * Register Microsoft Implicit OAuth
-         * The default scope is limited to basic profile
+         * If overrides is left empty, the default scope is limited to basic profile information
          *
          * @param {string} clientId ClientID for the Microsoft App
          * @param {object} config Valid Endpoint configuration to override the defaults
@@ -130,7 +131,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         ;
         /**
          * Register Facebook Implicit OAuth
-         * The default scope is limited to basic profile
+         * If overrides is left empty, the default scope is limited to basic profile information
          *
          * @param {string} clientId ClientID for the Facebook App
          * @param {object} config Valid Endpoint configuration to override the defaults
@@ -170,12 +171,15 @@ var __extends = (this && this.__extends) || function (d, b) {
                 'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl),
                 'scope=' + oAuthScope
             ];
-            if (state)
+            if (state) {
                 urlSegments.push('state=' + state);
-            if (nonce)
+            }
+            if (nonce) {
                 urlSegments.push('nonce=' + nonce);
-            if (endpointConfig)
+            }
+            if (endpointConfig) {
                 urlSegments.push(endpointConfig.extraQueryParameters);
+            }
             return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
         };
         return EndpointManager;

@@ -48,15 +48,25 @@ var __extends = (this && this.__extends) || function (d, b) {
             if (!this._storage.hasOwnProperty(this._container)) {
                 this._storage[this._container] = null;
             }
-            this._load();
+            this.load();
         };
         /**
          * Add an item
-         * Extends Dictionary's implementation with a save to the storage
+         * Extends Dictionary's implementation with a save to the storage.
+         * Throws if the same key is available twice.
          */
         Storage.prototype.add = function (item, value) {
+            _super.prototype.add.call(this, item, value);
+            this.save();
+            return value;
+        };
+        /**
+         * Insert an item
+         * Extends Dictionary's implementation with a save to the storage
+         */
+        Storage.prototype.insert = function (item, value) {
             _super.prototype.insert.call(this, item, value);
-            this._save();
+            this.save();
             return value;
         };
         /**
@@ -65,7 +75,7 @@ var __extends = (this && this.__extends) || function (d, b) {
          */
         Storage.prototype.remove = function (item) {
             var value = _super.prototype.remove.call(this, item);
-            this._save();
+            this.save();
             return value;
         };
         /**
@@ -80,14 +90,20 @@ var __extends = (this && this.__extends) || function (d, b) {
          * Clear all storages
          * completely clears all storages
          */
-        Storage.clear = function () {
+        Storage.clearAll = function () {
             window.localStorage.clear();
             window.sessionStorage.clear();
         };
-        Storage.prototype._save = function () {
+        /**
+         * Saves the current state to the storage
+         */
+        Storage.prototype.save = function () {
             this._storage[this._container] = JSON.stringify(this.items);
         };
-        Storage.prototype._load = function () {
+        /**
+         * Refreshes the storage with the current localstorage values.
+         */
+        Storage.prototype.load = function () {
             _super.prototype.clear.call(this);
             this.items = JSON.parse(this._storage[this._container]);
             if (this.items == null)

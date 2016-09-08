@@ -17,15 +17,15 @@ export declare enum AuthenticationMode {
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export declare class Authenticator {
-    private _endpointManager;
-    private _tokenManager;
+    endpoints: EndpointManager;
+    tokens: TokenManager;
     /**
      * @constructor
      *
      * @param endpointManager Depends on an instance of EndpointManager
      * @param TokenManager Depends on an instance of TokenManager
     */
-    constructor(_endpointManager: EndpointManager, _tokenManager: TokenManager);
+    constructor(endpoints?: EndpointManager, tokens?: TokenManager);
     /**
      * Controls the way the authentication should take place.
      * Either by using dialog or by redirecting the current window.
@@ -34,8 +34,7 @@ export declare class Authenticator {
     static mode: AuthenticationMode;
     /**
      * Authenticate based on the given provider
-     * Either uses DialogAPI or Window Popups based on where its being called from
-     * viz. Add-in or Web.
+     * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
      *
      * WARNING: you have to manually check the expires_in or expires_at property to determine
@@ -57,12 +56,12 @@ export declare class Authenticator {
      * If true then it calls messageParent by extracting the token information.
      *
      * @return {boolean}
-     * Returns false if the code is running inside of a dialog without the requried information
+     * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
     static isAuthDialog: boolean;
     /**
-     * Check if the code is running inside of an Addin or Web Context.
+     * Check if the code is running inside of an Addin versus a Web Context.
      * The checks for Office and Word, Excel or OneNote objects.
      */
     private static _isAddin;

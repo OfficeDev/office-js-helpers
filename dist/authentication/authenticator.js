@@ -33,20 +33,17 @@
          * @param endpointManager Depends on an instance of EndpointManager
          * @param TokenManager Depends on an instance of TokenManager
         */
-        function Authenticator(_endpointManager, _tokenManager) {
-            this._endpointManager = _endpointManager;
-            this._tokenManager = _tokenManager;
-            if (_endpointManager == null)
-                throw 'Please pass an instance of EndpointManager.';
-            if (_tokenManager == null)
-                throw 'Please pass an instance of TokenManager.';
-            if (_endpointManager.count == 0)
-                throw 'No registered Endpoints could be found. Either use the default endpoint registrations or add one manually';
+        function Authenticator(endpoints, tokens) {
+            this.endpoints = endpoints;
+            this.tokens = tokens;
+            if (endpoints == null)
+                this.endpoints = new authentication_1.EndpointManager();
+            if (tokens == null)
+                this.tokens = new authentication_1.TokenManager();
         }
         /**
          * Authenticate based on the given provider
-         * Either uses DialogAPI or Window Popups based on where its being called from
-         * viz. Add-in or Web.
+         * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
          * If the token was cached, the it retrieves the cached token.
          *
          * WARNING: you have to manually check the expires_in or expires_at property to determine
@@ -58,21 +55,21 @@
          */
         Authenticator.prototype.authenticate = function (provider, force) {
             if (force === void 0) { force = false; }
-            var token = this._tokenManager.get(provider);
-            if (token != null && !force)
+            var token = this.tokens.get(provider);
+            if (token != null && !force) {
                 return Promise.resolve(token);
-            var endpoint = this._endpointManager.get(provider);
+            }
+            var endpoint = this.endpoints.get(provider);
+            if (endpoint == null) {
+                return Promise.reject({ error: "No such registered endpoint: " + provider + " could be found." });
+            }
             if (Authenticator.mode == AuthenticationMode.Redirect) {
                 var url = authentication_1.EndpointManager.getLoginUrl(endpoint);
                 location.replace(url);
-                return Promise.reject('AUTH_REDIRECT');
+                return Promise.reject({ error: "Redirecting window to authentication provider." });
             }
             else {
-                var auth;
-                if (Authenticator.isAddin)
-                    auth = this._openInDialog(endpoint);
-                else
-                    auth = this._openInWindowPopup(endpoint);
+                var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
                 return auth.catch(function (error) { return console.error(error); });
             }
         };
@@ -121,15 +118,17 @@
              * If true then it calls messageParent by extracting the token information.
              *
              * @return {boolean}
-             * Returns false if the code is running inside of a dialog without the requried information
+             * Returns false if the code is running inside of a dialog without the required information
              * or is not running inside of a dialog at all.
              */
             get: function () {
-                if (!Authenticator.isAddin)
+                if (!Authenticator.isAddin) {
                     return false;
+                }
                 else {
-                    if (!authentication_1.TokenManager.isTokenUrl(location.href))
+                    if (!authentication_1.TokenManager.isTokenUrl(location.href)) {
                         return false;
+                    }
                     var token = authentication_1.TokenManager.getToken(location.href, location.origin);
                     Office.context.ui.messageParent(JSON.stringify(token));
                     return true;
@@ -169,35 +168,35 @@
                                 clearInterval(interval_1);
                                 var result = authentication_1.TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                                 if (result == null)
-                                    reject('No access_token or code could be parsed.');
+                                    return reject({ error: 'No access_token or code could be parsed.' });
                                 else if ('code' in result) {
                                     popupWindow.close();
                                     if (endpoint.tokenUrl != '') {
-                                        resolve(_this.exchangeCodeForToken(endpoint.tokenUrl, result.code));
+                                        return resolve(_this.exchangeCodeForToken(endpoint.tokenUrl, result.code));
                                     }
-                                    resolve(result);
+                                    return resolve(result);
                                 }
                                 else if ('access_token' in result) {
-                                    _this._tokenManager.add(endpoint.provider, result);
+                                    _this.tokens.add(endpoint.provider, result);
                                     popupWindow.close();
-                                    resolve(result);
+                                    return resolve(result);
                                 }
                                 else {
-                                    reject(result);
+                                    return reject(result);
                                 }
                             }
                         }
                         catch (exception) {
                             if (!popupWindow) {
                                 clearInterval(interval_1);
-                                reject(exception);
+                                return reject({ error: exception });
                             }
                         }
                     }, 400);
                 }
                 catch (exception) {
                     popupWindow.close();
-                    reject(exception);
+                    return reject({ error: exception });
                 }
             });
         };
@@ -214,25 +213,26 @@
                     dialog.addEventHandler(Office.EventType.DialogMessageReceived, function (args) {
                         dialog.close();
                         try {
-                            if (args.message == null || args.message === '')
-                                reject('No access_token or code could be parsed.');
+                            if (args.message == null || args.message === '') {
+                                return reject({ error: 'No access_token or code could be parsed.' });
+                            }
                             var json = JSON.parse(args.message);
                             if ('code' in json) {
                                 if (endpoint.tokenUrl != '') {
-                                    resolve(_this.exchangeCodeForToken(endpoint.tokenUrl, json.code));
+                                    return resolve(_this.exchangeCodeForToken(endpoint.tokenUrl, json.code));
                                 }
-                                resolve(json);
+                                return resolve(json);
                             }
                             else if ('access_token' in json) {
-                                _this._tokenManager.add(endpoint.provider, json);
-                                resolve(json);
+                                _this.tokens.add(endpoint.provider, json);
+                                return resolve(json);
                             }
                             else {
-                                reject(json);
+                                return reject(json);
                             }
                         }
                         catch (exception) {
-                            reject(exception);
+                            return reject({ error: exception });
                         }
                     });
                 });

@@ -30,13 +30,8 @@ export declare class Dictionary<T> {
      */
     add(key: string, value: T): T;
     /**
-     * Gets the first time of the dictionary
-     *
-     * @return {object} Returns the first item in the dictionary.
-     */
-    first(): T;
-    /**
      * Inserts an item into the dictionary.
+     * If an item already exists with the same key, it will be overridden by the new value
      *
      * @param {string} key The key of the item.
      * @param {object} value The item to be added.
@@ -45,7 +40,7 @@ export declare class Dictionary<T> {
     insert(key: string, value: T): T;
     /**
      * Removes an item from the dictionary.
-     * If the key doesnt exist, then it will throw.
+     * Will throw if the key doesn't exist.
      *
      * @param {string} key The key of the item.
      * @return {object} Returns the deleted item.
@@ -77,7 +72,7 @@ export declare class Dictionary<T> {
     /**
      * Get the dictionary.
      *
-     * @return {object} Returns the dictionary if it contains data else null.
+     * @return {object} Returns the dictionary if it contains data, null otherwise.
      */
     lookup(): {
         [key: string]: T;

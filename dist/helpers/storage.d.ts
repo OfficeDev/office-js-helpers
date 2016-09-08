@@ -26,9 +26,15 @@ export declare class Storage<T> extends Dictionary<T> {
     switchStorage(type: StorageType): void;
     /**
      * Add an item
-     * Extends Dictionary's implementation with a save to the storage
+     * Extends Dictionary's implementation with a save to the storage.
+     * Throws if the same key is available twice.
      */
     add(item: string, value: T): T;
+    /**
+     * Insert an item
+     * Extends Dictionary's implementation with a save to the storage
+     */
+    insert(item: string, value: T): T;
     /**
      * Remove an item
      * Extends Dictionary's implementation with a save to the storage
@@ -43,7 +49,15 @@ export declare class Storage<T> extends Dictionary<T> {
      * Clear all storages
      * completely clears all storages
      */
-    static clear(): void;
-    private _save();
-    private _load();
+    static clearAll(): void;
+    /**
+     * Saves the current state to the storage
+     */
+    save(): void;
+    /**
+     * Refreshes the storage with the current localstorage values.
+     */
+    load(): {
+        [index: string]: T;
+    };
 }

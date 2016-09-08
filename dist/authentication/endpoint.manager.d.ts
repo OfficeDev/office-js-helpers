@@ -44,7 +44,7 @@ export declare class EndpointManager extends Storage<IEndpoint> {
     add(provider: string, config: IEndpoint): IEndpoint;
     /**
      * Register Google Implicit OAuth
-     * The default scope is limited to basic profile
+     * If overrides is left empty, the default scope is limited to basic profile information
      *
      * @param {string} clientId ClientID for the Google App
      * @param {object} config Valid Endpoint configuration to override the defaults
@@ -53,7 +53,7 @@ export declare class EndpointManager extends Storage<IEndpoint> {
     registerGoogleAuth(clientId: string, overrides?: IEndpoint): IEndpoint;
     /**
      * Register Microsoft Implicit OAuth
-     * The default scope is limited to basic profile
+     * If overrides is left empty, the default scope is limited to basic profile information
      *
      * @param {string} clientId ClientID for the Microsoft App
      * @param {object} config Valid Endpoint configuration to override the defaults
@@ -62,7 +62,7 @@ export declare class EndpointManager extends Storage<IEndpoint> {
     registerMicrosoftAuth(clientId: string, overrides?: IEndpoint): void;
     /**
      * Register Facebook Implicit OAuth
-     * The default scope is limited to basic profile
+     * If overrides is left empty, the default scope is limited to basic profile information
      *
      * @param {string} clientId ClientID for the Facebook App
      * @param {object} config Valid Endpoint configuration to override the defaults

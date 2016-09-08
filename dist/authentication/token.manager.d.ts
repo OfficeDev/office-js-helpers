@@ -31,7 +31,7 @@ export declare class TokenManager extends Storage<IToken> {
     /**
      * Compute the expiration date based on the expires_in field in a OAuth token.
      */
-    setExpiry(token: IToken): any;
+    setExpiry(token: IToken): void;
     /**
      * Extends Storage's default add method
      * Adds a new OAuth Token after settings its expiry

@@ -27,12 +27,11 @@ export class Authenticator {
      * @param TokenManager Depends on an instance of TokenManager
     */
     constructor(
-        private _endpointManager: EndpointManager,
-        private _tokenManager: TokenManager
+        public endpoints?: EndpointManager,
+        public tokens?: TokenManager
     ) {
-        if (_endpointManager == null) throw 'Please pass an instance of EndpointManager.';
-        if (_tokenManager == null) throw 'Please pass an instance of TokenManager.';
-        if (_endpointManager.count == 0) throw 'No registered Endpoints could be found. Either use the default endpoint registrations or add one manually';
+        if (endpoints == null) this.endpoints = new EndpointManager();
+        if (tokens == null) this.tokens = new TokenManager();
     }
 
     /**
@@ -55,15 +54,20 @@ export class Authenticator {
      * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
      */
     authenticate(provider: string, force: boolean = false): Promise<IToken | ICode | IError> {
-        let token = this._tokenManager.get(provider);
-        if (token != null && !force) return Promise.resolve(token);
+        let token = this.tokens.get(provider);
+        if (token != null && !force) {
+            return Promise.resolve(token);
+        }
 
-        let endpoint = this._endpointManager.get(provider);
+        let endpoint = this.endpoints.get(provider);
+        if (endpoint == null) {
+            return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
+        }
 
         if (Authenticator.mode == AuthenticationMode.Redirect) {
             let url = EndpointManager.getLoginUrl(endpoint);
             location.replace(url);
-            return Promise.reject('AUTH_REDIRECT') as Promise<any>;
+            return Promise.reject(<IError>{ error: `Redirecting window to authentication provider.` }) as any;
         }
         else {
             var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
@@ -125,9 +129,13 @@ export class Authenticator {
      * or is not running inside of a dialog at all.
      */
     static get isAuthDialog(): boolean {
-        if (!Authenticator.isAddin) return false;
+        if (!Authenticator.isAddin) {
+            return false;
+        }
         else {
-            if (!TokenManager.isTokenUrl(location.href)) return false;
+            if (!TokenManager.isTokenUrl(location.href)) {
+                return false;
+            }
 
             var token = TokenManager.getToken(location.href, location.origin);
             Office.context.ui.messageParent(JSON.stringify(token));
@@ -171,35 +179,35 @@ export class Authenticator {
                         if (popupWindow.document.URL.indexOf(endpoint.redirectUrl) !== -1) {
                             clearInterval(interval);
                             let result = TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
-                            if (result == null) reject('No access_token or code could be parsed.');
+                            if (result == null) return reject(<IError>{ error: 'No access_token or code could be parsed.' });
                             else if ('code' in result) {
                                 popupWindow.close();
                                 if (endpoint.tokenUrl != '') {
-                                    resolve(this.exchangeCodeForToken(endpoint.tokenUrl, (<ICode>result).code));
+                                    return resolve(this.exchangeCodeForToken(endpoint.tokenUrl, (<ICode>result).code));
                                 }
-                                resolve(result as ICode);
+                                return resolve(result as ICode);
                             }
                             else if ('access_token' in result) {
-                                this._tokenManager.add(endpoint.provider, result as IToken);
+                                this.tokens.add(endpoint.provider, result as IToken);
                                 popupWindow.close();
-                                resolve(result as IToken);
+                                return resolve(result as IToken);
                             }
                             else {
-                                reject(result as IError);
+                                return reject(result as IError);
                             }
                         }
                     }
                     catch (exception) {
                         if (!popupWindow) {
                             clearInterval(interval);
-                            reject(exception);
+                            return reject(<IError>{ error: exception });
                         }
                     }
                 }, 400);
             }
             catch (exception) {
                 popupWindow.close();
-                reject(exception);
+                return reject(<IError>{ error: exception });
             }
         });
     }
@@ -218,26 +226,28 @@ export class Authenticator {
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {
                     dialog.close();
                     try {
-                        if (args.message == null || args.message === '') reject('No access_token or code could be parsed.');
+                        if (args.message == null || args.message === '') {
+                            return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                        }
 
                         var json = JSON.parse(args.message);
 
                         if ('code' in json) {
                             if (endpoint.tokenUrl != '') {
-                                resolve(this.exchangeCodeForToken(endpoint.tokenUrl, (<ICode>json).code));
+                                return resolve(this.exchangeCodeForToken(endpoint.tokenUrl, (<ICode>json).code));
                             }
-                            resolve(json as ICode);
+                            return resolve(json as ICode);
                         }
                         else if ('access_token' in json) {
-                            this._tokenManager.add(endpoint.provider, json as IToken);
-                            resolve(json as IToken);
+                            this.tokens.add(endpoint.provider, json as IToken);
+                            return resolve(json as IToken);
                         }
                         else {
-                            reject(json as IError);
+                            return reject(json as IError);
                         }
                     }
                     catch (exception) {
-                        reject(exception);
+                        return reject(<IError>{ error: exception });
                     }
                 });
             });

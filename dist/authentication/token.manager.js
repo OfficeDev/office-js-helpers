@@ -28,13 +28,8 @@ var __extends = (this && this.__extends) || function (d, b) {
          * Compute the expiration date based on the expires_in field in a OAuth token.
          */
         TokenManager.prototype.setExpiry = function (token) {
-            var expire = function (seconds) {
-                if (seconds === void 0) { seconds = 3600; }
-                return new Date(new Date().getTime() + ~~seconds * 1000);
-            };
-            if (token == null)
-                return null;
-            if (token.expires_at == null) {
+            var expire = function (seconds) { return new Date(new Date().getTime() + ~~seconds * 1000); };
+            if (!(token == null) && token.expires_at == null) {
                 token.expires_at = expire(token.expires_in);
             }
         };
@@ -50,7 +45,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         TokenManager.prototype.add = function (provider, value) {
             value.provider = provider;
             this.setExpiry(value);
-            return _super.prototype.add.call(this, provider, value);
+            return _super.prototype.insert.call(this, provider, value);
         };
         /**
          * Extract the token from the URL
