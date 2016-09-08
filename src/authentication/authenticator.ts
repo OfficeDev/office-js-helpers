@@ -17,7 +17,7 @@ export enum AuthenticationMode {
 }
 
 /**
- * Helper for performing Implicit OAuth Authentication with registered endpoints. 
+ * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
     /**
@@ -44,12 +44,11 @@ export class Authenticator {
 
     /**
      * Authenticate based on the given provider
-     * Either uses DialogAPI or Window Popups based on where its being called from
-     * viz. Add-in or Web.
+     * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
      * 
      * WARNING: you have to manually check the expires_in or expires_at property to determine
-     * if the token has expired. Not all OAuth providers support refresh token flows. 
+     * if the token has expired. Not all OAuth providers support refresh token flows.
      * 
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
@@ -67,16 +66,14 @@ export class Authenticator {
             return Promise.reject('AUTH_REDIRECT') as Promise<any>;
         }
         else {
-            var auth;
-            if (Authenticator.isAddin) auth = this._openInDialog(endpoint);
-            else auth = this._openInWindowPopup(endpoint);
+            var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
             return auth.catch(error => console.error(error));
         }
     }
 
     /**
      * POST Helper for exchanging the code with a given url.
-     *           
+     * 
      * @return {Promise<IToken|IError>} Returns a promise of the token or error.
      */
     exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken | IError> {
@@ -124,7 +121,7 @@ export class Authenticator {
      * If true then it calls messageParent by extracting the token information.
      *
      * @return {boolean}
-     * Returns false if the code is running inside of a dialog without the requried information
+     * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
     static get isAuthDialog(): boolean {
@@ -139,7 +136,7 @@ export class Authenticator {
     }
 
     /**
-     * Check if the code is running inside of an Addin or Web Context.
+     * Check if the code is running inside of an Addin versus a Web Context.
      * The checks for Office and Word, Excel or OneNote objects.
      */
     private static _isAddin: boolean;

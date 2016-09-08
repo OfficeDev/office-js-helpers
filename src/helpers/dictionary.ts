@@ -8,9 +8,11 @@ export class Dictionary<T> {
      * @param {object} items Initial seed of items.        
     */
     constructor(protected items?: { [index: string]: T }) {
-        if (this.items == null) this.items = {};
+        if (this.items == null) {
+            this.items = {};
+        }
     }
-    
+
     /**
      * Gets an item from the dictionary.
      *
@@ -18,8 +20,9 @@ export class Dictionary<T> {
      * @return {object} Returns an item if found, else returns null.
      */
     get(key: string): T {
-        if (this.items == null) throw new Error('Dictionary isn\'t initialized. Call \'new\' first.');
-        if (!this.contains(key)) return null;
+        if (!this.contains(key)) {
+            return null;
+        }
         return this.items[key];
     }
 
@@ -32,49 +35,41 @@ export class Dictionary<T> {
      * @return {object} Returns the added item.
      */
     add(key: string, value: T): T {
-        if (this.contains(key)) throw new Error('Key already exists.');
+        if (this.contains(key)) {
+            throw new Error(`Key: ${key} already exists.`);
+        }
         return this.insert(key, value);
     };
 
     /**
-     * Gets the first time of the dictionary     
-     *
-     * @return {object} Returns the first item in the dictionary.
-     */
-    first() {
-        if (this.items == null) throw new Error('Dictionary isn\'t initialized. Call \'new\' first.');
-        var key = this.keys()[0];
-        if (key != null) return this.items[key];
-    }
-
-    /**
      * Inserts an item into the dictionary.     
+     * If an item already exists with the same key, it will be overridden by the new value
      *
      * @param {string} key The key of the item.
      * @param {object} value The item to be added.
      * @return {object} Returns the added item.
      */
     insert(key: string, value: T): T {
-        if (this.items == null) throw new Error('Dictionary isn\'t initialized. Call \'new\' first.');
-        if (value == null) throw new Error('Value expected. Got ' + value);
         this.items[key] = value;
         return value;
     }
 
     /**
      * Removes an item from the dictionary.
-     * If the key doesnt exist, then it will throw.
+     * Will throw if the key doesn't exist.
      *
      * @param {string} key The key of the item.
      * @return {object} Returns the deleted item.
      */
     remove(key: string): T {
-        if (!this.contains(key)) throw new Error('Key not found.');
+        if (!this.contains(key)) {
+            throw new Error(`Key: ${key} not found.`);
+        }
         var value = this.items[key];
         delete this.items[key];
-        return this.insert(key, value);
+        return value;
     };
-    
+
     /**
      * Clears the dictionary.                    
      */
@@ -89,8 +84,9 @@ export class Dictionary<T> {
      * @return {boolean} Returns true if the key was found.
      */
     contains(key: string): boolean {
-        if (key == null) throw new Error('Key cannot be null or undefined');
-        if (this.items == null) throw new Error('Dictionary isn\'t initialized. Call \'new\' first.');
+        if (key == null) {
+            throw new Error('Key cannot be null or undefined');
+        }
         return this.items.hasOwnProperty(key);
     }
 
@@ -100,7 +96,6 @@ export class Dictionary<T> {
      * @return {array} Returns all the keys.
      */
     keys(): string[] {
-        if (this == null) throw new Error('Dictionary isn\'t initialized. Call \'new\' first.');
         return Object.keys(this.items);
     }
 
@@ -110,14 +105,13 @@ export class Dictionary<T> {
      * @return {array} Returns all the values.
      */
     values(): T[] {
-        if (this == null) throw new Error('Dictionary isn\'t initialized. Call \'new\' first.');
         return Object.values(this.items);
     }
 
     /**
      * Get the dictionary.
      *     
-     * @return {object} Returns the dictionary if it contains data else null.
+     * @return {object} Returns the dictionary if it contains data, null otherwise.
      */
     lookup(): { [key: string]: T } {
         return this.keys().length ? this.items : null;

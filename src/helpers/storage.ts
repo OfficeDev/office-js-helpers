@@ -36,16 +36,27 @@ export class Storage<T> extends Dictionary<T>{
             this._storage[this._container] = null;
         }
 
-        this._load();
+        this.load();
     }
 
     /**
      * Add an item
-     * Extends Dictionary's implementation with a save to the storage          
+     * Extends Dictionary's implementation with a save to the storage.
+     * Throws if the same key is available twice.
      */
     add(item: string, value: T): T {
+        super.add(item, value);
+        this.save();
+        return value;
+    }
+
+    /**
+     * Insert an item
+     * Extends Dictionary's implementation with a save to the storage          
+     */
+    insert(item: string, value: T): T {
         super.insert(item, value);
-        this._save();
+        this.save();
         return value;
     }
 
@@ -55,7 +66,7 @@ export class Storage<T> extends Dictionary<T>{
      */
     remove(item: string) {
         var value = super.remove(item);
-        this._save();
+        this.save();
         return value;
     }
 
@@ -72,16 +83,22 @@ export class Storage<T> extends Dictionary<T>{
      * Clear all storages
      * completely clears all storages          
      */
-    static clear() {
+    static clearAll() {
         window.localStorage.clear();
         window.sessionStorage.clear();
     }
 
-    private _save() {
+    /**
+     * Saves the current state to the storage       
+     */    
+    save() {
         this._storage[this._container] = JSON.stringify(this.items);
     }
 
-    private _load() {
+    /**
+     * Refreshes the storage with the current localstorage values.       
+     */        
+    load() {
         super.clear();
         this.items = JSON.parse(this._storage[this._container]);
         if (this.items == null) this.items = {};

@@ -49,7 +49,7 @@ export class EndpointManager extends Storage<IEndpoint> {
     /**
      * @constructor                  
     */
-    constructor() {        
+    constructor() {
         super('OAuth2Endpoints', StorageType.LocalStorage);
     }
 
@@ -75,14 +75,16 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @return {object} Returns the added endpoint.
      */
     add(provider: string, config: IEndpoint): IEndpoint {
-        if (config.redirectUrl == null) config.redirectUrl = this.currentHost;
+        if (config.redirectUrl == null) {
+            config.redirectUrl = this.currentHost;
+        }
         config.provider = provider;
         return super.add(provider, config);
     }
 
     /**
      * Register Google Implicit OAuth
-     * The default scope is limited to basic profile
+     * If overrides is left empty, the default scope is limited to basic profile information
      * 
      * @param {string} clientId ClientID for the Google App
      * @param {object} config Valid Endpoint configuration to override the defaults     
@@ -104,7 +106,7 @@ export class EndpointManager extends Storage<IEndpoint> {
 
     /**
      * Register Microsoft Implicit OAuth
-     * The default scope is limited to basic profile
+     * If overrides is left empty, the default scope is limited to basic profile information
      * 
      * @param {string} clientId ClientID for the Microsoft App
      * @param {object} config Valid Endpoint configuration to override the defaults     
@@ -129,7 +131,7 @@ export class EndpointManager extends Storage<IEndpoint> {
 
     /**
      * Register Facebook Implicit OAuth
-     * The default scope is limited to basic profile
+     * If overrides is left empty, the default scope is limited to basic profile information
      * 
      * @param {string} clientId ClientID for the Facebook App
      * @param {object} config Valid Endpoint configuration to override the defaults     
@@ -171,9 +173,15 @@ export class EndpointManager extends Storage<IEndpoint> {
             'scope=' + oAuthScope
         ]
 
-        if (state) urlSegments.push('state=' + state);
-        if (nonce) urlSegments.push('nonce=' + nonce);
-        if (endpointConfig) urlSegments.push(endpointConfig.extraQueryParameters);
+        if (state) {
+            urlSegments.push('state=' + state);
+        }
+        if (nonce) {
+            urlSegments.push('nonce=' + nonce);
+        }
+        if (endpointConfig) {
+            urlSegments.push(endpointConfig.extraQueryParameters);
+        }
 
         return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
     }
