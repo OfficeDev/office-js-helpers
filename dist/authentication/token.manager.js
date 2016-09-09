@@ -45,7 +45,7 @@ var __extends = (this && this.__extends) || function (d, b) {
         TokenManager.prototype.add = function (provider, value) {
             value.provider = provider;
             this.setExpiry(value);
-            return _super.prototype.insert.call(this, provider, value);
+            return _super.prototype.add.call(this, provider, value);
         };
         /**
          * Extract the token from the URL
@@ -71,13 +71,6 @@ var __extends = (this && this.__extends) || function (d, b) {
                 rightPart = queryPart[1];
             }
             return this._extractParams(rightPart);
-        };
-        /**
-         * Check if the supplied url has either access_token or code or error
-         */
-        TokenManager.isTokenUrl = function (url) {
-            var regex = /(access_token|code|error)/gi;
-            return regex.test(url);
         };
         TokenManager._extractParams = function (segment) {
             var params = {}, regex = /([^&=]+)=([^&]*)/g, matches;

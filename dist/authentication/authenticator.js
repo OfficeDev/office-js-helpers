@@ -9,21 +9,6 @@
     "use strict";
     var authentication_1 = require('../authentication');
     /**
-     * Enumeration for the supported modes of Authentication.
-     * Either dialog or redirection.
-     */
-    (function (AuthenticationMode) {
-        /**
-         * Opens a the authorize url inside of a dialog.
-         */
-        AuthenticationMode[AuthenticationMode["Dialog"] = 0] = "Dialog";
-        /**
-         * Redirects the current window to the authorize url.
-         */
-        AuthenticationMode[AuthenticationMode["Redirect"] = 1] = "Redirect";
-    })(exports.AuthenticationMode || (exports.AuthenticationMode = {}));
-    var AuthenticationMode = exports.AuthenticationMode;
-    /**
      * Helper for performing Implicit OAuth Authentication with registered endpoints.
      */
     var Authenticator = (function () {
@@ -51,7 +36,7 @@
          *
          * @param {string} provider Link to the provider.
          * @param {boolean} force Force re-authentication.
-         * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
+         * @return {Promise<IToken|ICode>} Returns a promise of the token or code or error.
          */
         Authenticator.prototype.authenticate = function (provider, force) {
             if (force === void 0) { force = false; }
@@ -63,20 +48,13 @@
             if (endpoint == null) {
                 return Promise.reject({ error: "No such registered endpoint: " + provider + " could be found." });
             }
-            if (Authenticator.mode == AuthenticationMode.Redirect) {
-                var url = authentication_1.EndpointManager.getLoginUrl(endpoint);
-                location.replace(url);
-                return Promise.reject({ error: "Redirecting window to authentication provider." });
-            }
-            else {
-                var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
-                return auth.catch(function (error) { return console.error(error); });
-            }
+            var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+            return auth.catch(function (error) { return console.error(error); });
         };
         /**
          * POST Helper for exchanging the code with a given url.
          *
-         * @return {Promise<IToken|IError>} Returns a promise of the token or error.
+         * @return {Promise<IToken>} Returns a promise of the token or error.
          */
         Authenticator.prototype.exchangeCodeForToken = function (url, data, headers) {
             return new Promise(function (resolve, reject) {
@@ -112,31 +90,34 @@
                 xhr.send(JSON.stringify(data));
             });
         };
-        Object.defineProperty(Authenticator, "isAuthDialog", {
-            /**
-             * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
-             * If true then it calls messageParent by extracting the token information.
-             *
-             * @return {boolean}
-             * Returns false if the code is running inside of a dialog without the required information
-             * or is not running inside of a dialog at all.
-             */
-            get: function () {
-                if (!Authenticator.isAddin) {
+        /**
+         * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
+         * If true then it calls messageParent by extracting the token information.
+         *
+         * @return {boolean}
+         * Returns false if the code is running inside of a dialog without the required information
+         * or is not running inside of a dialog at all.
+         */
+        Authenticator.closeDialog = function () {
+            if (!Authenticator.isAddin) {
+                return false;
+            }
+            else {
+                if (!Authenticator.isTokenUrl(location.href)) {
                     return false;
                 }
-                else {
-                    if (!authentication_1.TokenManager.isTokenUrl(location.href)) {
-                        return false;
-                    }
-                    var token = authentication_1.TokenManager.getToken(location.href, location.origin);
-                    Office.context.ui.messageParent(JSON.stringify(token));
-                    return true;
-                }
-            },
-            enumerable: true,
-            configurable: true
-        });
+                var token = authentication_1.TokenManager.getToken(location.href, location.origin);
+                Office.context.ui.messageParent(JSON.stringify(token));
+                return true;
+            }
+        };
+        /**
+         * Check if the supplied url has either access_token or code or error
+         */
+        Authenticator.isTokenUrl = function (url) {
+            var regex = /(access_token|code|error)/gi;
+            return regex.test(url);
+        };
         Object.defineProperty(Authenticator, "isAddin", {
             get: function () {
                 if (Authenticator._isAddin == null) {
@@ -238,12 +219,6 @@
                 });
             });
         };
-        /**
-         * Controls the way the authentication should take place.
-         * Either by using dialog or by redirecting the current window.
-         * Defaults to the dialog flow.
-         */
-        Authenticator.mode = AuthenticationMode.Dialog;
         return Authenticator;
     }());
     exports.Authenticator = Authenticator;

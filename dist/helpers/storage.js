@@ -56,15 +56,6 @@ var __extends = (this && this.__extends) || function (d, b) {
          * Throws if the same key is available twice.
          */
         Storage.prototype.add = function (item, value) {
-            _super.prototype.add.call(this, item, value);
-            this.save();
-            return value;
-        };
-        /**
-         * Insert an item
-         * Extends Dictionary's implementation with a save to the storage
-         */
-        Storage.prototype.insert = function (item, value) {
             _super.prototype.insert.call(this, item, value);
             this.save();
             return value;

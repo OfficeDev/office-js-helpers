@@ -51,9 +51,5 @@ export declare class TokenManager extends Storage<IToken> {
      * @return {object} Returns the extracted token.
      */
     static getToken(url: string, exclude?: string, delimiter?: string): ICode | IToken | IError;
-    /**
-     * Check if the supplied url has either access_token or code or error
-     */
-    static isTokenUrl(url: string): boolean;
     private static _extractParams(segment);
 }

@@ -31,11 +31,6 @@ export declare class Storage<T> extends Dictionary<T> {
      */
     add(item: string, value: T): T;
     /**
-     * Insert an item
-     * Extends Dictionary's implementation with a save to the storage
-     */
-    insert(item: string, value: T): T;
-    /**
      * Remove an item
      * Extends Dictionary's implementation with a save to the storage
      */

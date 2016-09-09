@@ -1,18 +1,4 @@
-import { EndpointManager, TokenManager, IToken, ICode, IError } from '../authentication';
-/**
- * Enumeration for the supported modes of Authentication.
- * Either dialog or redirection.
- */
-export declare enum AuthenticationMode {
-    /**
-     * Opens a the authorize url inside of a dialog.
-     */
-    Dialog = 0,
-    /**
-     * Redirects the current window to the authorize url.
-     */
-    Redirect = 1,
-}
+import { EndpointManager, TokenManager, IToken, ICode } from '../authentication';
 /**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
@@ -27,12 +13,6 @@ export declare class Authenticator {
     */
     constructor(endpoints?: EndpointManager, tokens?: TokenManager);
     /**
-     * Controls the way the authentication should take place.
-     * Either by using dialog or by redirecting the current window.
-     * Defaults to the dialog flow.
-     */
-    static mode: AuthenticationMode;
-    /**
      * Authenticate based on the given provider
      * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
@@ -42,15 +22,15 @@ export declare class Authenticator {
      *
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
-     * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
+     * @return {Promise<IToken|ICode>} Returns a promise of the token or code or error.
      */
-    authenticate(provider: string, force?: boolean): Promise<IToken | ICode | IError>;
+    authenticate(provider: string, force?: boolean): Promise<IToken | ICode>;
     /**
      * POST Helper for exchanging the code with a given url.
      *
-     * @return {Promise<IToken|IError>} Returns a promise of the token or error.
+     * @return {Promise<IToken>} Returns a promise of the token or error.
      */
-    exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken | IError>;
+    exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken>;
     /**
      * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
      * If true then it calls messageParent by extracting the token information.
@@ -59,7 +39,11 @@ export declare class Authenticator {
      * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
-    static isAuthDialog: boolean;
+    static closeDialog(): boolean;
+    /**
+     * Check if the supplied url has either access_token or code or error
+     */
+    static isTokenUrl(url: string): boolean;
     /**
      * Check if the code is running inside of an Addin versus a Web Context.
      * The checks for Office and Word, Excel or OneNote objects.

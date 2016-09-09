@@ -101,7 +101,7 @@ var __extends = (this && this.__extends) || function (d, b) {
                 responseType: 'token',
                 scope: 'https://www.googleapis.com/auth/plus.me'
             };
-            var config = extend({}, defaults, overrides);
+            var config = extend({}, overrides, defaults);
             return this.add(exports.DefaultEndpoints.Google, config);
         };
         ;
@@ -125,7 +125,7 @@ var __extends = (this && this.__extends) || function (d, b) {
                 nonce: true,
                 state: true
             };
-            var config = extend({}, defaults, overrides);
+            var config = extend({}, overrides, defaults);
             this.add(exports.DefaultEndpoints.Microsoft, config);
         };
         ;
@@ -148,7 +148,7 @@ var __extends = (this && this.__extends) || function (d, b) {
                 nonce: true,
                 state: true
             };
-            var config = extend({}, defaults, overrides);
+            var config = extend({}, overrides, defaults);
             this.add(exports.DefaultEndpoints.Facebook, config);
         };
         ;
