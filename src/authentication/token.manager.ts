@@ -39,7 +39,7 @@ export class TokenManager extends Storage<IToken> {
      * Compute the expiration date based on the expires_in field in a OAuth token.
      */
     setExpiry(token: IToken) {
-        var expire = seconds => new Date(new Date().getTime() + ~~seconds * 1000);
+        var expire = seconds => seconds == null ? null : new Date(new Date().getTime() + ~~seconds * 1000);
         if (!(token == null) && token.expires_at == null) {
             token.expires_at = expire(token.expires_in);
         }

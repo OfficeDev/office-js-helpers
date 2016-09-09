@@ -23,8 +23,9 @@ export class Authenticator {
      * Authenticate based on the given provider.
      * Either uses DialogAPI or Window Popups based on where its being called from either Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
+     * If the cached token has expired then the authentication dialog is displayed.
      *
-     * WARNING: you have to manually check the expires_in or expires_at property to determine
+     * NOTE: you have to manually check the expires_in or expires_at property to determine
      * if the token has expired. Not all OAuth providers support refresh token flows.
      *
      * @param {string} provider Link to the provider.
@@ -33,8 +34,17 @@ export class Authenticator {
      */
     authenticate(provider: string, force: boolean = false): Promise<IToken | ICode> {
         let token = this.tokens.get(provider);
-        if (token != null && !force) {
-            return Promise.resolve(token);
+
+        if (token != null) {
+            if (token.expires_at != null) {
+                if (token.expires_at.getTime() - new Date().getTime() < 0) {
+                    force = true;
+                }
+            }
+
+            if (!force) {
+                return Promise.resolve(token);
+            }
         }
 
         let endpoint = this.endpoints.get(provider);
