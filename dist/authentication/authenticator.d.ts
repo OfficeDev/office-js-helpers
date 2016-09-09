@@ -33,13 +33,14 @@ export declare class Authenticator {
     exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken>;
     /**
      * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
-     * If true then it calls messageParent by extracting the token information.
+     * If true then it calls messageParent by extracting the token information, thereby closing the dialog.
+     * Otherwise, the caller should proceed with normal initialization of their application.
      *
      * @return {boolean}
      * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
-    static closeDialog(): boolean;
+    static isAuthDialog(): boolean;
     /**
      * Check if the supplied url has either access_token or code or error
      */
