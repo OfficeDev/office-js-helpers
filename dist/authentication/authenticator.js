@@ -15,8 +15,8 @@
         /**
          * @constructor
          *
-         * @param endpointManager Depends on an instance of EndpointManager
-         * @param TokenManager Depends on an instance of TokenManager
+         * @param endpointManager Depends on an instance of EndpointManager.
+         * @param TokenManager Depends on an instance of TokenManager.
         */
         function Authenticator(endpoints, tokens) {
             this.endpoints = endpoints;
@@ -27,8 +27,8 @@
                 this.tokens = new index_1.TokenManager();
         }
         /**
-         * Authenticate based on the given provider
-         * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
+         * Authenticate based on the given provider.
+         * Either uses DialogAPI or Window Popups based on where its being called from either Add-in or Web.
          * If the token was cached, the it retrieves the cached token.
          *
          * WARNING: you have to manually check the expires_in or expires_at property to determine
@@ -113,7 +113,7 @@
             }
         };
         /**
-         * Check if the supplied url has either access_token or code or error
+         * Check if the supplied url has either access_token or code or error.
          */
         Authenticator.isTokenUrl = function (url) {
             var regex = /(access_token|code|error)/gi;
@@ -144,6 +144,7 @@
             var popupWindow = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
             return new Promise(function (resolve, reject) {
                 try {
+                    var POLL_INTERVAL = 400;
                     var interval_1 = setInterval(function () {
                         try {
                             if (popupWindow.document.URL.indexOf(endpoint.redirectUrl) !== -1) {
@@ -174,7 +175,7 @@
                                 return reject({ error: exception });
                             }
                         }
-                    }, 400);
+                    }, POLL_INTERVAL);
                 }
                 catch (exception) {
                     popupWindow.close();

@@ -18,39 +18,38 @@ export declare class Storage<T> extends Dictionary<T> {
     */
     constructor(_container: string, type?: StorageType);
     /**
-     * Switch the storage type
-     * Switches the storage type and then reloads the in-memory collection
+     * Switch the storage type.
+     * Switches the storage type and then reloads the in-memory collection.
      *
-     * @type {StorageType} type The desired storage to be used
+     * @type {StorageType} type The desired storage to be used.
      */
     switchStorage(type: StorageType): void;
     /**
-     * Add an item
-     * Extends Dictionary's implementation with a save to the storage.
-     * Throws if the same key is available twice.
+     * Add an item.
+     * Extends Dictionary's implementation of insert, with a save to the storage.
      */
     add(item: string, value: T): T;
     /**
-     * Remove an item
-     * Extends Dictionary's implementation with a save to the storage
+     * Remove an item.
+     * Extends Dictionary's implementation with a save to the storage.
      */
     remove(item: string): T;
     /**
-     * Clear the storage
-     * Extends Dictionary's implementation with a save to the storage
+     * Clear the storage.
+     * Extends Dictionary's implementation with a save to the storage.
      */
     clear(): void;
     /**
      * Clear all storages
-     * completely clears all storages
+     * Completely clears both the localStorage and sessionStorage.
      */
     static clearAll(): void;
     /**
-     * Saves the current state to the storage
+     * Saves the current state to the storage.
      */
     save(): void;
     /**
-     * Refreshes the storage with the current localstorage values.
+     * Refreshes the storage with the current localStorage values.
      */
     load(): {
         [index: string]: T;

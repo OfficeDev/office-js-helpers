@@ -7,8 +7,8 @@ export class Authenticator {
     /**
      * @constructor
      *
-     * @param endpointManager Depends on an instance of EndpointManager
-     * @param TokenManager Depends on an instance of TokenManager
+     * @param endpointManager Depends on an instance of EndpointManager.
+     * @param TokenManager Depends on an instance of TokenManager.
     */
     constructor(
         public endpoints?: EndpointManager,
@@ -19,8 +19,8 @@ export class Authenticator {
     }
 
     /**
-     * Authenticate based on the given provider
-     * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
+     * Authenticate based on the given provider.
+     * Either uses DialogAPI or Window Popups based on where its being called from either Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
      *
      * WARNING: you have to manually check the expires_in or expires_at property to determine
@@ -115,7 +115,7 @@ export class Authenticator {
     }
 
     /**
-     * Check if the supplied url has either access_token or code or error
+     * Check if the supplied url has either access_token or code or error.
      */
     static isTokenUrl(url: string) {
         var regex = /(access_token|code|error)/gi;
@@ -153,6 +153,7 @@ export class Authenticator {
 
         return new Promise<IToken | ICode>((resolve, reject) => {
             try {
+                const POLL_INTERVAL = 400;
                 let interval = setInterval(() => {
                     try {
                         if (popupWindow.document.URL.indexOf(endpoint.redirectUrl) !== -1) {
@@ -182,7 +183,7 @@ export class Authenticator {
                             return reject(<IError>{ error: exception });
                         }
                     }
-                }, 400);
+                }, POLL_INTERVAL);
             }
             catch (exception) {
                 popupWindow.close();

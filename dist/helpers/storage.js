@@ -38,10 +38,10 @@ var __extends = (this && this.__extends) || function (d, b) {
             this.switchStorage(type);
         }
         /**
-         * Switch the storage type
-         * Switches the storage type and then reloads the in-memory collection
+         * Switch the storage type.
+         * Switches the storage type and then reloads the in-memory collection.
          *
-         * @type {StorageType} type The desired storage to be used
+         * @type {StorageType} type The desired storage to be used.
          */
         Storage.prototype.switchStorage = function (type) {
             this._storage = type === StorageType.LocalStorage ? localStorage : sessionStorage;
@@ -51,9 +51,8 @@ var __extends = (this && this.__extends) || function (d, b) {
             this.load();
         };
         /**
-         * Add an item
-         * Extends Dictionary's implementation with a save to the storage.
-         * Throws if the same key is available twice.
+         * Add an item.
+         * Extends Dictionary's implementation of insert, with a save to the storage.
          */
         Storage.prototype.add = function (item, value) {
             _super.prototype.insert.call(this, item, value);
@@ -61,8 +60,8 @@ var __extends = (this && this.__extends) || function (d, b) {
             return value;
         };
         /**
-         * Remove an item
-         * Extends Dictionary's implementation with a save to the storage
+         * Remove an item.
+         * Extends Dictionary's implementation with a save to the storage.
          */
         Storage.prototype.remove = function (item) {
             var value = _super.prototype.remove.call(this, item);
@@ -70,8 +69,8 @@ var __extends = (this && this.__extends) || function (d, b) {
             return value;
         };
         /**
-         * Clear the storage
-         * Extends Dictionary's implementation with a save to the storage
+         * Clear the storage.
+         * Extends Dictionary's implementation with a save to the storage.
          */
         Storage.prototype.clear = function () {
             _super.prototype.clear.call(this);
@@ -79,20 +78,20 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         /**
          * Clear all storages
-         * completely clears all storages
+         * Completely clears both the localStorage and sessionStorage.
          */
         Storage.clearAll = function () {
             window.localStorage.clear();
             window.sessionStorage.clear();
         };
         /**
-         * Saves the current state to the storage
+         * Saves the current state to the storage.
          */
         Storage.prototype.save = function () {
             this._storage[this._container] = JSON.stringify(this.items);
         };
         /**
-         * Refreshes the storage with the current localstorage values.
+         * Refreshes the storage with the current localStorage values.
          */
         Storage.prototype.load = function () {
             _super.prototype.clear.call(this);

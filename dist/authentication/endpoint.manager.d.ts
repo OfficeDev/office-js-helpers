@@ -33,46 +33,46 @@ export declare class EndpointManager extends Storage<IEndpoint> {
      */
     currentHost: string;
     /**
-     * Extends Storage's default add method
-     * Registers a new OAuth Endpoint
+     * Extends Storage's default add method.
+     * Registers a new OAuth Endpoint.
      *
      * @param {string} provider Unique name for the registered OAuth Endpoint.
-     * @param {object} config Valid Endpoint configuration
+     * @param {object} config Valid Endpoint configuration.
      * @see {@link IEndpoint}.
      * @return {object} Returns the added endpoint.
      */
     add(provider: string, config: IEndpoint): IEndpoint;
     /**
-     * Register Google Implicit OAuth
-     * If overrides is left empty, the default scope is limited to basic profile information
+     * Register Google Implicit OAuth.
+     * If overrides is left empty, the default scope is limited to basic profile information.
      *
-     * @param {string} clientId ClientID for the Google App
-     * @param {object} config Valid Endpoint configuration to override the defaults
+     * @param {string} clientId ClientID for the Google App.
+     * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
     registerGoogleAuth(clientId: string, overrides?: IEndpoint): IEndpoint;
     /**
-     * Register Microsoft Implicit OAuth
-     * If overrides is left empty, the default scope is limited to basic profile information
+     * Register Microsoft Implicit OAuth.
+     * If overrides is left empty, the default scope is limited to basic profile information.
      *
-     * @param {string} clientId ClientID for the Microsoft App
-     * @param {object} config Valid Endpoint configuration to override the defaults
+     * @param {string} clientId ClientID for the Microsoft App.
+     * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
     registerMicrosoftAuth(clientId: string, overrides?: IEndpoint): void;
     /**
-     * Register Facebook Implicit OAuth
-     * If overrides is left empty, the default scope is limited to basic profile information
+     * Register Facebook Implicit OAuth.
+     * If overrides is left empty, the default scope is limited to basic profile information.
      *
-     * @param {string} clientId ClientID for the Facebook App
-     * @param {object} config Valid Endpoint configuration to override the defaults
+     * @param {string} clientId ClientID for the Facebook App.
+     * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
     registerFacebookAuth(clientId: string, overrides?: IEndpoint): void;
     /**
-     * Helper to generate the OAuth login url
+     * Helper to generate the OAuth login url.
      *
-     * @param {object} config Valid Endpoint configuration
+     * @param {object} config Valid Endpoint configuration.
      * @return {object} Returns the added endpoint.
      */
     static getLoginUrl(endpointConfig: IEndpoint): string;

@@ -13,7 +13,7 @@ var __extends = (this && this.__extends) || function (d, b) {
 })(function (require, exports) {
     "use strict";
     var index_1 = require('../helpers/index');
-    // Underscore.js implementation of extend
+    // Underscore.js implementation of extend.
     // https://github.com/jashkenas/underscore/blob/master/underscore.js
     var extend = function (obj) {
         var defaults = [];
@@ -69,11 +69,11 @@ var __extends = (this && this.__extends) || function (d, b) {
             configurable: true
         });
         /**
-         * Extends Storage's default add method
-         * Registers a new OAuth Endpoint
+         * Extends Storage's default add method.
+         * Registers a new OAuth Endpoint.
          *
          * @param {string} provider Unique name for the registered OAuth Endpoint.
-         * @param {object} config Valid Endpoint configuration
+         * @param {object} config Valid Endpoint configuration.
          * @see {@link IEndpoint}.
          * @return {object} Returns the added endpoint.
          */
@@ -85,11 +85,11 @@ var __extends = (this && this.__extends) || function (d, b) {
             return _super.prototype.add.call(this, provider, config);
         };
         /**
-         * Register Google Implicit OAuth
-         * If overrides is left empty, the default scope is limited to basic profile information
+         * Register Google Implicit OAuth.
+         * If overrides is left empty, the default scope is limited to basic profile information.
          *
-         * @param {string} clientId ClientID for the Google App
-         * @param {object} config Valid Endpoint configuration to override the defaults
+         * @param {string} clientId ClientID for the Google App.
+         * @param {object} config Valid Endpoint configuration to override the defaults.
          * @return {object} Returns the added endpoint.
          */
         EndpointManager.prototype.registerGoogleAuth = function (clientId, overrides) {
@@ -106,11 +106,11 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         ;
         /**
-         * Register Microsoft Implicit OAuth
-         * If overrides is left empty, the default scope is limited to basic profile information
+         * Register Microsoft Implicit OAuth.
+         * If overrides is left empty, the default scope is limited to basic profile information.
          *
-         * @param {string} clientId ClientID for the Microsoft App
-         * @param {object} config Valid Endpoint configuration to override the defaults
+         * @param {string} clientId ClientID for the Microsoft App.
+         * @param {object} config Valid Endpoint configuration to override the defaults.
          * @return {object} Returns the added endpoint.
          */
         EndpointManager.prototype.registerMicrosoftAuth = function (clientId, overrides) {
@@ -130,11 +130,11 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         ;
         /**
-         * Register Facebook Implicit OAuth
-         * If overrides is left empty, the default scope is limited to basic profile information
+         * Register Facebook Implicit OAuth.
+         * If overrides is left empty, the default scope is limited to basic profile information.
          *
-         * @param {string} clientId ClientID for the Facebook App
-         * @param {object} config Valid Endpoint configuration to override the defaults
+         * @param {string} clientId ClientID for the Facebook App.
+         * @param {object} config Valid Endpoint configuration to override the defaults.
          * @return {object} Returns the added endpoint.
          */
         EndpointManager.prototype.registerFacebookAuth = function (clientId, overrides) {
@@ -153,18 +153,16 @@ var __extends = (this && this.__extends) || function (d, b) {
         };
         ;
         /**
-         * Helper to generate the OAuth login url
+         * Helper to generate the OAuth login url.
          *
-         * @param {object} config Valid Endpoint configuration
+         * @param {object} config Valid Endpoint configuration.
          * @return {object} Returns the added endpoint.
          */
         EndpointManager.getLoginUrl = function (endpointConfig) {
-            var rand = function (limit, start) {
-                if (limit === void 0) { limit = 10; }
-                if (start === void 0) { start = 0; }
-                return Math.floor(Math.random() * limit + start);
-            };
-            var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '', state = endpointConfig.state && rand(10000), nonce = endpointConfig.nonce && rand(10000);
+            var rand = function () { return Math.floor(Math.random() * 1000000 + 0); };
+            var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
+            var state = endpointConfig.state && rand();
+            var nonce = endpointConfig.nonce && rand();
             var urlSegments = [
                 'response_type=' + endpointConfig.responseType,
                 'client_id=' + encodeURIComponent(endpointConfig.clientId),

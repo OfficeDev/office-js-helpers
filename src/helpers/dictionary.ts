@@ -43,7 +43,7 @@ export class Dictionary<T> {
 
     /**
      * Inserts an item into the dictionary.
-     * If an item already exists with the same key, it will be overridden by the new value
+     * If an item already exists with the same key, it will be overridden by the new value.
      *
      * @param {string} key The key of the item.
      * @param {object} value The item to be added.
@@ -120,7 +120,7 @@ export class Dictionary<T> {
     /**
      * Number of items in the dictionary.
      *
-     * @return {number} Returns the number of items in the dictionary
+     * @return {number} Returns the number of items in the dictionary.
      */
     get count(): number {
         return this.values().length;
