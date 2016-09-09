@@ -3,11 +3,12 @@
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", '../authentication/index'], factory);
+        define(["require", "exports", '../authentication/endpoint.manager', '../authentication/token.manager'], factory);
     }
 })(function (require, exports) {
     "use strict";
-    var index_1 = require('../authentication/index');
+    var endpoint_manager_1 = require('../authentication/endpoint.manager');
+    var token_manager_1 = require('../authentication/token.manager');
     /**
      * Helper for performing Implicit OAuth Authentication with registered endpoints.
      */
@@ -22,9 +23,9 @@
             this.endpoints = endpoints;
             this.tokens = tokens;
             if (endpoints == null)
-                this.endpoints = new index_1.EndpointManager();
+                this.endpoints = new endpoint_manager_1.EndpointManager();
             if (tokens == null)
-                this.tokens = new index_1.TokenManager();
+                this.tokens = new token_manager_1.TokenManager();
         }
         /**
          * Authenticate based on the given provider.
@@ -107,7 +108,7 @@
                 if (!Authenticator.isTokenUrl(location.href)) {
                     return false;
                 }
-                var token = index_1.TokenManager.getToken(location.href, location.origin);
+                var token = token_manager_1.TokenManager.getToken(location.href, location.origin);
                 Office.context.ui.messageParent(JSON.stringify(token));
                 return true;
             }
@@ -138,7 +139,7 @@
         });
         Authenticator.prototype._openInWindowPopup = function (endpoint) {
             var _this = this;
-            var url = index_1.EndpointManager.getLoginUrl(endpoint);
+            var url = endpoint_manager_1.EndpointManager.getLoginUrl(endpoint);
             var windowSize = endpoint.windowSize || "width=400,height=600";
             var windowFeatures = windowSize + ",menubar=no,toolbar=no,location=no,resizable=no,scrollbars=yes,status=no";
             var popupWindow = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
@@ -149,7 +150,7 @@
                         try {
                             if (popupWindow.document.URL.indexOf(endpoint.redirectUrl) !== -1) {
                                 clearInterval(interval_1);
-                                var result = index_1.TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
+                                var result = token_manager_1.TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                                 if (result == null)
                                     return reject({ error: 'No access_token or code could be parsed.' });
                                 else if ('code' in result) {
@@ -185,7 +186,7 @@
         };
         Authenticator.prototype._openInDialog = function (endpoint) {
             var _this = this;
-            var url = index_1.EndpointManager.getLoginUrl(endpoint);
+            var url = endpoint_manager_1.EndpointManager.getLoginUrl(endpoint);
             var options = {
                 height: 35,
                 width: 35

@@ -1,4 +1,4 @@
-import { Storage } from '../helpers/index';
+import { Storage } from '../helpers/storage';
 export interface IToken {
     provider: string;
     id_token?: string;

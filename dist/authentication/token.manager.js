@@ -8,11 +8,11 @@ var __extends = (this && this.__extends) || function (d, b) {
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", '../helpers/index'], factory);
+        define(["require", "exports", '../helpers/storage'], factory);
     }
 })(function (require, exports) {
     "use strict";
-    var index_1 = require('../helpers/index');
+    var storage_1 = require('../helpers/storage');
     /**
      * Helper for caching and managing OAuth Tokens.
      */
@@ -22,7 +22,7 @@ var __extends = (this && this.__extends) || function (d, b) {
          * @constructor
         */
         function TokenManager() {
-            _super.call(this, 'OAuth2Tokens', index_1.StorageType.LocalStorage);
+            _super.call(this, 'OAuth2Tokens', storage_1.StorageType.LocalStorage);
         }
         /**
          * Compute the expiration date based on the expires_in field in a OAuth token.
@@ -80,7 +80,7 @@ var __extends = (this && this.__extends) || function (d, b) {
             return params;
         };
         return TokenManager;
-    }(index_1.Storage));
+    }(storage_1.Storage));
     exports.TokenManager = TokenManager;
 });
 //# sourceMappingURL=token.manager.js.map

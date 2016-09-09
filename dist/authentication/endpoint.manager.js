@@ -8,11 +8,11 @@ var __extends = (this && this.__extends) || function (d, b) {
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", '../helpers/index'], factory);
+        define(["require", "exports", '../helpers/storage'], factory);
     }
 })(function (require, exports) {
     "use strict";
-    var index_1 = require('../helpers/index');
+    var storage_1 = require('../helpers/storage');
     // Underscore.js implementation of extend.
     // https://github.com/jashkenas/underscore/blob/master/underscore.js
     var extend = function (obj) {
@@ -53,7 +53,7 @@ var __extends = (this && this.__extends) || function (d, b) {
          * @constructor
         */
         function EndpointManager() {
-            _super.call(this, 'OAuth2Endpoints', index_1.StorageType.LocalStorage);
+            _super.call(this, 'OAuth2Endpoints', storage_1.StorageType.LocalStorage);
         }
         Object.defineProperty(EndpointManager.prototype, "currentHost", {
             /**
@@ -181,7 +181,7 @@ var __extends = (this && this.__extends) || function (d, b) {
             return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
         };
         return EndpointManager;
-    }(index_1.Storage));
+    }(storage_1.Storage));
     exports.EndpointManager = EndpointManager;
 });
 //# sourceMappingURL=endpoint.manager.js.map
