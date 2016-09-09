@@ -3,14 +3,14 @@
         var v = factory(require, exports); if (v !== undefined) module.exports = v;
     }
     else if (typeof define === 'function' && define.amd) {
-        define(["require", "exports", './helpers', './authentication'], factory);
+        define(["require", "exports", './helpers/index', './authentication/index'], factory);
     }
 })(function (require, exports) {
     "use strict";
     function __export(m) {
         for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
     }
-    __export(require('./helpers'));
-    __export(require('./authentication'));
+    __export(require('./helpers/index'));
+    __export(require('./authentication/index'));
 });
 //# sourceMappingURL=index.js.map

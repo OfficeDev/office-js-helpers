@@ -1,4 +1,4 @@
-import { Storage } from '../helpers';
+import { Storage } from '../helpers/index';
 export declare const DefaultEndpoints: {
     Google: string;
     Microsoft: string;
