@@ -1,4 +1,4 @@
-import { Storage, StorageType } from '../helpers';
+import { Storage, StorageType } from '../helpers/index';
 
 export interface IToken {
     provider: string;

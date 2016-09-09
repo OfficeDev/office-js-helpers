@@ -1,4 +1,4 @@
-import {EndpointManager, TokenManager, IEndpoint, IToken, ICode, IError} from '../authentication';
+import {EndpointManager, TokenManager, IEndpoint, IToken, ICode, IError} from '../authentication/index';
 
 /**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
