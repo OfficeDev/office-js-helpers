@@ -57,7 +57,7 @@ export class TokenManager extends Storage<IToken> {
     add(provider: string, value: IToken) {
         value.provider = provider;
         this.setExpiry(value);
-        return super.insert(provider, value);
+        return super.add(provider, value);
     }
 
     /**
@@ -84,14 +84,6 @@ export class TokenManager extends Storage<IToken> {
         }
 
         return this._extractParams(rightPart);
-    }
-
-    /**
-     * Check if the supplied url has either access_token or code or error
-     */
-    static isTokenUrl(url: string) {
-        var regex = /(access_token|code|error)/gi;
-        return regex.test(url);
     }
 
     private static _extractParams(segment: string): any {

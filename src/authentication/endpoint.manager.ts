@@ -100,7 +100,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             scope: 'https://www.googleapis.com/auth/plus.me'
         };
 
-        var config = extend({}, defaults, overrides);
+        var config = extend({}, overrides, defaults);
         return this.add(DefaultEndpoints.Google, config);
     };
 
@@ -125,7 +125,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = extend({}, defaults, overrides);
+        var config = extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Microsoft, config);
     };
 
@@ -149,7 +149,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = extend({}, defaults, overrides);
+        var config = extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Facebook, config);
     };
 

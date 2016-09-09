@@ -1,22 +1,6 @@
 import {EndpointManager, TokenManager, IEndpoint, IToken, ICode, IError} from '../authentication';
 
 /**
- * Enumeration for the supported modes of Authentication.
- * Either dialog or redirection.
- */
-export enum AuthenticationMode {
-    /**
-     * Opens a the authorize url inside of a dialog.
-     */
-    Dialog,
-
-    /**
-     * Redirects the current window to the authorize url.
-     */
-    Redirect
-}
-
-/**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
@@ -35,13 +19,6 @@ export class Authenticator {
     }
 
     /**
-     * Controls the way the authentication should take place.
-     * Either by using dialog or by redirecting the current window.
-     * Defaults to the dialog flow.
-     */
-    static mode: AuthenticationMode = AuthenticationMode.Dialog;
-
-    /**
      * Authenticate based on the given provider
      * Either uses DialogAPI or Window Popups based on where its being called from viz. Add-in or Web.
      * If the token was cached, the it retrieves the cached token.
@@ -51,9 +28,9 @@ export class Authenticator {
      *
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
-     * @return {Promise<IToken|ICode|IError>} Returns a promise of the token or code or error.
+     * @return {Promise<IToken|ICode>} Returns a promise of the token or code or error.
      */
-    authenticate(provider: string, force: boolean = false): Promise<IToken | ICode | IError> {
+    authenticate(provider: string, force: boolean = false): Promise<IToken | ICode> {
         let token = this.tokens.get(provider);
         if (token != null && !force) {
             return Promise.resolve(token);
@@ -64,23 +41,16 @@ export class Authenticator {
             return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
         }
 
-        if (Authenticator.mode == AuthenticationMode.Redirect) {
-            let url = EndpointManager.getLoginUrl(endpoint);
-            location.replace(url);
-            return Promise.reject(<IError>{ error: `Redirecting window to authentication provider.` }) as any;
-        }
-        else {
-            var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
-            return auth.catch(error => console.error(error));
-        }
+        var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+        return auth.catch(error => console.error(error));
     }
 
     /**
      * POST Helper for exchanging the code with a given url.
      *
-     * @return {Promise<IToken|IError>} Returns a promise of the token or error.
+     * @return {Promise<IToken>} Returns a promise of the token or error.
      */
-    exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken | IError> {
+    exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken> {
         return new Promise((resolve, reject) => {
             var xhr = new XMLHttpRequest();
             xhr.open('POST', url);
@@ -128,12 +98,12 @@ export class Authenticator {
      * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
-    static tryCloseDialog(): boolean {
+    static closeDialog(): boolean {
         if (!Authenticator.isAddin) {
             return false;
         }
         else {
-            if (!TokenManager.isTokenUrl(location.href)) {
+            if (!Authenticator.isTokenUrl(location.href)) {
                 return false;
             }
 
@@ -141,6 +111,14 @@ export class Authenticator {
             Office.context.ui.messageParent(JSON.stringify(token));
             return true;
         }
+    }
+
+    /**
+     * Check if the supplied url has either access_token or code or error
+     */
+    static isTokenUrl(url: string) {
+        var regex = /(access_token|code|error)/gi;
+        return regex.test(url);
     }
 
     /**
@@ -166,13 +144,13 @@ export class Authenticator {
         Authenticator._isAddin = value;
     }
 
-    private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken | ICode | IError> {
+    private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken | ICode> {
         let url = EndpointManager.getLoginUrl(endpoint);
         let windowSize = endpoint.windowSize || "width=400,height=600";
         let windowFeatures = windowSize + ",menubar=no,toolbar=no,location=no,resizable=no,scrollbars=yes,status=no";
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
-        return new Promise<IToken | ICode | IError>((resolve, reject) => {
+        return new Promise<IToken | ICode>((resolve, reject) => {
             try {
                 let interval = setInterval(() => {
                     try {
@@ -212,7 +190,7 @@ export class Authenticator {
         });
     }
 
-    private _openInDialog(endpoint: IEndpoint): Promise<IToken | ICode | IError> {
+    private _openInDialog(endpoint: IEndpoint): Promise<IToken | ICode> {
         let url = EndpointManager.getLoginUrl(endpoint);
 
         var options: Office.DialogOptions = {
@@ -220,7 +198,7 @@ export class Authenticator {
             width: 35
         };
 
-        return new Promise<IToken | IError>((resolve, reject) => {
+        return new Promise<IToken | ICode>((resolve, reject) => {
             Office.context.ui.displayDialogAsync(url, options, result => {
                 var dialog = result.value;
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {

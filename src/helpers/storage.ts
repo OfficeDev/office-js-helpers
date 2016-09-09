@@ -7,16 +7,16 @@ export enum StorageType {
 
 /**
  * Helper for creating and querying Local Storage or Session Storage.
- * @see Uses {@link Dictionary} to create an in-memory copy of 
- * the storage for faster reads. Writes update the actual storage. 
+ * @see Uses {@link Dictionary} to create an in-memory copy of
+ * the storage for faster reads. Writes update the actual storage.
  */
 export class Storage<T> extends Dictionary<T>{
     private _storage = null;
 
     /**
-     * @constructor     
+     * @constructor
      * @param {string} container Container name to be created in the LocalStorage.
-     * @param {StorageType} type[optional] Storage Type to be used, defaults to Local Storage.        
+     * @param {StorageType} type[optional] Storage Type to be used, defaults to Local Storage.
     */
     constructor(private _container: string, type?: StorageType) {
         super();
@@ -27,8 +27,8 @@ export class Storage<T> extends Dictionary<T>{
     /**
      * Switch the storage type
      * Switches the storage type and then reloads the in-memory collection
-     * 
-     * @type {StorageType} type The desired storage to be used     
+     *
+     * @type {StorageType} type The desired storage to be used
      */
     switchStorage(type: StorageType) {
         this._storage = type === StorageType.LocalStorage ? localStorage : sessionStorage;
@@ -45,16 +45,6 @@ export class Storage<T> extends Dictionary<T>{
      * Throws if the same key is available twice.
      */
     add(item: string, value: T): T {
-        super.add(item, value);
-        this.save();
-        return value;
-    }
-
-    /**
-     * Insert an item
-     * Extends Dictionary's implementation with a save to the storage          
-     */
-    insert(item: string, value: T): T {
         super.insert(item, value);
         this.save();
         return value;
@@ -62,7 +52,7 @@ export class Storage<T> extends Dictionary<T>{
 
     /**
      * Remove an item
-     * Extends Dictionary's implementation with a save to the storage          
+     * Extends Dictionary's implementation with a save to the storage
      */
     remove(item: string) {
         var value = super.remove(item);
@@ -72,7 +62,7 @@ export class Storage<T> extends Dictionary<T>{
 
     /**
      * Clear the storage
-     * Extends Dictionary's implementation with a save to the storage          
+     * Extends Dictionary's implementation with a save to the storage
      */
     clear() {
         super.clear();
@@ -81,7 +71,7 @@ export class Storage<T> extends Dictionary<T>{
 
     /**
      * Clear all storages
-     * completely clears all storages          
+     * completely clears all storages
      */
     static clearAll() {
         window.localStorage.clear();
@@ -89,15 +79,15 @@ export class Storage<T> extends Dictionary<T>{
     }
 
     /**
-     * Saves the current state to the storage       
-     */    
+     * Saves the current state to the storage
+     */
     save() {
         this._storage[this._container] = JSON.stringify(this.items);
     }
 
     /**
-     * Refreshes the storage with the current localstorage values.       
-     */        
+     * Refreshes the storage with the current localstorage values.
+     */
     load() {
         super.clear();
         this.items = JSON.parse(this._storage[this._container]);
