@@ -1,4 +1,4 @@
-import { Storage, StorageType } from '../helpers/index';
+import { Storage, StorageType } from '../helpers/storage';
 
 // Underscore.js implementation of extend.
 // https://github.com/jashkenas/underscore/blob/master/underscore.js
