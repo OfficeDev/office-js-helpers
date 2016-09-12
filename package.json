@@ -12,10 +12,11 @@
   },
   "version": "1.0.0",
   "main": "src/index.ts",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/office-js-helpers.d.ts",
   "license": "MIT",
   "files": [
-    "dist/"
+    "dist/",
+    "src/"
   ],
   "dependencies": {
     "core-js": "^2.4.1"
