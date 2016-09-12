@@ -1,16 +1,15 @@
 var webpack = require('webpack');
+var declarationBundler = require('declaration-bundler-webpack-plugin');
 var path = require('path');
 
-var library = 'office-js-helpers';
+var library = 'OfficeJSHelpers';
 
 module.exports = {
-    entry: {
-        "office-js-helpers": "./src/index.ts"
-    },
+    entry: "./src/index.ts",
     devtool: 'source-map',
     output: {
         path: path.resolve('./dist'),
-        filename: library + '.js',
+        filename: 'office-js-helpers.js',
         library: library,
         libraryTarget: 'umd',
         umdNamedDefine: true
@@ -35,15 +34,5 @@ module.exports = {
                 exclude: /(node_modules|bower_components)/
             }
         ]
-    },
-
-    plugins: [
-        // new webpack.optimize.DedupePlugin(),
-        // new webpack.optimize.OccurrenceOrderPlugin(),
-        // new webpack.optimize.UglifyJsPlugin({
-        //    compress: {
-        //        warnings: false
-        //    }
-        // })
-    ]
+    }
 };

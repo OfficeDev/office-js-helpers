@@ -1,13 +1,12 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "umd",
+    "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
     "rootDir": "./src",
-    "outDir": "./dist",
     "sourceMap": true
   },
   "exclude": [
