@@ -592,6 +592,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            this.endpoints = new endpoint_manager_1.EndpointManager();
 	        if (tokens == null)
 	            this.tokens = new token_manager_1.TokenManager();
+	        Authenticator.isAddin = true;
 	    }
 	    /**
 	     * Authenticate based on the given provider.
@@ -623,8 +624,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (endpoint == null) {
 	            return Promise.reject({ error: "No such registered endpoint: " + provider + " could be found." });
 	        }
-	        var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
-	        return auth.catch(function (error) { return console.error(error); });
+	        return Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
 	    };
 	    /**
 	     * POST Helper for exchanging the code with a given url.

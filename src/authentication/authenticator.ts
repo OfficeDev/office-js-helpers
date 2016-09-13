@@ -17,6 +17,7 @@ export class Authenticator {
     ) {
         if (endpoints == null) this.endpoints = new EndpointManager();
         if (tokens == null) this.tokens = new TokenManager();
+        Authenticator.isAddin = true;
     }
 
     /**
@@ -52,8 +53,7 @@ export class Authenticator {
             return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
         }
 
-        var auth = Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
-        return auth.catch(error => console.error(error));
+        return Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
     }
 
     /**
