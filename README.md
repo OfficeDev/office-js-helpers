@@ -35,7 +35,7 @@ Reference the library inside of your `.html` page using:
 
 The Authentication helper is built for standards compliant OAuth Implicit Flow. Out of the box it directly integrates with Microsoft, Google and Facebook authentication.
 
-> Microsoft integration uses the AzureAD AppModel v2 endpoints which enable Converged Authentication. It enables uses to login using their Work, School or Personal accounts.
+> Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School or Personal accounts.
 
 #### Setup
 Inside of your `Office.initialize` function add the following check:
