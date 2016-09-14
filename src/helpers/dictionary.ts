@@ -8,11 +8,7 @@ export class Dictionary<T> {
      * @param {object} items Initial seed of items.
     */
     constructor(protected items?: { [index: string]: T }) {
-        if (!(this.items === new Object(this.items))) {
-            throw new Error('items is expected to be an object');
-        }
-
-        if (this.items == null) {
+        if (!(this.items === new Object(this.items)) || Array.isArray(this.items)) {
             this.items = {};
         }
     }
@@ -54,6 +50,9 @@ export class Dictionary<T> {
      * @return {object} Returns the added item.
      */
     insert(key: string, value: T): T {
+        if (key == null) {
+            throw new Error('Key cannot be null or undefined');
+        }
         this.items[key] = value;
         return value;
     }
@@ -104,21 +103,12 @@ export class Dictionary<T> {
     }
 
     /**
-     * Lists all the values in the dictionary.
-     *
-     * @return {array} Returns all the values.
-     */
-    values(): T[] {
-        return Object.values(this.items);
-    }
-
-    /**
      * Get the dictionary.
      *
      * @return {object} Returns the dictionary if it contains data, null otherwise.
      */
     lookup(): { [key: string]: T } {
-        return this.keys().length ? this.items : null;
+        return this.keys().length ? JSON.parse(JSON.stringify(this.items)) : null;
     }
 
     /**
@@ -127,6 +117,6 @@ export class Dictionary<T> {
      * @return {number} Returns the number of items in the dictionary.
      */
     get count(): number {
-        return this.values().length;
+        return this.keys().length;
     };
 }

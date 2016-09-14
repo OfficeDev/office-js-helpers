@@ -6,11 +6,11 @@ var library = 'OfficeJSHelpers';
 
 module.exports = {
     entry: {
-        'office-js-helpers': "./src/index.ts"
+        'office-js-helpers': "./src/index.spec.ts",
     },
     devtool: 'source-map',
     output: {
-        path: path.resolve('./dist'),
+        path: path.resolve('./test'),
         filename: '[name].js',
         library: library,
         libraryTarget: 'umd',

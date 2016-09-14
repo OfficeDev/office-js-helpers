@@ -52,7 +52,7 @@ obj/**
 bin/**
 *.user
 temp
-tests
+test
 node_modules/**
 typings/**
 npm-debug.log
