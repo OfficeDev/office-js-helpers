@@ -1,6 +1,7 @@
 var webpack = require('webpack');
 var declarationBundler = require('declaration-bundler-webpack-plugin');
 var path = require('path');
+var HtmlWebpackPlugin = require('html-webpack-plugin');
 
 var library = 'OfficeJSHelpers';
 
@@ -11,17 +12,19 @@ module.exports = {
     devtool: 'source-map',
     output: {
         path: path.resolve('./test'),
-        filename: '[name].js',
+        filename: '[name].[hash].js',
         library: library,
         libraryTarget: 'umd',
         umdNamedDefine: true
     },
 
-    tslint: {
-        emitErrors: false,
-        failOnHint: false,
-        resourcePath: 'src'
-    },
+    plugins: [
+        new HtmlWebpackPlugin({
+            title: 'OfficeJS Helpers Test',
+            filename: 'index.html',
+            template: './tests.html'
+        })
+    ],
 
     resolve: {
         root: path.resolve('./src'),

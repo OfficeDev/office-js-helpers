@@ -9,10 +9,10 @@
     "postinstall": "typings install",
     "build": "npm run webpack-build && npm run gen-dts",
     "test": "npm run webpack-test",
-    "webpack-test": "webpack --config webpack.test.js --progress --colors",
-    "webpack-build": "rimraf dist && webpack --config webpack.build.js --progress --profile --bail --colors --display-modules",
+    "webpack-test": "webpack-dev-server --compress --inline --open --port 3000 --https --config config/webpack.test.js --progress --colors",
+    "webpack-build": "rimraf dist && webpack --config config/webpack.build.js --progress --profile --bail --colors --display-modules",
     "gen-dts": "rimraf temp && tsc -p tsconfig.json -outDir temp -d && npm run build-dts && rimraf temp",
-    "build-dts": "node dts-gen.js",
+    "build-dts": "node config/dts-gen.js",
     "lint": "tslint 'src/**/*.ts'"
   },
   "version": "1.0.0",
@@ -35,10 +35,8 @@
     "ts-loader": "^0.8.2",
     "webpack": "^1.13.1",
     "webpack-dev-server": "^1.15.1",
-    "jasmine-core": "^2.5.1",
-    "karma": "^1.3.0",
-    "karma-jasmine": "^1.0.2",
-    "karma-chrome-launcher": "^2.0.0"
+    "html-webpack-plugin": "^2.22.0",
+    "jasmine-core": "^2.5.1"
   },
   "keywords": [
     "OfficeJS",
