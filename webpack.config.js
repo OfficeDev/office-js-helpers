@@ -6,8 +6,7 @@ var library = 'OfficeJSHelpers';
 
 module.exports = {
     entry: {
-        'office-js-helpers': "./src/index.ts",
-        'office-js-helpers-tests': "./tests/index.ts"
+        'office-js-helpers': "./src/index.ts"
     },
     devtool: 'source-map',
     output: {

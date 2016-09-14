@@ -8,6 +8,10 @@ export class Dictionary<T> {
      * @param {object} items Initial seed of items.
     */
     constructor(protected items?: { [index: string]: T }) {
+        if (!(this.items === new Object(this.items))) {
+            throw new Error('items is expected to be an object');
+        }
+
         if (this.items == null) {
             this.items = {};
         }

@@ -81,6 +81,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	    */
 	    function Dictionary(items) {
 	        this.items = items;
+	        if (!(this.items === new Object(this.items))) {
+	            throw new Error('items is expected to be an object');
+	        }
 	        if (this.items == null) {
 	            this.items = {};
 	        }
