@@ -140,12 +140,12 @@ declare namespace officeJsHelpers {
        * @return {object} Returns the added endpoint.
        */
       static getLoginUrl(endpointConfig: IEndpoint): string;
+      private static _generateCryptoSafeRandom();
   }
   export interface IToken {
       provider: string;
       id_token?: string;
       access_token?: string;
-      refresh_token?: string;
       token_type?: string;
       scope?: string;
       state?: string;

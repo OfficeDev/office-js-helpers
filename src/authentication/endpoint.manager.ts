@@ -160,11 +160,9 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @return {object} Returns the added endpoint.
      */
     static getLoginUrl(endpointConfig: IEndpoint): string {
-        var rand = () => Math.floor(Math.random() * 1000000 + 0);
-
         var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
-        var state = endpointConfig.state && rand();
-        var nonce = endpointConfig.nonce && rand();
+        var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
+        var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 
         var urlSegments = [
             'response_type=' + endpointConfig.responseType,
@@ -184,5 +182,19 @@ export class EndpointManager extends Storage<IEndpoint> {
         }
 
         return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
+    }
+
+    private static _generateCryptoSafeRandom() {
+        var random = new Uint32Array(1);
+        if ('msCrypto' in window) {
+            (<any>window).msCrypto.getRandomValues(random);
+        }
+        else if ('crypto' in window) {
+            window.crypto.getRandomValues(random);
+        }
+        else {
+            random[0] = new Date().getTime();
+        }
+        return random[0];
     }
 }

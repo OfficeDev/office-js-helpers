@@ -542,10 +542,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return {object} Returns the added endpoint.
 	     */
 	    EndpointManager.getLoginUrl = function (endpointConfig) {
-	        var rand = function () { return Math.floor(Math.random() * 1000000 + 0); };
 	        var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
-	        var state = endpointConfig.state && rand();
-	        var nonce = endpointConfig.nonce && rand();
+	        var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
+	        var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 	        var urlSegments = [
 	            'response_type=' + endpointConfig.responseType,
 	            'client_id=' + encodeURIComponent(endpointConfig.clientId),
@@ -562,6 +561,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	            urlSegments.push(endpointConfig.extraQueryParameters);
 	        }
 	        return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
+	    };
+	    EndpointManager._generateCryptoSafeRandom = function () {
+	        var random = new Uint32Array(1);
+	        if ('msCrypto' in window) {
+	            window.msCrypto.getRandomValues(random);
+	        }
+	        else if ('crypto' in window) {
+	            window.crypto.getRandomValues(random);
+	        }
+	        else {
+	            random[0] = new Date().getTime();
+	        }
+	        return random[0];
 	    };
 	    return EndpointManager;
 	}(storage_1.Storage));
@@ -611,11 +623,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (force === void 0) { force = false; }
 	        var token = this.tokens.get(provider);
 	        if (token != null) {
-	            // if (token.expires_at != null) {
-	            //     if (token.expires_at.getTime() - new Date().getTime() < 0) {
-	            //         force = true;
-	            //     }
-	            // }
+	            if (token.expires_at != null) {
+	                token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at);
+	                if (token.expires_at.getTime() - new Date().getTime() < 0) {
+	                    force = true;
+	                }
+	            }
 	            if (!force) {
 	                return Promise.resolve(token);
 	            }

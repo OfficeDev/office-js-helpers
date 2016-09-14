@@ -37,11 +37,12 @@ export class Authenticator {
         let token = this.tokens.get(provider);
 
         if (token != null) {
-            // if (token.expires_at != null) {
-            //     if (token.expires_at.getTime() - new Date().getTime() < 0) {
-            //         force = true;
-            //     }
-            // }
+            if (token.expires_at != null) {
+                token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
+                if (token.expires_at.getTime() - new Date().getTime() < 0) {
+                    force = true;
+                }
+            }
 
             if (!force) {
                 return Promise.resolve(token);
