@@ -5,11 +5,14 @@ var path = require('path');
 var library = 'OfficeJSHelpers';
 
 module.exports = {
-    entry: "./src/index.ts",
+    entry: {
+        'office-js-helpers': "./src/index.ts",
+        'office-js-helpers-tests': "./tests/index.ts"
+    },
     devtool: 'source-map',
     output: {
         path: path.resolve('./dist'),
-        filename: 'office-js-helpers.js',
+        filename: '[name].js',
         library: library,
         libraryTarget: 'umd',
         umdNamedDefine: true
