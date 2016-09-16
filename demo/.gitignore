@@ -1,0 +1,12 @@
+!.gitignore
+
+# Ignore the following folders
+.vs/**
+obj/**
+bin/**
+*.user
+temp
+test
+node_modules/**
+typings/**
+npm-debug.log
