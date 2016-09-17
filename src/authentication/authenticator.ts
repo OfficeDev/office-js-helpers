@@ -200,8 +200,8 @@ export class Authenticator {
 
     private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {
         let url = EndpointManager.getLoginUrl(endpoint);
-        let windowSize = "width=400,height=600";
-        let windowFeatures = windowSize + ",menubar=no,toolbar=no,location=no,resizable=no,scrollbars=yes,status=no";
+        let windowSize = this._determineDialogSize().toPixels();
+        let windowFeatures = `width=${windowSize.width},height=${windowSize.height},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
         return new Promise<IToken>((resolve, reject) => {
@@ -245,13 +245,8 @@ export class Authenticator {
     private _openInDialog(endpoint: IEndpoint): Promise<IToken> {
         let url = EndpointManager.getLoginUrl(endpoint);
 
-        var options: Office.DialogOptions = {
-            height: 48000 / window.screen.height,
-            width: 64000 / window.screen.width
-        };
-
         return new Promise<IToken | ICode>((resolve, reject) => {
-            Office.context.ui.displayDialogAsync(url, options, result => {
+            Office.context.ui.displayDialogAsync(url, this._determineDialogSize(), result => {
                 var dialog = result.value;
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {
                     dialog.close();
@@ -279,5 +274,58 @@ export class Authenticator {
                 });
             });
         });
+    }
+
+    private _determineDialogSize() {
+        var screenHeight = window.screen.height;
+        var screenWidth = window.screen.width;
+
+        var minOrDefault = (value: number, isHorizontal: boolean) => {
+            if (orientation) {
+                return value < screenWidth ? value : screenWidth - 30;
+            }
+            else {
+                return value < screenHeight ? value : screenHeight - 30;
+            }
+        }
+
+        var percentage = (value: number, isHorizontal: boolean) => isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight);
+
+        if (screenWidth <= 640) {
+            return {
+                width: percentage(screenWidth - 30, true),
+                height: percentage(screenHeight - 30, true),
+                toPixels: () => {
+                    return {
+                        width: (screenWidth - 30),
+                        height: (screenHeight - 30)
+                    }
+                }
+            };
+        }
+        else if (screenWidth <= 1007) {
+            return {
+                width: percentage(minOrDefault(800, true), true),
+                height: percentage(minOrDefault(600, true), true),
+                toPixels: () => {
+                    return {
+                        width: minOrDefault(800, true),
+                        height: minOrDefault(600, true)
+                    }
+                }
+            };
+        }
+        else {
+            return {
+                width: percentage(minOrDefault(1024, true), true),
+                height: percentage(minOrDefault(768, true), true),
+                toPixels: () => {
+                    return {
+                        width: minOrDefault(1024, true),
+                        height: minOrDefault(768, true)
+                    }
+                }
+            }
+        }
     }
 }
