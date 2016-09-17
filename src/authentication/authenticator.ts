@@ -2,6 +2,21 @@ import {EndpointManager, IEndpoint} from '../authentication/endpoint.manager';
 import {TokenManager, IToken, ICode, IError} from '../authentication/token.manager';
 
 /**
+ * Helper for determining authentication mode to be either via DialogAPI, Window or Redirect.
+ */
+export enum AuthenticationMode {
+    /**
+     * @param Dialog Run the authenticator inside of DialogAPI
+     */
+    Dialog,
+
+    /**
+     * @param Dialog Run the authenticator by redirecting the currrent window
+     */
+    Redirect
+}
+
+/**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
@@ -13,12 +28,19 @@ export class Authenticator {
     */
     constructor(
         public endpoints?: EndpointManager,
-        public tokens?: TokenManager
+        public tokens?: TokenManager,
+        public authenticationMode?: AuthenticationMode
     ) {
         if (endpoints == null) this.endpoints = new EndpointManager();
         if (tokens == null) this.tokens = new TokenManager();
-        Authenticator.isAddin = true;
+        this.mode = authenticationMode || AuthenticationMode.Dialog;
     }
+
+    /**
+     * @param mode registers the Authentication Mode to be used.
+     * @see {@link AuthenticationMode}
+     */
+    mode: AuthenticationMode;
 
     /**
      * Authenticate based on the given provider.
@@ -33,13 +55,14 @@ export class Authenticator {
      * @param {boolean} force Force re-authentication.
      * @return {Promise<IToken|ICode>} Returns a promise of the token or code or error.
      */
-    authenticate(provider: string, force: boolean = false): Promise<IToken | ICode> {
+    authenticate(provider: string, force: boolean = false): Promise<IToken> {
         let token = this.tokens.get(provider);
 
         if (token != null) {
             if (token.expires_at != null) {
                 token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
                 if (token.expires_at.getTime() - new Date().getTime() < 0) {
+                    console.warn(`Token for provider: ${provider} has expired. Re-authenticating...`);
                     force = true;
                 }
             }
@@ -54,18 +77,43 @@ export class Authenticator {
             return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
         }
 
-        return Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+        if (this.mode == AuthenticationMode.Redirect) {
+            return Promise.reject(() => {
+                location.replace(EndpointManager.getLoginUrl(endpoint));
+                return <IError>{ error: `Redirecting to endpoint: ${provider}` };
+            }) as any;
+        }
+        else {
+            return Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+        }
     }
 
     /**
-     * POST Helper for exchanging the code with a given url.
+     * Helper for exchanging the code with a registered Endpoint.
+     * The helper sends a POST request to the given Endpoint's tokenUrl.
      *
+     * The Endpoint must accept the data JSON input and return an 'access_token'
+     * in the JSON output.
+     *
+     * @param {string} provider Name of the provider.
+     * @param {object} data Data to be sent to the tokenUrl.
+     * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
      */
-    exchangeCodeForToken(url: string, data: any, headers?: any): Promise<IToken> {
+    exchangeCodeForToken(provider: string, data: any, headers?: any): Promise<IToken> {
         return new Promise((resolve, reject) => {
+            var endpoint = this.endpoints.get(provider);
+            if (endpoint.tokenUrl == null) {
+                console.warn(
+                    `We couldn\'t exchange the received code for an access_token.
+                    The value returned is not an access_token.
+                    Please set the tokenUrl property or refer to our docs.`
+                );
+                return resolve(data);
+            }
+
             var xhr = new XMLHttpRequest();
-            xhr.open('POST', url);
+            xhr.open('POST', endpoint.tokenUrl);
 
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('Content-Type', 'application/json');
@@ -78,11 +126,12 @@ export class Authenticator {
                 xhr.setRequestHeader(header, headers[header]);
             }
 
-            xhr.onload = function () {
+            xhr.onload = () => {
                 try {
                     if (xhr.status === 200) {
                         var json = JSON.parse(xhr.responseText);
                         if ('access_token' in json) {
+                            this.tokens.add(endpoint.provider, json)
                             resolve(json as IToken);
                         }
                         else {
@@ -143,45 +192,34 @@ export class Authenticator {
         if (Authenticator._isAddin == null) {
             Authenticator._isAddin =
                 window.hasOwnProperty('Office') &&
-                (
-                    window.hasOwnProperty('Word') ||
-                    window.hasOwnProperty('Excel') ||
-                    window.hasOwnProperty('OneNote')
-                );
+                !(Office.context.ui == null);
         }
 
         return Authenticator._isAddin;
     }
 
-    static set isAddin(value: boolean) {
-        Authenticator._isAddin = value;
-    }
-
-    private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken | ICode> {
+    private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {
         let url = EndpointManager.getLoginUrl(endpoint);
-        let windowSize = endpoint.windowSize || "width=400,height=600";
+        let windowSize = "width=400,height=600";
         let windowFeatures = windowSize + ",menubar=no,toolbar=no,location=no,resizable=no,scrollbars=yes,status=no";
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
-        return new Promise<IToken | ICode>((resolve, reject) => {
+        return new Promise<IToken>((resolve, reject) => {
             try {
                 const POLL_INTERVAL = 400;
                 let interval = setInterval(() => {
                     try {
                         if (popupWindow.document.URL.indexOf(endpoint.redirectUrl) !== -1) {
                             clearInterval(interval);
+                            popupWindow.close();
+
                             let result = TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                             if (result == null) return reject(<IError>{ error: 'No access_token or code could be parsed.' });
                             else if ('code' in result) {
-                                popupWindow.close();
-                                if (endpoint.tokenUrl != '') {
-                                    return resolve(this.exchangeCodeForToken(endpoint.tokenUrl, (<ICode>result).code));
-                                }
-                                return resolve(result as ICode);
+                                return resolve(this.exchangeCodeForToken(endpoint.provider, (<ICode>result)));
                             }
                             else if ('access_token' in result) {
                                 this.tokens.add(endpoint.provider, result as IToken);
-                                popupWindow.close();
                                 return resolve(result as IToken);
                             }
                             else {
@@ -204,12 +242,12 @@ export class Authenticator {
         });
     }
 
-    private _openInDialog(endpoint: IEndpoint): Promise<IToken | ICode> {
+    private _openInDialog(endpoint: IEndpoint): Promise<IToken> {
         let url = EndpointManager.getLoginUrl(endpoint);
 
         var options: Office.DialogOptions = {
-            height: 35,
-            width: 35
+            height: 48000 / window.screen.height,
+            width: 64000 / window.screen.width
         };
 
         return new Promise<IToken | ICode>((resolve, reject) => {
@@ -225,10 +263,7 @@ export class Authenticator {
                         var json = JSON.parse(args.message);
 
                         if ('code' in json) {
-                            if (endpoint.tokenUrl != '') {
-                                return resolve(this.exchangeCodeForToken(endpoint.tokenUrl, (<ICode>json).code));
-                            }
-                            return resolve(json as ICode);
+                            return resolve(this.exchangeCodeForToken(endpoint.provider, (<ICode>json)));
                         }
                         else if ('access_token' in json) {
                             this.tokens.add(endpoint.provider, json as IToken);

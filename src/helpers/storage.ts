@@ -41,9 +41,19 @@ export class Storage<T> extends Dictionary<T>{
 
     /**
      * Add an item.
-     * Extends Dictionary's implementation of insert, with a save to the storage.
+     * Extends Dictionary's implementation of add, with a save to the storage.
      */
     add(item: string, value: T): T {
+        super.add(item, value);
+        this.save();
+        return value;
+    }
+
+    /**
+     * Add or Update an item.
+     * Extends Dictionary's implementation of insert, with a save to the storage.
+     */
+    insert(item: string, value: T): T {
         super.insert(item, value);
         this.save();
         return value;

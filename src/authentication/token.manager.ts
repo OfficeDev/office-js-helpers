@@ -56,7 +56,7 @@ export class TokenManager extends Storage<IToken> {
     add(provider: string, value: IToken) {
         value.provider = provider;
         this.setExpiry(value);
-        return super.add(provider, value);
+        return super.insert(provider, value);
     }
 
     /**

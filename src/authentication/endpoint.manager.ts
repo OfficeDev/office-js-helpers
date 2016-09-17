@@ -27,19 +27,68 @@ export const DefaultEndpoints = {
 };
 
 export interface IEndpoint {
+    /**
+     * Unique name for the Endpoint
+     */
     provider?: string;
+
+    /**
+     * Registered OAuth ClientID
+     */
     clientId?: string;
+
+    /**
+     * Base URL of the endpoint
+     */
     baseUrl?: string;
+
+    /**
+     * URL segment for OAuth authorize endpoint.
+     * The final authorize url is constructed as (baseUrl + '/' + authorizeUrl).
+     */
     authorizeUrl?: string;
+
+    /**
+     * Registered OAuth redirect url.
+     * Defaults to window.location.origin
+     */
     redirectUrl?: string;
+
+    /**
+     * Optional token url to exchange a code with.
+     * Not recommended if OAuth provider supports implicit flow.
+     */
     tokenUrl?: string;
+
+    /**
+     * Registered OAuth scope.
+     */
     scope?: string;
+
+    /**
+     * Resource paramater for the OAuth provider.
+     */
     resource?: string;
+
+    /**
+     * Automatically generate a state? defaults to false.
+     */
     state?: boolean;
+
+    /**
+     * Automatically generate a nonce? defaults to false.
+     */
     nonce?: boolean;
+
+    /**
+     * OAuth responseType.
+     */
     responseType?: string;
+
+    /**
+     * Additional '&' separated query parameters.
+     */
     extraQueryParameters?: string;
-    windowSize?: string;
 }
 
 /**
@@ -79,7 +128,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             config.redirectUrl = this.currentHost;
         }
         config.provider = provider;
-        return super.add(provider, config);
+        return super.insert(provider, config);
     }
 
     /**
@@ -167,17 +216,19 @@ export class EndpointManager extends Storage<IEndpoint> {
         var urlSegments = [
             'response_type=' + endpointConfig.responseType,
             'client_id=' + encodeURIComponent(endpointConfig.clientId),
-            'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl),
-            'scope=' + oAuthScope
-        ]
+            'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl)
+        ];
 
+        if (oAuthScope) {
+            urlSegments.push('scope=' + oAuthScope);
+        }
         if (state) {
             urlSegments.push('state=' + state);
         }
         if (nonce) {
             urlSegments.push('nonce=' + nonce);
         }
-        if (endpointConfig) {
+        if (endpointConfig.extraQueryParameters) {
             urlSegments.push(endpointConfig.extraQueryParameters);
         }
 
