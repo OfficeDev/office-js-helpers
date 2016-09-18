@@ -192,7 +192,11 @@ export class Authenticator {
         if (Authenticator._isAddin == null) {
             Authenticator._isAddin =
                 window.hasOwnProperty('Office') &&
-                !(Office.context.ui == null);
+                (
+                    window.hasOwnProperty('Excel') ||
+                    window.hasOwnProperty('Word') ||
+                    window.hasOwnProperty('OneNote')
+                )
         }
 
         return Authenticator._isAddin;
@@ -244,10 +248,14 @@ export class Authenticator {
 
     private _openInDialog(endpoint: IEndpoint): Promise<IToken> {
         let url = EndpointManager.getLoginUrl(endpoint);
+        let windowSize = this._determineDialogSize();
 
-        return new Promise<IToken | ICode>((resolve, reject) => {
-            Office.context.ui.displayDialogAsync(url, this._determineDialogSize(), result => {
+        return new Promise<IToken>((resolve, reject) => {
+            Office.context.ui.displayDialogAsync(url, windowSize, result => {
                 var dialog = result.value;
+                if (dialog == null) {
+                    return reject(<IError>{ error: result.error.message });
+                }
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {
                     dialog.close();
                     try {
@@ -281,12 +289,8 @@ export class Authenticator {
         var screenWidth = window.screen.width;
 
         var minOrDefault = (value: number, isHorizontal: boolean) => {
-            if (orientation) {
-                return value < screenWidth ? value : screenWidth - 30;
-            }
-            else {
-                return value < screenHeight ? value : screenHeight - 30;
-            }
+            var comparator = isHorizontal ? screenWidth : screenHeight;
+            return value < comparator ? value : comparator - 30;
         }
 
         var percentage = (value: number, isHorizontal: boolean) => isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight);
