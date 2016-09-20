@@ -1,6 +1,6 @@
 language: node_js
 node_js:
-    - "iojs"
+    - "6.x.x"
 install:
     - npm install
 script:

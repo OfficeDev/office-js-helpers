@@ -1,10 +1,12 @@
 # OfficeJS Helpers
 
+[![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
+
 OfficeJS Helpers are a collection of helpers to ease development of Office Add-ins. These helpers address features as Storage Management, Authentication, helpful utilities etc.
 
 The current version includes:
-1. [Authentication](#authentication)
-2. Storage Management
+- [Authentication](#authentication)
+- Storage Management
 
 ## Getting Started
 
