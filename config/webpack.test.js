@@ -1,5 +1,4 @@
 var webpack = require('webpack');
-var declarationBundler = require('declaration-bundler-webpack-plugin');
 var path = require('path');
 var HtmlWebpackPlugin = require('html-webpack-plugin');
 
