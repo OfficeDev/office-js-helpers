@@ -210,6 +210,7 @@ export class EndpointManager extends Storage<IEndpoint> {
      */
     static getLoginUrl(endpointConfig: IEndpoint): string {
         var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
+        var oResource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : '';
         var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
         var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 
@@ -221,6 +222,9 @@ export class EndpointManager extends Storage<IEndpoint> {
 
         if (oAuthScope) {
             urlSegments.push('scope=' + oAuthScope);
+        }
+        if (oResource) {
+            urlSegments.push('resource=' + oResource);
         }
         if (state) {
             urlSegments.push('state=' + state);

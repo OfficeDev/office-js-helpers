@@ -547,6 +547,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	     */
 	    EndpointManager.getLoginUrl = function (endpointConfig) {
 	        var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
+	        var oResource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : '';
 	        var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
 	        var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 	        var urlSegments = [
@@ -556,6 +557,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	        ];
 	        if (oAuthScope) {
 	            urlSegments.push('scope=' + oAuthScope);
+	        }
+	        if (oResource) {
+	            urlSegments.push('resource=' + oResource);
 	        }
 	        if (state) {
 	            urlSegments.push('state=' + state);
