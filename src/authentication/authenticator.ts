@@ -2,21 +2,6 @@ import {EndpointManager, IEndpoint} from '../authentication/endpoint.manager';
 import {TokenManager, IToken, ICode, IError} from '../authentication/token.manager';
 
 /**
- * Helper for determining authentication mode to be either via DialogAPI, Window or Redirect.
- */
-export enum AuthenticationMode {
-    /**
-     * @param Dialog Run the authenticator inside of DialogAPI
-     */
-    Dialog,
-
-    /**
-     * @param Dialog Run the authenticator by redirecting the currrent window
-     */
-    Redirect
-}
-
-/**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
@@ -28,19 +13,11 @@ export class Authenticator {
     */
     constructor(
         public endpoints?: EndpointManager,
-        public tokens?: TokenManager,
-        public authenticationMode?: AuthenticationMode
+        public tokens?: TokenManager
     ) {
         if (endpoints == null) this.endpoints = new EndpointManager();
         if (tokens == null) this.tokens = new TokenManager();
-        this.mode = authenticationMode || AuthenticationMode.Dialog;
     }
-
-    /**
-     * @param mode registers the Authentication Mode to be used.
-     * @see {@link AuthenticationMode}
-     */
-    mode: AuthenticationMode;
 
     /**
      * Authenticate based on the given provider.
@@ -76,15 +53,8 @@ export class Authenticator {
         if (endpoint == null) {
             return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
         }
-
-        if (this.mode == AuthenticationMode.Redirect) {
-            return Promise.reject(() => {
-                location.replace(EndpointManager.getLoginUrl(endpoint));
-                return <IError>{ error: `Redirecting to endpoint: ${provider}` };
-            }) as any;
-        }
         else {
-            return Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+            return (Authenticator.isAddin) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
         }
     }
 

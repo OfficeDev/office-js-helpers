@@ -3,8 +3,8 @@ var dtsBuilder = require('dts-builder');
 
 dtsBuilder.generateBundles([
     {
-        name: 'office-js-helpers',
-        alias: 'OfficeJSHelpers',
+        name: 'OfficeHelpers',
+        alias: 'OfficeHelpers',
         sourceDir: path.resolve('./temp'),
         destDir: path.resolve('./dist'),
         externals: []

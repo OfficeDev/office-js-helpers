@@ -2,11 +2,11 @@
 	if(typeof exports === 'object' && typeof module === 'object')
 		module.exports = factory();
 	else if(typeof define === 'function' && define.amd)
-		define("OfficeJSHelpers", [], factory);
+		define("OfficeHelpers", [], factory);
 	else if(typeof exports === 'object')
-		exports["OfficeJSHelpers"] = factory();
+		exports["OfficeHelpers"] = factory();
 	else
-		root["OfficeJSHelpers"] = factory();
+		root["OfficeHelpers"] = factory();
 })(this, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -594,20 +594,6 @@ return /******/ (function(modules) { // webpackBootstrap
 	var endpoint_manager_1 = __webpack_require__(4);
 	var token_manager_1 = __webpack_require__(3);
 	/**
-	 * Helper for determining authentication mode to be either via DialogAPI, Window or Redirect.
-	 */
-	(function (AuthenticationMode) {
-	    /**
-	     * @param Dialog Run the authenticator inside of DialogAPI
-	     */
-	    AuthenticationMode[AuthenticationMode["Dialog"] = 0] = "Dialog";
-	    /**
-	     * @param Dialog Run the authenticator by redirecting the currrent window
-	     */
-	    AuthenticationMode[AuthenticationMode["Redirect"] = 1] = "Redirect";
-	})(exports.AuthenticationMode || (exports.AuthenticationMode = {}));
-	var AuthenticationMode = exports.AuthenticationMode;
-	/**
 	 * Helper for performing Implicit OAuth Authentication with registered endpoints.
 	 */
 	var Authenticator = (function () {
@@ -617,15 +603,13 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param endpointManager Depends on an instance of EndpointManager.
 	     * @param TokenManager Depends on an instance of TokenManager.
 	    */
-	    function Authenticator(endpoints, tokens, authenticationMode) {
+	    function Authenticator(endpoints, tokens) {
 	        this.endpoints = endpoints;
 	        this.tokens = tokens;
-	        this.authenticationMode = authenticationMode;
 	        if (endpoints == null)
 	            this.endpoints = new endpoint_manager_1.EndpointManager();
 	        if (tokens == null)
 	            this.tokens = new token_manager_1.TokenManager();
-	        this.mode = authenticationMode || AuthenticationMode.Dialog;
 	    }
 	    /**
 	     * Authenticate based on the given provider.
@@ -659,14 +643,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (endpoint == null) {
 	            return Promise.reject({ error: "No such registered endpoint: " + provider + " could be found." });
 	        }
-	        if (this.mode == AuthenticationMode.Redirect) {
-	            return Promise.reject(function () {
-	                location.replace(endpoint_manager_1.EndpointManager.getLoginUrl(endpoint));
-	                return { error: "Redirecting to endpoint: " + provider };
-	            });
-	        }
 	        else {
-	            return Authenticator.isAddin ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+	            return (Authenticator.isAddin) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
 	        }
 	    };
 	    /**
@@ -897,4 +875,4 @@ return /******/ (function(modules) { // webpackBootstrap
 /******/ ])
 });
 ;
-//# sourceMappingURL=office-js-helpers.js.map
+//# sourceMappingURL=office.helpers.js.map

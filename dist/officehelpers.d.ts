@@ -1,44 +1,25 @@
 
-import OfficeJSHelpers = officeJsHelpers;
+import OfficeHelpers = officehelpers;
 
-declare module 'officeJsHelpers' {
-  export = officeJsHelpers;
+declare module 'officehelpers' {
+  export = officehelpers;
 }
 
-declare namespace officeJsHelpers {
+declare namespace officehelpers {
   
-  /**
-   * Helper for determining authentication mode to be either via DialogAPI, Window or Redirect.
-   */
-  export enum AuthenticationMode {
-      /**
-       * @param Dialog Run the authenticator inside of DialogAPI
-       */
-      Dialog = 0,
-      /**
-       * @param Dialog Run the authenticator by redirecting the currrent window
-       */
-      Redirect = 1,
-  }
   /**
    * Helper for performing Implicit OAuth Authentication with registered endpoints.
    */
   export class Authenticator {
       endpoints: EndpointManager;
       tokens: TokenManager;
-      authenticationMode: AuthenticationMode;
       /**
        * @constructor
        *
        * @param endpointManager Depends on an instance of EndpointManager.
        * @param TokenManager Depends on an instance of TokenManager.
       */
-      constructor(endpoints?: EndpointManager, tokens?: TokenManager, authenticationMode?: AuthenticationMode);
-      /**
-       * @param mode registers the Authentication Mode to be used.
-       * @see {@link AuthenticationMode}
-       */
-      mode: AuthenticationMode;
+      constructor(endpoints?: EndpointManager, tokens?: TokenManager);
       /**
        * Authenticate based on the given provider.
        * Either uses DialogAPI or Window Popups based on where its being called from either Add-in or Web.

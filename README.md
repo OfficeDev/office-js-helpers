@@ -1,12 +1,14 @@
-# OfficeJS Helpers
+# Office JavaScript API Helpers
 
 [![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
 
-OfficeJS Helpers are a collection of helpers to ease development of Office Add-ins. These helpers address features as Storage Management, Authentication, helpful utilities etc.
+Office JavaScript API Helpers are a collection of helpers to ease development of Office Add-ins. These helpers address features as Storage Management, Authentication, helpful utilities etc.
 
 The current version includes:
 - [Authentication](#authentication)
 - Storage Management
+
+> Note: Updated the global namespace to OfficeHelpers from OfficeJSHelpers
 
 ## Getting Started
 
@@ -29,7 +31,7 @@ Reference the library inside of your `.html` page using:
 <!-- ES6 Shim of your choice -->
 <script src="https://unpkg.com/core-js/client/core.min.js"></script>
 
-<!-- OfficeJS Helpers -->
+<!-- Office JavaScript API Helpers -->
 <script src="office-js-helpers.js"></script>
 ```
 
@@ -43,7 +45,7 @@ The Authentication helper is built for standards compliant OAuth Implicit Flow. 
 Inside of your `Office.initialize` function add the following check:
 
 ```javascript
-if (OfficeJSHelpers.Authenticator.isAuthDialog()) return;
+if (OfficeHelpers.Authenticator.isAuthDialog()) return;
 ```
 
 This to inform the Authenticator to automatically close the authentication dialog once the authentication is complete.
@@ -52,7 +54,7 @@ This to inform the Authenticator to automatically close the authentication dialo
 Create a new instance of `Authenticator` and register the endpoints. An endpoint corresponds to a service that allows the user to authenticate with.
 
 ```javascript
-var authenticator = new OfficeJSHelpers.Authenticator();
+var authenticator = new OfficeHelpers.Authenticator();
 
 // register Microsoft endpoint using
 authenticator.endpoints.registerMicrosoftAuth('client id here');
@@ -84,19 +86,19 @@ authenticator
 
 // for the default Microsoft endpoint
 authenticator
-    .authenticate(OfficeJSHelpers.DefaultEndpoints.Microsoft)
+    .authenticate(OfficeHelpers.DefaultEndpoints.Microsoft)
     .then(function (token) { /* Microsoft Token */ })
     .catch(function(error) { /* handle error here */ });
 
 // for the default Google endpoint
 authenticator
-    .authenticate(OfficeJSHelpers.DefaultEndpoints.Google)
+    .authenticate(OfficeHelpers.DefaultEndpoints.Google)
     .then(function (token) { /* Google Token */ })
     .catch(function(error) { /* handle error here */ });
 
 // for the default Facebook endpoint
 authenticator
-    .authenticate(OfficeJSHelpers.DefaultEndpoints.Facebook)
+    .authenticate(OfficeHelpers.DefaultEndpoints.Facebook)
     .then(function (token) { /* Facebook Token */ })
     .catch(function(error) { /* handle error here */ });
 ```
@@ -127,7 +129,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduc
 
 ## Versioning
 
-We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/your/project/tags).
+We use [SemVer](http://semver.org/) for versioning. For the versions available, see the [tags on this repository](https://github.com/officedev/office-js-helpers/tags).
 
 ## License
 

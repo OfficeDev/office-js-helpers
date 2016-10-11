@@ -1,11 +1,11 @@
 var webpack = require('webpack');
 var path = require('path');
 
-var library = 'OfficeJSHelpers';
+var library = 'OfficeHelpers';
 
 module.exports = {
     entry: {
-        'office-js-helpers': "./src/index.ts",
+        'office.helpers': "./src/index.ts",
     },
     devtool: 'source-map',
     output: {
