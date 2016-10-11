@@ -32,7 +32,7 @@ Reference the library inside of your `.html` page using:
 <script src="https://unpkg.com/core-js/client/core.min.js"></script>
 
 <!-- Office JavaScript API Helpers -->
-<script src="office-js-helpers.js"></script>
+<script src="office.helpers.js"></script>
 ```
 
 ### Authentication
