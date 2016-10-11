@@ -19,8 +19,8 @@ If you wish to consume the library then you will need the following to get up an
 
 1. Clone the project or download it to your machine.
 2. Copy the contents of the `dist` folder to your Add-in project.
-3. The `office-js-helpers.js` file contains the code for all the helpers listed in the `src` folder.
-4. The `office-js-helpers.d.ts` is required for intellisense when using any editor capable of working with `d.ts` files.
+3. The `office.helpers.js` file contains the code for all the helpers listed in the `src` folder.
+4. The `officehelpers.d.ts` is required for intellisense when using any editor capable of working with `d.ts` files.
 5. You will need a ES6 Shim library to enable ES6 features such as Promises, Maps etc inside of Add-ins. You can use any library of your choice or use [core-js](https://github.com/zloirock/core-js).
 
 Reference the library inside of your `.html` page using:
