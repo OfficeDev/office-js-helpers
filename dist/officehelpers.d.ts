@@ -70,11 +70,13 @@ declare namespace officehelpers {
       private _openInWindowPopup(endpoint);
       private _openInDialog(endpoint);
       private _determineDialogSize();
+      private _createSizeObject(width, height, screenWidth, screenHeight);
   }
   export const DefaultEndpoints: {
       Google: string;
       Microsoft: string;
       Facebook: string;
+      AzureAD: string;
   };
   export interface IEndpoint {
       /**
@@ -180,12 +182,25 @@ declare namespace officehelpers {
        */
       registerFacebookAuth(clientId: string, overrides?: IEndpoint): void;
       /**
+       * Register AzureAD Implicit OAuth.
+       * If overrides is left empty, the default scope is limited to basic profile information.
+       *
+       * @param {string} clientId ClientID for the AzureAD App.
+       * @param {string} tenant Tenant for the AzureAD App.
+       * @param {object} config Valid Endpoint configuration to override the defaults.
+       * @return {object} Returns the added endpoint.
+       */
+      registerAzureADAuth(clientId: string, tenant: string, overrides?: IEndpoint): void;
+      /**
        * Helper to generate the OAuth login url.
        *
        * @param {object} config Valid Endpoint configuration.
        * @return {object} Returns the added endpoint.
        */
-      static getLoginUrl(endpointConfig: IEndpoint): string;
+      static getLoginParams(endpointConfig: IEndpoint): {
+          url: string;
+          state: number;
+      };
       private static _generateCryptoSafeRandom();
   }
   export interface IToken {

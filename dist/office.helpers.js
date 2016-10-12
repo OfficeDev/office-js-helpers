@@ -429,7 +429,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	exports.DefaultEndpoints = {
 	    Google: 'Google',
 	    Microsoft: 'Microsoft',
-	    Facebook: 'Facebook'
+	    Facebook: 'Facebook',
+	    AzureAD: 'AzureAD'
 	};
 	/**
 	 * Helper for creating and registering OAuth Endpoints.
@@ -486,7 +487,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            authorizeUrl: '/o/oauth2/v2/auth',
 	            resource: 'https://www.googleapis.com',
 	            responseType: 'token',
-	            scope: 'https://www.googleapis.com/auth/plus.me'
+	            scope: 'https://www.googleapis.com/auth/plus.me',
+	            state: true
 	        };
 	        var config = extend({}, overrides, defaults);
 	        return this.add(exports.DefaultEndpoints.Google, config);
@@ -505,9 +507,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	            clientId: clientId,
 	            baseUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0',
 	            authorizeUrl: '/authorize',
-	            resource: 'https://graph.microsoft.com',
-	            responseType: 'id_token+token',
-	            scope: 'openid https://graph.microsoft.com/user.read',
+	            responseType: 'token',
+	            scope: 'https://graph.microsoft.com/user.read',
 	            extraParameters: '&response_mode=fragment',
 	            nonce: true,
 	            state: true
@@ -540,14 +541,37 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    ;
 	    /**
+	     * Register AzureAD Implicit OAuth.
+	     * If overrides is left empty, the default scope is limited to basic profile information.
+	     *
+	     * @param {string} clientId ClientID for the AzureAD App.
+	     * @param {string} tenant Tenant for the AzureAD App.
+	     * @param {object} config Valid Endpoint configuration to override the defaults.
+	     * @return {object} Returns the added endpoint.
+	     */
+	    EndpointManager.prototype.registerAzureADAuth = function (clientId, tenant, overrides) {
+	        var defaults = {
+	            clientId: clientId,
+	            baseUrl: "https://login.windows.net/" + tenant,
+	            authorizeUrl: '/oauth2/authorize',
+	            resource: 'https://graph.microsoft.com',
+	            responseType: 'token',
+	            nonce: true,
+	            state: true
+	        };
+	        var config = extend({}, overrides, defaults);
+	        this.add(exports.DefaultEndpoints.AzureAD, config);
+	    };
+	    ;
+	    /**
 	     * Helper to generate the OAuth login url.
 	     *
 	     * @param {object} config Valid Endpoint configuration.
 	     * @return {object} Returns the added endpoint.
 	     */
-	    EndpointManager.getLoginUrl = function (endpointConfig) {
-	        var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
-	        var oResource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : '';
+	    EndpointManager.getLoginParams = function (endpointConfig) {
+	        var scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
+	        var resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
 	        var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
 	        var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 	        var urlSegments = [
@@ -555,11 +579,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	            'client_id=' + encodeURIComponent(endpointConfig.clientId),
 	            'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl)
 	        ];
-	        if (oAuthScope) {
-	            urlSegments.push('scope=' + oAuthScope);
+	        if (scope) {
+	            urlSegments.push('scope=' + scope);
 	        }
-	        if (oResource) {
-	            urlSegments.push('resource=' + oResource);
+	        if (resource) {
+	            urlSegments.push('resource=' + resource);
 	        }
 	        if (state) {
 	            urlSegments.push('state=' + state);
@@ -570,7 +594,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	        if (endpointConfig.extraQueryParameters) {
 	            urlSegments.push(endpointConfig.extraQueryParameters);
 	        }
-	        return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
+	        return {
+	            url: endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&'),
+	            state: state
+	        };
 	    };
 	    EndpointManager._generateCryptoSafeRandom = function () {
 	        var random = new Uint32Array(1);
@@ -749,10 +776,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    });
 	    Authenticator.prototype._openInWindowPopup = function (endpoint) {
 	        var _this = this;
-	        var url = endpoint_manager_1.EndpointManager.getLoginUrl(endpoint);
+	        var params = endpoint_manager_1.EndpointManager.getLoginParams(endpoint);
 	        var windowSize = this._determineDialogSize().toPixels();
 	        var windowFeatures = "width=" + windowSize.width + ",height=" + windowSize.height + ",menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no";
-	        var popupWindow = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
+	        var popupWindow = window.open(params.url, endpoint.provider.toUpperCase(), windowFeatures);
 	        return new Promise(function (resolve, reject) {
 	            try {
 	                var POLL_INTERVAL = 400;
@@ -762,8 +789,12 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            clearInterval(interval_1);
 	                            popupWindow.close();
 	                            var result = token_manager_1.TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
-	                            if (result == null)
+	                            if (result == null) {
 	                                return reject({ error: 'No access_token or code could be parsed.' });
+	                            }
+	                            else if (+result.state !== params.state) {
+	                                return reject({ error: 'State couldn\'t be verified' });
+	                            }
 	                            else if ('code' in result) {
 	                                return resolve(_this.exchangeCodeForToken(endpoint.provider, result));
 	                            }
@@ -792,10 +823,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	    };
 	    Authenticator.prototype._openInDialog = function (endpoint) {
 	        var _this = this;
-	        var url = endpoint_manager_1.EndpointManager.getLoginUrl(endpoint);
+	        var params = endpoint_manager_1.EndpointManager.getLoginParams(endpoint);
 	        var windowSize = this._determineDialogSize();
 	        return new Promise(function (resolve, reject) {
-	            Office.context.ui.displayDialogAsync(url, windowSize, function (result) {
+	            Office.context.ui.displayDialogAsync(params.url, windowSize, function (result) {
 	                var dialog = result.value;
 	                if (dialog == null) {
 	                    return reject({ error: result.error.message });
@@ -807,7 +838,10 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            return reject({ error: 'No access_token or code could be parsed.' });
 	                        }
 	                        var json = JSON.parse(args.message);
-	                        if ('code' in json) {
+	                        if (+json.state !== params.state) {
+	                            return reject({ error: 'State couldn\'t be verified' });
+	                        }
+	                        else if ('code' in json) {
 	                            return resolve(_this.exchangeCodeForToken(endpoint.provider, json));
 	                        }
 	                        else if ('access_token' in json) {
@@ -828,47 +862,32 @@ return /******/ (function(modules) { // webpackBootstrap
 	    Authenticator.prototype._determineDialogSize = function () {
 	        var screenHeight = window.screen.height;
 	        var screenWidth = window.screen.width;
-	        var minOrDefault = function (value, isHorizontal) {
-	            var comparator = isHorizontal ? screenWidth : screenHeight;
-	            return value < comparator ? value : comparator - 30;
-	        };
-	        var percentage = function (value, isHorizontal) { return isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight); };
 	        if (screenWidth <= 640) {
-	            return {
-	                width: percentage(screenWidth - 30, true),
-	                height: percentage(screenHeight - 30, true),
-	                toPixels: function () {
-	                    return {
-	                        width: (screenWidth - 30),
-	                        height: (screenHeight - 30)
-	                    };
-	                }
-	            };
+	            return this._createSizeObject(640, 480, screenWidth, screenHeight);
 	        }
 	        else if (screenWidth <= 1007) {
-	            return {
-	                width: percentage(minOrDefault(800, true), true),
-	                height: percentage(minOrDefault(600, true), true),
-	                toPixels: function () {
-	                    return {
-	                        width: minOrDefault(800, true),
-	                        height: minOrDefault(600, true)
-	                    };
-	                }
-	            };
+	            return this._createSizeObject(1024, 768, screenWidth, screenHeight);
 	        }
 	        else {
-	            return {
-	                width: percentage(minOrDefault(1024, true), true),
-	                height: percentage(minOrDefault(768, true), true),
-	                toPixels: function () {
-	                    return {
-	                        width: minOrDefault(1024, true),
-	                        height: minOrDefault(768, true)
-	                    };
-	                }
-	            };
+	            return this._createSizeObject(1024, 768, screenWidth, screenHeight);
 	        }
+	    };
+	    Authenticator.prototype._createSizeObject = function (width, height, screenWidth, screenHeight) {
+	        var minOrDefault = function (value, isHorizontal) {
+	            var dimension = isHorizontal ? screenWidth : screenHeight;
+	            return value < dimension ? value : dimension - 30;
+	        };
+	        var percentage = function (value, isHorizontal) { return isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight); };
+	        return {
+	            width: percentage(minOrDefault(width, true), true),
+	            height: percentage(minOrDefault(height, false), false),
+	            toPixels: function () {
+	                return {
+	                    width: minOrDefault(width, true),
+	                    height: minOrDefault(height, false)
+	                };
+	            }
+	        };
 	    };
 	    return Authenticator;
 	}());

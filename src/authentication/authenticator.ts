@@ -173,10 +173,10 @@ export class Authenticator {
     }
 
     private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {
-        let url = EndpointManager.getLoginUrl(endpoint);
+        let params = EndpointManager.getLoginParams(endpoint);
         let windowSize = this._determineDialogSize().toPixels();
         let windowFeatures = `width=${windowSize.width},height=${windowSize.height},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
-        let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
+        let popupWindow: Window = window.open(params.url, endpoint.provider.toUpperCase(), windowFeatures);
 
         return new Promise<IToken>((resolve, reject) => {
             try {
@@ -188,7 +188,12 @@ export class Authenticator {
                             popupWindow.close();
 
                             let result = TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
-                            if (result == null) return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                            if (result == null) {
+                                return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                            }
+                            else if (+result.state !== params.state) {
+                                return reject(<IError>{ error: 'State couldn\'t be verified' });
+                            }
                             else if ('code' in result) {
                                 return resolve(this.exchangeCodeForToken(endpoint.provider, (<ICode>result)));
                             }
@@ -217,11 +222,11 @@ export class Authenticator {
     }
 
     private _openInDialog(endpoint: IEndpoint): Promise<IToken> {
-        let url = EndpointManager.getLoginUrl(endpoint);
+        let params = EndpointManager.getLoginParams(endpoint);
         let windowSize = this._determineDialogSize();
 
         return new Promise<IToken>((resolve, reject) => {
-            Office.context.ui.displayDialogAsync(url, windowSize, result => {
+            Office.context.ui.displayDialogAsync(params.url, windowSize, result => {
                 var dialog = result.value;
                 if (dialog == null) {
                     return reject(<IError>{ error: result.error.message });
@@ -234,8 +239,10 @@ export class Authenticator {
                         }
 
                         var json = JSON.parse(args.message);
-
-                        if ('code' in json) {
+                        if (+json.state !== params.state) {
+                            return reject(<IError>{ error: 'State couldn\'t be verified' });
+                        }
+                        else if ('code' in json) {
                             return resolve(this.exchangeCodeForToken(endpoint.provider, (<ICode>json)));
                         }
                         else if ('access_token' in json) {
@@ -258,46 +265,32 @@ export class Authenticator {
         var screenHeight = window.screen.height;
         var screenWidth = window.screen.width;
 
+        if (screenWidth <= 640) {
+            return this._createSizeObject(640, 480, screenWidth, screenHeight);
+        }
+        else if (screenWidth <= 1007) {
+            return this._createSizeObject(1024, 768, screenWidth, screenHeight);
+        }
+        else {
+            return this._createSizeObject(1024, 768, screenWidth, screenHeight);
+        }
+    }
+
+    private _createSizeObject(width: number, height: number, screenWidth: number, screenHeight: number) {
         var minOrDefault = (value: number, isHorizontal: boolean) => {
-            var comparator = isHorizontal ? screenWidth : screenHeight;
-            return value < comparator ? value : comparator - 30;
+            var dimension = isHorizontal ? screenWidth : screenHeight;
+            return value < dimension ? value : dimension - 30;
         }
 
         var percentage = (value: number, isHorizontal: boolean) => isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight);
 
-        if (screenWidth <= 640) {
-            return {
-                width: percentage(screenWidth - 30, true),
-                height: percentage(screenHeight - 30, true),
-                toPixels: () => {
-                    return {
-                        width: (screenWidth - 30),
-                        height: (screenHeight - 30)
-                    }
-                }
-            };
-        }
-        else if (screenWidth <= 1007) {
-            return {
-                width: percentage(minOrDefault(800, true), true),
-                height: percentage(minOrDefault(600, true), true),
-                toPixels: () => {
-                    return {
-                        width: minOrDefault(800, true),
-                        height: minOrDefault(600, true)
-                    }
-                }
-            };
-        }
-        else {
-            return {
-                width: percentage(minOrDefault(1024, true), true),
-                height: percentage(minOrDefault(768, true), true),
-                toPixels: () => {
-                    return {
-                        width: minOrDefault(1024, true),
-                        height: minOrDefault(768, true)
-                    }
+        return {
+            width: percentage(minOrDefault(width, true), true),
+            height: percentage(minOrDefault(height, false), false),
+            toPixels: () => {
+                return {
+                    width: minOrDefault(width, true),
+                    height: minOrDefault(height, false)
                 }
             }
         }

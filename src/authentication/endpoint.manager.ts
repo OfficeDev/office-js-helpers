@@ -23,7 +23,8 @@ var extend = function (obj, ...defaults) {
 export const DefaultEndpoints = {
     Google: 'Google',
     Microsoft: 'Microsoft',
-    Facebook: 'Facebook'
+    Facebook: 'Facebook',
+    AzureAD: 'AzureAD'
 };
 
 export interface IEndpoint {
@@ -146,7 +147,8 @@ export class EndpointManager extends Storage<IEndpoint> {
             authorizeUrl: '/o/oauth2/v2/auth',
             resource: 'https://www.googleapis.com',
             responseType: 'token',
-            scope: 'https://www.googleapis.com/auth/plus.me'
+            scope: 'https://www.googleapis.com/auth/plus.me',
+            state: true
         };
 
         var config = extend({}, overrides, defaults);
@@ -166,9 +168,8 @@ export class EndpointManager extends Storage<IEndpoint> {
             clientId: clientId,
             baseUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0',
             authorizeUrl: '/authorize',
-            resource: 'https://graph.microsoft.com',
-            responseType: 'id_token+token',
-            scope: 'openid https://graph.microsoft.com/user.read',
+            responseType: 'token',
+            scope: 'https://graph.microsoft.com/user.read',
             extraParameters: '&response_mode=fragment',
             nonce: true,
             state: true
@@ -203,14 +204,41 @@ export class EndpointManager extends Storage<IEndpoint> {
     };
 
     /**
+     * Register AzureAD Implicit OAuth.
+     * If overrides is left empty, the default scope is limited to basic profile information.
+     *
+     * @param {string} clientId ClientID for the AzureAD App.
+     * @param {string} tenant Tenant for the AzureAD App.
+     * @param {object} config Valid Endpoint configuration to override the defaults.
+     * @return {object} Returns the added endpoint.
+     */
+    registerAzureADAuth(clientId: string, tenant: string, overrides?: IEndpoint) {
+        var defaults = <IEndpoint>{
+            clientId: clientId,
+            baseUrl: `https://login.windows.net/${tenant}`,
+            authorizeUrl: '/oauth2/authorize',
+            resource: 'https://graph.microsoft.com',
+            responseType: 'token',
+            nonce: true,
+            state: true
+        };
+
+        var config = extend({}, overrides, defaults);
+        this.add(DefaultEndpoints.AzureAD, config);
+    };
+
+    /**
      * Helper to generate the OAuth login url.
      *
      * @param {object} config Valid Endpoint configuration.
      * @return {object} Returns the added endpoint.
      */
-    static getLoginUrl(endpointConfig: IEndpoint): string {
-        var oAuthScope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : '';
-        var oResource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : '';
+    static getLoginParams(endpointConfig: IEndpoint): {
+        url: string,
+        state: number
+    } {
+        var scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
+        var resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
         var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
         var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 
@@ -220,11 +248,11 @@ export class EndpointManager extends Storage<IEndpoint> {
             'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl)
         ];
 
-        if (oAuthScope) {
-            urlSegments.push('scope=' + oAuthScope);
+        if (scope) {
+            urlSegments.push('scope=' + scope);
         }
-        if (oResource) {
-            urlSegments.push('resource=' + oResource);
+        if (resource) {
+            urlSegments.push('resource=' + resource);
         }
         if (state) {
             urlSegments.push('state=' + state);
@@ -236,7 +264,10 @@ export class EndpointManager extends Storage<IEndpoint> {
             urlSegments.push(endpointConfig.extraQueryParameters);
         }
 
-        return endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&');
+        return {
+            url: endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&'),
+            state: state
+        };
     }
 
     private static _generateCryptoSafeRandom() {
