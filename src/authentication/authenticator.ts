@@ -54,7 +54,7 @@ export class Authenticator {
             return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
         }
         else {
-            return (Authenticator.isAddin) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+            return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
         }
     }
 
@@ -131,7 +131,7 @@ export class Authenticator {
      * or is not running inside of a dialog at all.
      */
     static isAuthDialog(): boolean {
-        if (!Authenticator.isAddin) {
+        if (!Authenticator.hasDialogAPI) {
             return false;
         }
         else {
@@ -139,8 +139,7 @@ export class Authenticator {
                 return false;
             }
 
-            var token = TokenManager.getToken(location.href, location.origin);
-            Office.context.ui.messageParent(JSON.stringify(token));
+            Office.context.ui.messageParent(JSON.stringify(TokenManager.getToken()));
             return true;
         }
     }
@@ -157,19 +156,20 @@ export class Authenticator {
      * Check if the code is running inside of an Addin versus a Web Context.
      * The checks for Office and Word, Excel or OneNote objects.
      */
-    private static _isAddin: boolean;
-    static get isAddin() {
-        if (Authenticator._isAddin == null) {
-            Authenticator._isAddin =
-                window.hasOwnProperty('Office') &&
-                (
-                    window.hasOwnProperty('Excel') ||
-                    window.hasOwnProperty('Word') ||
-                    window.hasOwnProperty('OneNote')
-                )
+    private static _hasDialogAPI: boolean;
+    static get hasDialogAPI() {
+        if (Authenticator._hasDialogAPI == null) {
+            try {
+                Authenticator._hasDialogAPI =
+                    window.hasOwnProperty('Office') &&
+                    (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1');
+            }
+            catch (e) {
+                Authenticator._hasDialogAPI = false;
+            }
         }
 
-        return Authenticator._isAddin;
+        return Authenticator._hasDialogAPI;
     }
 
     private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {

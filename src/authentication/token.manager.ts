@@ -67,7 +67,7 @@ export class TokenManager extends Storage<IToken> {
      * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
      * @return {object} Returns the extracted token.
      */
-    static getToken(url: string, exclude?: string, delimiter: string = '#'): ICode | IToken | IError {
+    static getToken(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
         if (exclude) url = url.replace(exclude, '');
 
         let parts = url.split(delimiter);

@@ -65,8 +65,8 @@ declare namespace officehelpers {
        * Check if the code is running inside of an Addin versus a Web Context.
        * The checks for Office and Word, Excel or OneNote objects.
        */
-      private static _isAddin;
-      static isAddin: boolean;
+      private static _hasDialogAPI;
+      static hasDialogAPI: boolean;
       private _openInWindowPopup(endpoint);
       private _openInDialog(endpoint);
       private _determineDialogSize();
@@ -253,7 +253,7 @@ declare namespace officehelpers {
        * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
        * @return {object} Returns the extracted token.
        */
-      static getToken(url: string, exclude?: string, delimiter?: string): ICode | IToken | IError;
+      static getToken(url?: string, exclude?: string, delimiter?: string): ICode | IToken | IError;
       private static _extractParams(segment);
   }
   

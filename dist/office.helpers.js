@@ -361,6 +361,8 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @return {object} Returns the extracted token.
 	     */
 	    TokenManager.getToken = function (url, exclude, delimiter) {
+	        if (url === void 0) { url = location.href; }
+	        if (exclude === void 0) { exclude = location.origin; }
 	        if (delimiter === void 0) { delimiter = '#'; }
 	        if (exclude)
 	            url = url.replace(exclude, '');
@@ -675,7 +677,7 @@ return /******/ (function(modules) { // webpackBootstrap
 	            return Promise.reject({ error: "No such registered endpoint: " + provider + " could be found." });
 	        }
 	        else {
-	            return (Authenticator.isAddin) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+	            return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
 	        }
 	    };
 	    /**
@@ -741,15 +743,14 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * or is not running inside of a dialog at all.
 	     */
 	    Authenticator.isAuthDialog = function () {
-	        if (!Authenticator.isAddin) {
+	        if (!Authenticator.hasDialogAPI) {
 	            return false;
 	        }
 	        else {
 	            if (!Authenticator.isTokenUrl(location.href)) {
 	                return false;
 	            }
-	            var token = token_manager_1.TokenManager.getToken(location.href, location.origin);
-	            Office.context.ui.messageParent(JSON.stringify(token));
+	            Office.context.ui.messageParent(JSON.stringify(token_manager_1.TokenManager.getToken()));
 	            return true;
 	        }
 	    };
@@ -760,16 +761,19 @@ return /******/ (function(modules) { // webpackBootstrap
 	        var regex = /(access_token|code|error)/gi;
 	        return regex.test(url);
 	    };
-	    Object.defineProperty(Authenticator, "isAddin", {
+	    Object.defineProperty(Authenticator, "hasDialogAPI", {
 	        get: function () {
-	            if (Authenticator._isAddin == null) {
-	                Authenticator._isAddin =
-	                    window.hasOwnProperty('Office') &&
-	                        (window.hasOwnProperty('Excel') ||
-	                            window.hasOwnProperty('Word') ||
-	                            window.hasOwnProperty('OneNote'));
+	            if (Authenticator._hasDialogAPI == null) {
+	                try {
+	                    Authenticator._hasDialogAPI =
+	                        window.hasOwnProperty('Office') &&
+	                            window.Office.context.requirements.isSetSupported('DialogAPI', '1.1');
+	                }
+	                catch (e) {
+	                    Authenticator._hasDialogAPI = false;
+	                }
 	            }
-	            return Authenticator._isAddin;
+	            return Authenticator._hasDialogAPI;
 	        },
 	        enumerable: true,
 	        configurable: true
