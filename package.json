@@ -1,5 +1,5 @@
 {
-  "name": "office-js-helpers",
+  "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
   "repository": {
     "type": "git",
@@ -39,7 +39,13 @@
     "jasmine-core": "^2.5.1"
   },
   "keywords": [
-    "OfficeJS",
+    "Office",
+    "Office.js",
+    "Office JavaScript API",
+    "Authentication",
+    "OAuth",
+    "Implicit OAuth",
+    "Storage",
     "Helpers"
   ],
   "author": "Microsoft",
