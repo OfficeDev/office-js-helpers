@@ -15,7 +15,7 @@
     "build-dts": "node config/dts-gen.js",
     "lint": "tslint 'src/**/*.ts'"
   },
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "src/index.ts",
   "typings": "dist/officehelpers.d.ts",
   "license": "MIT",
