@@ -1,27 +1,35 @@
 # Office JavaScript API Helpers
 
 [![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
+[![npm version](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers.svg)](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers)
+[![dependencies](https://david-dm.org/officedev/office-js-helpers.svg)](https://david-dm.org/officedev/office-js-helpers)
+
 
 Office JavaScript API Helpers are a collection of helpers to ease development of Office Add-ins. These helpers address features as Storage Management, Authentication, helpful utilities etc.
 
-The current version includes:
+The current version includes the following helpers:
 - [Authentication](#authentication)
-- Storage Management
-
-> Note: Updated the global namespace to OfficeHelpers from OfficeJSHelpers
 
 ## Getting Started
 
-### Prerequisites
+### Installation
+
+#### Development
+> This assumes you are using npm as your package manager.
+
+To install the stable version:
+
+`npm install --save @microsoft/office-js-helpers`
 
 #### Production
-If you wish to consume the library then you will need the following to get up and running:
 
-1. Clone the project or download it to your machine.
-2. Copy the contents of the `dist` folder to your Add-in project.
-3. The `office.helpers.js` file contains the code for all the helpers listed in the `src` folder.
-4. The `officehelpers.d.ts` is required for intellisense when using any editor capable of working with `d.ts` files.
-5. You will need a ES6 Shim library to enable ES6 features such as Promises, Maps etc inside of Add-ins. You can use any library of your choice or use [core-js](https://github.com/zloirock/core-js).
+You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers/dist/office.helpers.js), download them, or point your package manager to them.
+
+You can also get the latest version from the [releases](https://github.com/OfficeDev/office-js-helpers/releases) tab
+
+## Usage
+
+### JavaScript
 
 Reference the library inside of your `.html` page using:
 ```html
@@ -31,15 +39,54 @@ Reference the library inside of your `.html` page using:
 <!-- ES6 Shim of your choice -->
 <script src="https://unpkg.com/core-js/client/core.min.js"></script>
 
-<!-- Office JavaScript API Helpers -->
+<!-- Office JavaScript API Helpers (via CDN) -->
+<script src="https://unpkg.com/@microsoft/office-js-helpers/dist/office.helpers.js"></script>
+
+<!-- Office JavaScript API Helpers (via local) -->
 <script src="office.helpers.js"></script>
 ```
 
+### TypeScript
+
+In a TypeScript environment,
+**If you are just referencing the library using a script tag** then add a reference to `officehelpers.d.ts` either in your `tsconfig.json` or `typings.json` or use
+
+```typescript
+/// <reference path="path_to_lib/officehelpers.d.ts" />
+```
+
+> We will publish to DefinitelyTyped soon and then you can directly use `typings` to get access to the definitions.
+
+**If you are using any dependency loader** such as [RequireJS](http://requirejs.org/) or [SystemJS](https://github.com/systemjs/systemjs) or module bundler such as [browserify](http://browserify.org/), [webpack](https://webpack.github.io/), you can use TypeScript `import` syntax to import specific modules. For e.g.
+
+```typescript
+import {Authenticator, DefaultEndpoints} from '@microsoft/office-js-helpers';
+
+import {Authenticator, Storage} from '@microsoft/office-js-helpers';
+
+import {Authenticator} from '@microsoft/office-js-helpers';
+```
+
+## Helpers
+
 ### Authentication
 
-The Authentication helper is built for standards compliant OAuth Implicit Flow. Out of the box it directly integrates with Microsoft, Google and Facebook authentication.
+The Authentication helper is built for standards compliant OAuth Implicit Flow. Out of the box it directly integrates with Microsoft, AzureAD, Google and Facebook authentication.
 
 > Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School or Personal accounts.
+
+> Note on MSAL. This helper isn't a replacement for MSAL. When MSAL for JavaScript is released publicily, the helper will use MSAL.
+
+#### For Office Add-ins
+You need to meet the following requirements before you are able to successfully to use the Authenticator inside of Office Add-ins.
+
+1. You need to us `https`. This is important as we are using OAuth Implicit Flow and it is critical to secure the communication over the wire.
+2. Add the location of the provider in your `AppDomains`, example:
+
+```xml
+    <AppDomain>https://login.windows.net</AppDomain>
+    <AppDomain>https://login.microsoftonline.com</AppDomain>
+```
 
 #### Setup
 Inside of your `Office.initialize` function add the following check:
@@ -50,14 +97,19 @@ if (OfficeHelpers.Authenticator.isAuthDialog()) return;
 
 This to inform the Authenticator to automatically close the authentication dialog once the authentication is complete.
 
+> Note: This code needs to be run in the page that is redirected to from the provider. By default we assume the root url of your website. The code ensures that if an access_token, code or error was received inside of the dialog, then it will parse it and close the dialog automatically. Also as an additional step it ensures that the `state` sent to the provider is the same as what was returned, to prevent [Cross Site Request Forgery (CSRF)](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html).
+
 #### Initialize
 Create a new instance of `Authenticator` and register the endpoints. An endpoint corresponds to a service that allows the user to authenticate with.
 
 ```javascript
 var authenticator = new OfficeHelpers.Authenticator();
 
-// register Microsoft endpoint using
+// register Microsoft (Azure AD 2.0 Converged auth) endpoint using
 authenticator.endpoints.registerMicrosoftAuth('client id here');
+
+// register Azure AD 1.0 endpoint using
+authenticator.endpoints.registerAzureADAuth('client id here', 'tenant here');
 
 // register Google endpoint using
 authenticator.endpoints.registerGoogleAuth('client id here');
@@ -90,6 +142,12 @@ authenticator
     .then(function (token) { /* Microsoft Token */ })
     .catch(function(error) { /* handle error here */ });
 
+// for the default AzureAD endpoint
+authenticator
+    .authenticate(OfficeHelpers.DefaultEndpoints.AzureAD)
+    .then(function (token) { /* Microsoft Token */ })
+    .catch(function(error) { /* handle error here */ });
+
 // for the default Google endpoint
 authenticator
     .authenticate(OfficeHelpers.DefaultEndpoints.Google)
@@ -109,19 +167,35 @@ By default the tokens are cached to the LocalStorage and upon expiry the AuthDia
 ```javascript
 authenticator
     .authenticate('name of endpoint')
-    .then(function(token) { /*
+    .then(function(token) {
+    /*
         `token` is either cached or newly obtained upon expiry.
-    */ });
+    */
+    })
+    .catch(function(exception) {
+    /*
+        exception in obtaining token.
+    */
+    });
 
 authenticator
     .authenticate('name of endpoint', true /* force re-authentication */)
-    .then(function(token) { /*
+    .then(function(token) {
+    /*
         `token` is newly obtained.
-    */ });
+    */
+    })
+    .catch(function(exception) {
+    /*
+        exception in obtaining token.
+    */
+    });
 
 // get the cached token if any. returns null otherwise.
 var token = authenticator.tokens.get('name of endpoint');
 ```
+
+> Note on Refresh Tokens: By default, Implicit OAuth does not support Token Refresh as a security measure. This is because Access Tokens cannot be securely stored inside of a JavaScript client.
 
 ## Contributing
 
