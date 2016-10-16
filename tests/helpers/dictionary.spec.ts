@@ -1,4 +1,4 @@
-import {Dictionary} from './dictionary';
+import { Dictionary } from '../../src/helpers/dictionary';
 
 export default describe('Testing Dictionary', () => {
 

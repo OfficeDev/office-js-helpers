@@ -5,7 +5,7 @@ dtsBuilder.generateBundles([
     {
         name: 'OfficeHelpers',
         alias: 'OfficeHelpers',
-        sourceDir: path.resolve('./temp'),
+        sourceDir: path.resolve('./dist'),
         destDir: path.resolve('./dist'),
         externals: []
     }

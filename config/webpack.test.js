@@ -6,11 +6,11 @@ var library = 'OfficeHelpers';
 
 module.exports = {
     entry: {
-        'office.helpers': "./src/index.spec.ts",
+        'office.helpers': "./tests/index.ts",
     },
     devtool: 'source-map',
     output: {
-        path: path.resolve('./test'),
+        path: path.resolve('./tests'),
         filename: '[name].[hash].js',
         library: library,
         libraryTarget: 'umd',
@@ -21,12 +21,12 @@ module.exports = {
         new HtmlWebpackPlugin({
             title: 'OfficeJS Helpers Test',
             filename: 'index.html',
-            template: './tests.html'
+            template: './tests/index.html'
         })
     ],
 
     resolve: {
-        root: path.resolve('./src'),
+        root: path.resolve('./tests'),
         extensions: ['', '.js', '.ts']
     },
 

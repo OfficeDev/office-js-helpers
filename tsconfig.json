@@ -1,17 +1,18 @@
 {
   "compilerOptions": {
     "target": "es5",
-    "module": "commonjs",
+    "module": "umd",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "removeComments": false,
+    "sourceMap": true,
     "rootDir": "./src",
-    "sourceMap": true
+    "outDir": "./dist"
   },
   "exclude": [
     "node_modules",
     "dist",
-    "*.spec.ts"
+    "tests"
   ]
 }

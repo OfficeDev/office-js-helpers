@@ -14,14 +14,14 @@
     "publish-minor": "npm version patch && npm publish",
     "webpack-test": "webpack-dev-server --compress --inline --open --port 3000 --https --config config/webpack.test.js --progress --colors",
     "webpack-build": "rimraf dist && webpack --config config/webpack.build.js --progress --profile --bail --colors --display-modules",
-    "gen-dts": "rimraf temp && tsc -p tsconfig.json -outDir temp -d && npm run build-dts && rimraf temp",
+    "gen-dts": "tsc -p tsconfig.json -d && npm run build-dts",
     "build-dts": "node config/dts-gen.js",
     "lint": "tslint 'src/**/*.ts'",
     "postinstall": "typings install"
   },
   "version": "0.1.2",
-  "main": "src/index.ts",
-  "typings": "dist/officehelpers.d.ts",
+  "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "license": "MIT",
   "files": [
     "dist/",

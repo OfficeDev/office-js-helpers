@@ -6,7 +6,7 @@ declare module 'officehelpers' {
 }
 
 declare namespace officehelpers {
-  
+  
   /**
    * Helper for performing Implicit OAuth Authentication with registered endpoints.
    */
@@ -66,7 +66,7 @@ declare namespace officehelpers {
        * The checks for Office and Word, Excel or OneNote objects.
        */
       private static _hasDialogAPI;
-      static hasDialogAPI: boolean;
+      static readonly hasDialogAPI: boolean;
       private _openInWindowPopup(endpoint);
       private _openInDialog(endpoint);
       private _determineDialogSize();
@@ -143,7 +143,7 @@ declare namespace officehelpers {
       /**
        * Gets the current url to be specified as the default redirect url.
        */
-      currentHost: string;
+      readonly currentHost: string;
       /**
        * Extends Storage's default add method.
        * Registers a new OAuth Endpoint.
@@ -335,11 +335,8 @@ declare namespace officehelpers {
        *
        * @return {number} Returns the number of items in the dictionary.
        */
-      count: number;
-  }
-  
-  var _default: void;
-  export default _default;
+      readonly count: number;
+  }
   export enum StorageType {
       LocalStorage = 0,
       SessionStorage = 1,
