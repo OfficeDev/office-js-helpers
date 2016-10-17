@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+
 import { EndpointManager, IEndpoint } from '../authentication/endpoint.manager';
 import { TokenManager, IToken, ICode, IError } from '../authentication/token.manager';
 

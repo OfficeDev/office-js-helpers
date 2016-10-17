@@ -14,7 +14,7 @@
     "publish-minor": "npm version patch && npm publish",
     "webpack-test": "webpack-dev-server --compress --inline --open --port 3000 --https --config config/webpack.test.js --progress --colors",
     "webpack-build": "rimraf dist && webpack --config config/webpack.build.js --progress --profile --bail --colors --display-modules",
-    "gen-dts": "tsc -p tsconfig.json -d && npm run build-dts",
+    "gen-dts": "tsc -p tsconfig.json -d -m umd && npm run build-dts",
     "build-dts": "node config/dts-gen.js",
     "lint": "tslint 'src/**/*.ts'",
     "postinstall": "typings install"

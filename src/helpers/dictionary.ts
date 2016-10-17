@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+
 /**
  * Helper for creating and querying Dictionaries.
  * A rudimentary alternative to ES6 Maps.

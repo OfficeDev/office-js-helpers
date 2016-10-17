@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+
 import { Dictionary } from '../../src/helpers/dictionary';
 
 export default describe('Testing Dictionary', () => {
