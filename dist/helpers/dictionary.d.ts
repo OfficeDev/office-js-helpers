@@ -64,6 +64,12 @@ export declare class Dictionary<T> {
      */
     keys(): string[];
     /**
+     * Lists all the values in the dictionary.
+     *
+     * @return {array} Returns all the values.
+     */
+    values(): T[];
+    /**
      * Get the dictionary.
      *
      * @return {object} Returns the dictionary if it contains data, null otherwise.

@@ -97,7 +97,18 @@ var Dictionary = (function () {
      * @return {array} Returns all the keys.
      */
     Dictionary.prototype.keys = function () {
+        if (this.items == null)
+            return [];
         return Object.keys(this.items);
+    };
+    /**
+     * Lists all the values in the dictionary.
+     *
+     * @return {array} Returns all the values.
+     */
+    Dictionary.prototype.values = function () {
+        var _this = this;
+        return Array.map(this.keys(), function (key) { return _this.items[key]; });
     };
     /**
      * Get the dictionary.

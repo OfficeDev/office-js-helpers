@@ -214,7 +214,7 @@ var EndpointManager = (function (_super) {
             window.crypto.getRandomValues(random);
         }
         else {
-            random[0] = new Date().getTime();
+            throw new Error('The platform doesn\'t support generation of Cryptographically Safe Randoms. Please disable the state flag and try again');
         }
         return random[0];
     };
