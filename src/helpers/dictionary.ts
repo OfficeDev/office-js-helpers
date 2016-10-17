@@ -101,7 +101,17 @@ export class Dictionary<T> {
      * @return {array} Returns all the keys.
      */
     keys(): string[] {
+        if (this.items == null) return [];
         return Object.keys(this.items);
+    }
+
+    /**
+     * Lists all the values in the dictionary.
+     *
+     * @return {array} Returns all the values.
+     */
+    values(): T[] {
+        return Array.map(this.keys(), key => this.items[key]);
     }
 
     /**
