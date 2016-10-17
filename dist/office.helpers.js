@@ -54,6 +54,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 0 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 	"use strict";
 	function __export(m) {
 	    for (var p in m) if (!exports.hasOwnProperty(p)) exports[p] = m[p];
@@ -69,6 +70,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 1 */
 /***/ function(module, exports) {
 
+	// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 	"use strict";
 	/**
 	 * Helper for creating and querying Dictionaries.
@@ -199,6 +201,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 2 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -311,6 +314,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 3 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -395,6 +399,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 4 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 	"use strict";
 	var __extends = (this && this.__extends) || function (d, b) {
 	    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
@@ -623,6 +628,7 @@ return /******/ (function(modules) { // webpackBootstrap
 /* 5 */
 /***/ function(module, exports, __webpack_require__) {
 
+	// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 	"use strict";
 	var endpoint_manager_1 = __webpack_require__(4);
 	var token_manager_1 = __webpack_require__(3);
