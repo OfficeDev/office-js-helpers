@@ -19,7 +19,7 @@
     "lint": "tslint 'src/**/*.ts'",
     "postinstall": "typings install"
   },
-  "version": "0.1.9",
+  "version": "0.1.10",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "license": "MIT",
