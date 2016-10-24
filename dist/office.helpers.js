@@ -663,6 +663,17 @@ return /******/ (function(modules) { // webpackBootstrap
 	        _super.call(this, message);
 	        this.state = state;
 	        this.name = "OAuthError";
+	        this.message = message;
+	        if (Error.captureStackTrace) {
+	            Error.captureStackTrace(this, this.constructor);
+	        }
+	        else {
+	            var error = new Error();
+	            if (error.stack) {
+	                var last_part = error.stack.match(/[^\s]+$/);
+	                this.stack = this.name + " at " + last_part;
+	            }
+	        }
 	    }
 	    return OAuthError;
 	}(Error));
