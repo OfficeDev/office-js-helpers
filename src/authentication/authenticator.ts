@@ -72,9 +72,8 @@ export class Authenticator {
      * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
      */
-    exchangeCodeForToken(provider: string, data: any, headers?: any): Promise<IToken> {
+    exchangeCodeForToken(endpoint: IEndpoint, data: any, headers?: any): Promise<IToken> {
         return new Promise((resolve, reject) => {
-            var endpoint = this.endpoints.get(provider);
             if (endpoint.tokenUrl == null) {
                 console.warn(
                     `We couldn\'t exchange the received code for an access_token.
@@ -98,24 +97,31 @@ export class Authenticator {
                 xhr.setRequestHeader(header, headers[header]);
             }
 
+            xhr.onerror = () => {
+                return reject({ error: 'Unable to send request due to a Network error' } as IError);
+            }
+
             xhr.onload = () => {
                 try {
                     if (xhr.status === 200) {
                         var json = JSON.parse(xhr.responseText);
-                        if ('access_token' in json) {
+                        if (json == null) {
+                            return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                        }
+                        else if ('access_token' in json) {
                             this.tokens.add(endpoint.provider, json)
-                            resolve(json as IToken);
+                            return resolve(json as IToken);
                         }
                         else {
-                            reject(json as IError);
+                            return reject(json as IError);
                         }
                     }
                     else if (xhr.status !== 200) {
-                        reject(<IError>{ error: 'Request failed. ' + xhr.response });
+                        return reject(<IError>{ error: 'Request failed. ' + xhr.response });
                     }
                 }
                 catch (e) {
-                    reject(<IError>{ error: e });
+                    return reject(<IError>{ error: e });
                 }
             };
 
@@ -201,11 +207,11 @@ export class Authenticator {
                             if (result == null) {
                                 return reject(<IError>{ error: 'No access_token or code could be parsed.' });
                             }
-                            else if (+result.state !== params.state) {
+                            else if (endpoint.state && +result.state !== params.state) {
                                 return reject(<IError>{ error: 'State couldn\'t be verified' });
                             }
                             else if ('code' in result) {
-                                return resolve(this.exchangeCodeForToken(endpoint.provider, (<ICode>result)));
+                                return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
                             }
                             else if ('access_token' in result) {
                                 this.tokens.add(endpoint.provider, result as IToken);
@@ -249,11 +255,11 @@ export class Authenticator {
                         }
 
                         var json = JSON.parse(args.message);
-                        if (+json.state !== params.state) {
+                        if (endpoint.state && +json.state !== params.state) {
                             return reject(<IError>{ error: 'State couldn\'t be verified' });
                         }
                         else if ('code' in json) {
-                            return resolve(this.exchangeCodeForToken(endpoint.provider, (<ICode>json)));
+                            return resolve(this.exchangeCodeForToken(endpoint, (<ICode>json)));
                         }
                         else if ('access_token' in json) {
                             this.tokens.add(endpoint.provider, json as IToken);
