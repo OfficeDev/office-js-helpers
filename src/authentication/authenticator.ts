@@ -17,6 +17,17 @@ export class OAuthError extends Error {
     constructor(message: string, public state?: string) {
         super(message);
         this.name = "OAuthError";
+        this.message = message;
+        if ((Error as any).captureStackTrace) {
+            (Error as any).captureStackTrace(this, this.constructor);
+        }
+        else {
+            var error = new Error();
+            if (error.stack) {
+                var last_part = error.stack.match(/[^\s]+$/);
+                this.stack = this.name + " at " + last_part;
+            }
+        }
     }
 }
 
