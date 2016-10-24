@@ -111,7 +111,7 @@ export class Dictionary<T> {
      * @return {array} Returns all the values.
      */
     values(): T[] {
-        return Array.map(this.keys(), key => this.items[key]);
+        return this.keys().map(key => this.items[key]);
     }
 
     /**
