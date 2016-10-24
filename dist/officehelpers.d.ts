@@ -46,7 +46,7 @@ declare namespace officehelpers {
        * @param {object} headers Headers to be sent to the tokenUrl.     *
        * @return {Promise<IToken>} Returns a promise of the token or error.
        */
-      exchangeCodeForToken(provider: string, data: any, headers?: any): Promise<IToken>;
+      exchangeCodeForToken(endpoint: IEndpoint, data: any, headers?: any): Promise<IToken>;
       /**
        * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
        * If true then it calls messageParent by extracting the token information, thereby closing the dialog.

@@ -1,4 +1,4 @@
-import { EndpointManager } from '../authentication/endpoint.manager';
+import { EndpointManager, IEndpoint } from '../authentication/endpoint.manager';
 import { TokenManager, IToken } from '../authentication/token.manager';
 /**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
@@ -39,7 +39,7 @@ export declare class Authenticator {
      * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
      */
-    exchangeCodeForToken(provider: string, data: any, headers?: any): Promise<IToken>;
+    exchangeCodeForToken(endpoint: IEndpoint, data: any, headers?: any): Promise<IToken>;
     /**
      * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
      * If true then it calls messageParent by extracting the token information, thereby closing the dialog.

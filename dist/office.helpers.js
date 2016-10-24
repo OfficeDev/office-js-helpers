@@ -709,10 +709,9 @@ return /******/ (function(modules) { // webpackBootstrap
 	     * @param {object} headers Headers to be sent to the tokenUrl.     *
 	     * @return {Promise<IToken>} Returns a promise of the token or error.
 	     */
-	    Authenticator.prototype.exchangeCodeForToken = function (provider, data, headers) {
+	    Authenticator.prototype.exchangeCodeForToken = function (endpoint, data, headers) {
 	        var _this = this;
 	        return new Promise(function (resolve, reject) {
-	            var endpoint = _this.endpoints.get(provider);
 	            if (endpoint.tokenUrl == null) {
 	                console.warn("We couldn't exchange the received code for an access_token.\n                    The value returned is not an access_token.\n                    Please set the tokenUrl property or refer to our docs.");
 	                return resolve(data);
@@ -727,24 +726,30 @@ return /******/ (function(modules) { // webpackBootstrap
 	                }
 	                xhr.setRequestHeader(header, headers[header]);
 	            }
+	            xhr.onerror = function () {
+	                return reject({ error: 'Unable to send request due to a Network error' });
+	            };
 	            xhr.onload = function () {
 	                try {
 	                    if (xhr.status === 200) {
 	                        var json = JSON.parse(xhr.responseText);
-	                        if ('access_token' in json) {
+	                        if (json == null) {
+	                            return reject({ error: 'No access_token or code could be parsed.' });
+	                        }
+	                        else if ('access_token' in json) {
 	                            _this.tokens.add(endpoint.provider, json);
-	                            resolve(json);
+	                            return resolve(json);
 	                        }
 	                        else {
-	                            reject(json);
+	                            return reject(json);
 	                        }
 	                    }
 	                    else if (xhr.status !== 200) {
-	                        reject({ error: 'Request failed. ' + xhr.response });
+	                        return reject({ error: 'Request failed. ' + xhr.response });
 	                    }
 	                }
 	                catch (e) {
-	                    reject({ error: e });
+	                    return reject({ error: e });
 	                }
 	            };
 	            xhr.send(JSON.stringify(data));
@@ -817,11 +822,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            if (result == null) {
 	                                return reject({ error: 'No access_token or code could be parsed.' });
 	                            }
-	                            else if (+result.state !== params.state) {
+	                            else if (endpoint.state && +result.state !== params.state) {
 	                                return reject({ error: 'State couldn\'t be verified' });
 	                            }
 	                            else if ('code' in result) {
-	                                return resolve(_this.exchangeCodeForToken(endpoint.provider, result));
+	                                return resolve(_this.exchangeCodeForToken(endpoint, result));
 	                            }
 	                            else if ('access_token' in result) {
 	                                _this.tokens.add(endpoint.provider, result);
@@ -863,11 +868,11 @@ return /******/ (function(modules) { // webpackBootstrap
 	                            return reject({ error: 'No access_token or code could be parsed.' });
 	                        }
 	                        var json = JSON.parse(args.message);
-	                        if (+json.state !== params.state) {
+	                        if (endpoint.state && +json.state !== params.state) {
 	                            return reject({ error: 'State couldn\'t be verified' });
 	                        }
 	                        else if ('code' in json) {
-	                            return resolve(_this.exchangeCodeForToken(endpoint.provider, json));
+	                            return resolve(_this.exchangeCodeForToken(endpoint, json));
 	                        }
 	                        else if ('access_token' in json) {
 	                            _this.tokens.add(endpoint.provider, json);
