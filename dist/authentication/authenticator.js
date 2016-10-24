@@ -143,7 +143,11 @@ var Authenticator = (function () {
                 try {
                     Authenticator._hasDialogAPI =
                         window.hasOwnProperty('Office') &&
-                            window.Office.context.requirements.isSetSupported('DialogAPI', '1.1');
+                            ((window.Office.context.requirements &&
+                                window.Office.context.requirements.isSetSupported('DialogAPI', '1.1')) ||
+                                window.hasOwnProperty('Excel') ||
+                                window.hasOwnProperty('Word') ||
+                                window.hasOwnProperty('OneNote'));
                 }
                 catch (e) {
                     Authenticator._hasDialogAPI = false;

@@ -164,7 +164,15 @@ export class Authenticator {
             try {
                 Authenticator._hasDialogAPI =
                     window.hasOwnProperty('Office') &&
-                    (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1');
+                    (
+                        (
+                            (<any>window).Office.context.requirements &&
+                            (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1')
+                        ) ||
+                        window.hasOwnProperty('Excel') ||
+                        window.hasOwnProperty('Word') ||
+                        window.hasOwnProperty('OneNote')
+                    )
             }
             catch (e) {
                 Authenticator._hasDialogAPI = false;
