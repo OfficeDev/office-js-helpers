@@ -1,7 +1,31 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 "use strict";
+var __extends = (this && this.__extends) || function (d, b) {
+    for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+    function __() { this.constructor = d; }
+    d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
+};
 var endpoint_manager_1 = require('../authentication/endpoint.manager');
 var token_manager_1 = require('../authentication/token.manager');
+/**
+ * Custom error type to handle OAuth specific errors.
+ */
+var OAuthError = (function (_super) {
+    __extends(OAuthError, _super);
+    /**
+     * @constructor
+     *
+     * @param message Error message to be propagated.
+     * @param state OAuth state if available.
+    */
+    function OAuthError(message, state) {
+        _super.call(this, message);
+        this.state = state;
+        this.name = "OAuthError";
+    }
+    return OAuthError;
+}(Error));
+exports.OAuthError = OAuthError;
 /**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
@@ -50,7 +74,7 @@ var Authenticator = (function () {
         }
         var endpoint = this.endpoints.get(provider);
         if (endpoint == null) {
-            return Promise.reject({ error: "No such registered endpoint: " + provider + " could be found." });
+            return Promise.reject(new OAuthError("No such registered endpoint: " + provider + " could be found."));
         }
         else {
             return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
@@ -63,7 +87,7 @@ var Authenticator = (function () {
      * The Endpoint must accept the data JSON input and return an 'access_token'
      * in the JSON output.
      *
-     * @param {string} provider Name of the provider.
+     * @param {Endpoint} endpoint Endpoint configuration.
      * @param {object} data Data to be sent to the tokenUrl.
      * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
@@ -86,29 +110,29 @@ var Authenticator = (function () {
                 xhr.setRequestHeader(header, headers[header]);
             }
             xhr.onerror = function () {
-                return reject({ error: 'Unable to send request due to a Network error' });
+                return reject(new OAuthError('Unable to send request due to a Network error'));
             };
             xhr.onload = function () {
                 try {
                     if (xhr.status === 200) {
                         var json = JSON.parse(xhr.responseText);
                         if (json == null) {
-                            return reject({ error: 'No access_token or code could be parsed.' });
+                            return reject(new OAuthError('No access_token or code could be parsed.'));
                         }
                         else if ('access_token' in json) {
                             _this.tokens.add(endpoint.provider, json);
                             return resolve(json);
                         }
                         else {
-                            return reject(json);
+                            return reject(new OAuthError(json.error, json.state));
                         }
                     }
                     else if (xhr.status !== 200) {
-                        return reject({ error: 'Request failed. ' + xhr.response });
+                        return reject(new OAuthError('Request failed. ' + xhr.response));
                     }
                 }
                 catch (e) {
-                    return reject({ error: e });
+                    return reject(new OAuthError('An error occured while parsing the response'));
                 }
             };
             xhr.send(JSON.stringify(data));
@@ -179,10 +203,10 @@ var Authenticator = (function () {
                             popupWindow.close();
                             var result = token_manager_1.TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                             if (result == null) {
-                                return reject({ error: 'No access_token or code could be parsed.' });
+                                return reject(new OAuthError('No access_token or code could be parsed.'));
                             }
                             else if (endpoint.state && +result.state !== params.state) {
-                                return reject({ error: 'State couldn\'t be verified' });
+                                return reject(new OAuthError('State couldn\'t be verified'));
                             }
                             else if ('code' in result) {
                                 return resolve(_this.exchangeCodeForToken(endpoint, result));
@@ -192,21 +216,21 @@ var Authenticator = (function () {
                                 return resolve(result);
                             }
                             else {
-                                return reject(result);
+                                return reject(new OAuthError(result.error, result.state));
                             }
                         }
                     }
                     catch (exception) {
                         if (!popupWindow) {
                             clearInterval(interval_1);
-                            return reject({ error: exception });
+                            return reject(new OAuthError('Popup window was closed'));
                         }
                     }
                 }, POLL_INTERVAL);
             }
             catch (exception) {
                 popupWindow.close();
-                return reject({ error: exception });
+                return reject(new OAuthError('Unexpected error occured while creating popup'));
             }
         });
     };
@@ -218,17 +242,17 @@ var Authenticator = (function () {
             Office.context.ui.displayDialogAsync(params.url, windowSize, function (result) {
                 var dialog = result.value;
                 if (dialog == null) {
-                    return reject({ error: result.error.message });
+                    return reject(new OAuthError(result.error.message));
                 }
                 dialog.addEventHandler(Office.EventType.DialogMessageReceived, function (args) {
                     dialog.close();
                     try {
                         if (args.message == null || args.message === '') {
-                            return reject({ error: 'No access_token or code could be parsed.' });
+                            return reject(new OAuthError('No access_token or code could be parsed.'));
                         }
                         var json = JSON.parse(args.message);
                         if (endpoint.state && +json.state !== params.state) {
-                            return reject({ error: 'State couldn\'t be verified' });
+                            return reject(new OAuthError('State couldn\'t be verified'));
                         }
                         else if ('code' in json) {
                             return resolve(_this.exchangeCodeForToken(endpoint, json));
@@ -238,11 +262,11 @@ var Authenticator = (function () {
                             return resolve(json);
                         }
                         else {
-                            return reject(json);
+                            return reject(new OAuthError(json.error, json.state));
                         }
                     }
                     catch (exception) {
-                        return reject({ error: exception });
+                        return reject(new OAuthError('Error while parsing response: ' + JSON.stringify(exception)));
                     }
                 });
             });

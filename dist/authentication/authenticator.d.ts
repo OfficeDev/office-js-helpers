@@ -1,6 +1,19 @@
 import { EndpointManager, IEndpoint } from '../authentication/endpoint.manager';
 import { TokenManager, IToken } from '../authentication/token.manager';
 /**
+ * Custom error type to handle OAuth specific errors.
+ */
+export declare class OAuthError extends Error {
+    state: string;
+    /**
+     * @constructor
+     *
+     * @param message Error message to be propagated.
+     * @param state OAuth state if available.
+    */
+    constructor(message: string, state?: string);
+}
+/**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export declare class Authenticator {
@@ -34,7 +47,7 @@ export declare class Authenticator {
      * The Endpoint must accept the data JSON input and return an 'access_token'
      * in the JSON output.
      *
-     * @param {string} provider Name of the provider.
+     * @param {Endpoint} endpoint Endpoint configuration.
      * @param {object} data Data to be sent to the tokenUrl.
      * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
