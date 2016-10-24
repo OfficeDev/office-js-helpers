@@ -108,7 +108,7 @@ var Dictionary = (function () {
      */
     Dictionary.prototype.values = function () {
         var _this = this;
-        return Array.map(this.keys(), function (key) { return _this.items[key]; });
+        return this.keys().map(function (key) { return _this.items[key]; });
     };
     /**
      * Get the dictionary.
