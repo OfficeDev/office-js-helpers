@@ -4,6 +4,23 @@ import { EndpointManager, IEndpoint } from '../authentication/endpoint.manager';
 import { TokenManager, IToken, ICode, IError } from '../authentication/token.manager';
 
 /**
+ * Custom error type to handle OAuth specific errors.
+ */
+
+export class OAuthError extends Error {
+    /**
+     * @constructor
+     *
+     * @param message Error message to be propagated.
+     * @param state OAuth state if available.
+    */
+    constructor(message: string, public state?: string) {
+        super(message);
+        this.name = "OAuthError";
+    }
+}
+
+/**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
@@ -53,7 +70,7 @@ export class Authenticator {
 
         let endpoint = this.endpoints.get(provider);
         if (endpoint == null) {
-            return Promise.reject(<IError>{ error: `No such registered endpoint: ${provider} could be found.` }) as any;
+            return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
         else {
             return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
@@ -67,7 +84,7 @@ export class Authenticator {
      * The Endpoint must accept the data JSON input and return an 'access_token'
      * in the JSON output.
      *
-     * @param {string} provider Name of the provider.
+     * @param {Endpoint} endpoint Endpoint configuration.
      * @param {object} data Data to be sent to the tokenUrl.
      * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
@@ -98,7 +115,7 @@ export class Authenticator {
             }
 
             xhr.onerror = () => {
-                return reject({ error: 'Unable to send request due to a Network error' } as IError);
+                return reject(new OAuthError('Unable to send request due to a Network error'));
             }
 
             xhr.onload = () => {
@@ -106,22 +123,22 @@ export class Authenticator {
                     if (xhr.status === 200) {
                         var json = JSON.parse(xhr.responseText);
                         if (json == null) {
-                            return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                            return reject(new OAuthError('No access_token or code could be parsed.'));
                         }
                         else if ('access_token' in json) {
                             this.tokens.add(endpoint.provider, json)
                             return resolve(json as IToken);
                         }
                         else {
-                            return reject(json as IError);
+                            return reject(new OAuthError(json.error, json.state));
                         }
                     }
                     else if (xhr.status !== 200) {
-                        return reject(<IError>{ error: 'Request failed. ' + xhr.response });
+                        return reject(new OAuthError('Request failed. ' + xhr.response));
                     }
                 }
                 catch (e) {
-                    return reject(<IError>{ error: e });
+                    return reject(new OAuthError('An error occured while parsing the response'));
                 }
             };
 
@@ -205,10 +222,10 @@ export class Authenticator {
 
                             let result = TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                             if (result == null) {
-                                return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                                return reject(new OAuthError('No access_token or code could be parsed.'));
                             }
                             else if (endpoint.state && +result.state !== params.state) {
-                                return reject(<IError>{ error: 'State couldn\'t be verified' });
+                                return reject(new OAuthError('State couldn\'t be verified'));
                             }
                             else if ('code' in result) {
                                 return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
@@ -218,21 +235,21 @@ export class Authenticator {
                                 return resolve(result as IToken);
                             }
                             else {
-                                return reject(result as IError);
+                                return reject(new OAuthError((result as IError).error, result.state));
                             }
                         }
                     }
                     catch (exception) {
                         if (!popupWindow) {
                             clearInterval(interval);
-                            return reject(<IError>{ error: exception });
+                            return reject(new OAuthError('Popup window was closed'));
                         }
                     }
                 }, POLL_INTERVAL);
             }
             catch (exception) {
                 popupWindow.close();
-                return reject(<IError>{ error: exception });
+                return reject(new OAuthError('Unexpected error occured while creating popup'));
             }
         });
     }
@@ -245,18 +262,18 @@ export class Authenticator {
             Office.context.ui.displayDialogAsync(params.url, windowSize, result => {
                 var dialog = result.value;
                 if (dialog == null) {
-                    return reject(<IError>{ error: result.error.message });
+                    return reject(new OAuthError(result.error.message));
                 }
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {
                     dialog.close();
                     try {
                         if (args.message == null || args.message === '') {
-                            return reject(<IError>{ error: 'No access_token or code could be parsed.' });
+                            return reject(new OAuthError('No access_token or code could be parsed.'));
                         }
 
                         var json = JSON.parse(args.message);
                         if (endpoint.state && +json.state !== params.state) {
-                            return reject(<IError>{ error: 'State couldn\'t be verified' });
+                            return reject(new OAuthError('State couldn\'t be verified'));
                         }
                         else if ('code' in json) {
                             return resolve(this.exchangeCodeForToken(endpoint, (<ICode>json)));
@@ -266,11 +283,11 @@ export class Authenticator {
                             return resolve(json as IToken);
                         }
                         else {
-                            return reject(json as IError);
+                            return reject(new OAuthError((json as IError).error, json.state));
                         }
                     }
                     catch (exception) {
-                        return reject(<IError>{ error: exception });
+                        return reject(new OAuthError('Error while parsing response: ' + JSON.stringify(exception)));
                     }
                 });
             });
