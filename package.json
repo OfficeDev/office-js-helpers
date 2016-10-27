@@ -11,7 +11,8 @@
     "tsc": "tsc -p tsconfig.json",
     "umd": "node build/browserify.js",
     "minify": "node build/minify.js",
-    "build": "rimraf dist && npm run tsc && npm run umd && npm run minify",
+    "clean": "rimraf dist",
+    "build": "npm run clean && npm run tsc && npm run umd && npm run minify",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
@@ -19,22 +20,22 @@
   },
   "main": "./dist/index.js",
   "jsnext:main": ".dist/index.js",
-  "typings": "./dist/lib/index.d.ts",
+  "typings": "./dts/index.d.ts",
   "license": "MIT",
   "files": [
     "dist/",
-    "src/"
+    "dts/"
   ],
   "dependencies": {
     "core-js": "^2.4.1"
   },
   "devDependencies": {
     "typings": "^1.4.0",
-    "typescript": "^2.0.3",
+    "typescript": "^2.0.6",
     "rimraf": "^2.5.4",
     "tslint": "^3.15.1",
     "jasmine-core": "^2.5.2",
-    "browserify": "^13.1.0",
+    "browserify": "^13.1.1",
     "browserify-umdify": "^1.0.3",
     "uglify-js": "^2.7.4"
   },
