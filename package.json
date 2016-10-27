@@ -19,7 +19,7 @@
     "publish-minor": "npm version patch && npm publish"
   },
   "main": "./dist/index.js",
-  "jsnext:main": ".dist/index.js",
+  "jsnext:main": "./dist/index.js",
   "typings": "./dts/index.d.ts",
   "license": "MIT",
   "files": [

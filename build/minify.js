@@ -1,3 +1,6 @@
+// Credit to Basarat/typescript-collections
+// https://github.com/basarat/typescript-collections/blob/release/minify-umd.js
+
 "use strict;"
 
 var fs = require("fs");
