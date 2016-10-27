@@ -9,8 +9,8 @@
   "scripts": {
     "install-deps": "npm install & typings install",
     "tsc": "tsc -p tsconfig.json",
-    "umd": "node build/browserify-umd.js",
-    "minify": "node build/minify-umd.js",
+    "umd": "node build/browserify.js",
+    "minify": "node build/minify.js",
     "build": "rimraf dist && npm run tsc && npm run umd && npm run minify",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
