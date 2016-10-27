@@ -1,54 +1,49 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
+  "version": "0.2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
   "scripts": {
-    "build": "npm run webpack-build && npm run gen-dts",
-    "test": "npm run webpack-test",
+    "install-deps": "npm install & typings install",
+    "tsc": "tsc -p tsconfig.json",
+    "umdify": "node build/browserify.js",
+    "minify": "node build/minify.js",
+    "clean": "rimraf dist && rimraf dts",
+    "build": "npm run clean && npm run tsc && npm run umdify && npm run minify",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
-    "publish-minor": "npm version patch && npm publish",
-    "webpack-test": "webpack-dev-server --compress --inline --open --port 3000 --https --config config/webpack.test.js --progress --colors",
-    "webpack-build": "rimraf dist && webpack --config config/webpack.build.js --progress --profile --bail --colors --display-modules",
-    "gen-dts": "tsc -p tsconfig.json -d && npm run build-dts",
-    "build-dts": "node config/dts-gen.js",
-    "lint": "tslint 'src/**/*.ts'",
-    "postinstall": "typings install"
+    "publish-minor": "npm version patch && npm publish"
   },
-  "version": "0.1.14",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "jsnext:main": "./dist/index.js",
+  "typings": "./dts/index.d.ts",
   "license": "MIT",
   "files": [
     "dist/",
-    "src/"
+    "dts/"
   ],
   "dependencies": {
     "core-js": "^2.4.1"
   },
   "devDependencies": {
     "typings": "^1.4.0",
-    "typescript": "^2.0.3",
-    "dts-builder": "^1.0.8",
+    "typescript": "^2.0.6",
     "rimraf": "^2.5.4",
     "tslint": "^3.15.1",
-    "ts-loader": "^0.9.3",
-    "webpack": "^1.13.2",
-    "webpack-dev-server": "^1.16.2",
-    "html-webpack-plugin": "^2.22.0",
-    "jasmine-core": "^2.5.2"
+    "jasmine-core": "^2.5.2",
+    "browserify": "^13.1.1",
+    "browserify-umdify": "^1.0.3",
+    "uglify-js": "^2.7.4"
   },
   "keywords": [
-    "Office",
-    "Office.js",
+    "Office Add-ins",
     "Office JavaScript API",
     "Authentication",
     "OAuth",
-    "Implicit OAuth",
     "Storage",
     "Helpers"
   ],

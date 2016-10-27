@@ -8,7 +8,9 @@
     "removeComments": false,
     "sourceMap": true,
     "rootDir": "./src",
-    "outDir": "./dist"
+    "outDir": "./dist",
+    "declaration": true,
+    "declarationDir": "./dts"
   },
   "exclude": [
     "node_modules",
