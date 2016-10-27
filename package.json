@@ -20,8 +20,9 @@
     "postinstall": "typings install"
   },
   "version": "0.1.14",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
+  "main": "./dist/index.js",
+  "jsnext:main": ".dist/index.js",
+  "typings": "./dist/lib/index.d.ts",
   "license": "MIT",
   "files": [
     "dist/",
@@ -33,22 +34,17 @@
   "devDependencies": {
     "typings": "^1.4.0",
     "typescript": "^2.0.3",
-    "dts-builder": "^1.0.8",
     "rimraf": "^2.5.4",
     "tslint": "^3.15.1",
-    "ts-loader": "^0.9.3",
-    "webpack": "^1.13.2",
-    "webpack-dev-server": "^1.16.2",
-    "html-webpack-plugin": "^2.22.0",
-    "jasmine-core": "^2.5.2"
+    "jasmine-core": "^2.5.2",
+    "browserify": "^13.1.0",
+    "browserify-umdify": "^1.0.3"
   },
   "keywords": [
-    "Office",
-    "Office.js",
+    "Office Add-ins",
     "Office JavaScript API",
     "Authentication",
     "OAuth",
-    "Implicit OAuth",
     "Storage",
     "Helpers"
   ],
