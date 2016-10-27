@@ -1,25 +1,22 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
+  "version": "0.1.14",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
   "scripts": {
-    "build": "npm run webpack-build && npm run gen-dts",
-    "test": "npm run webpack-test",
+    "postinstall": "typings install",
+    "tsc": "tsc -p tsconfig.json",
+    "umd": "node build/browserify-umd.js",
+    "minify": "node build/minify-umd.js",
+    "build": "rimraf dist && npm run tsc && npm run umd && npm run minify",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version patch && npm publish",
-    "webpack-test": "webpack-dev-server --compress --inline --open --port 3000 --https --config config/webpack.test.js --progress --colors",
-    "webpack-build": "rimraf dist && webpack --config config/webpack.build.js --progress --profile --bail --colors --display-modules",
-    "gen-dts": "tsc -p tsconfig.json -d && npm run build-dts",
-    "build-dts": "node config/dts-gen.js",
-    "lint": "tslint 'src/**/*.ts'",
-    "postinstall": "typings install"
   },
-  "version": "0.1.14",
   "main": "./dist/index.js",
   "jsnext:main": ".dist/index.js",
   "typings": "./dist/lib/index.d.ts",
@@ -38,7 +35,8 @@
     "tslint": "^3.15.1",
     "jasmine-core": "^2.5.2",
     "browserify": "^13.1.0",
-    "browserify-umdify": "^1.0.3"
+    "browserify-umdify": "^1.0.3",
+    "uglify-js": "^2.7.4"
   },
   "keywords": [
     "Office Add-ins",
