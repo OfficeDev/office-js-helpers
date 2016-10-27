@@ -1,0 +1,10 @@
+!dist/**
+src/**
+tests/**
+build/**
+.gitattributes
+.gitignore
+.travis.yml
+contributing.md
+tsconfig.json
+typings.json
