@@ -7,11 +7,11 @@
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
   "scripts": {
-    "install-deps": "npm install & typings install",
     "tsc": "tsc -p tsconfig.json",
     "umdify": "node build/browserify.js",
     "minify": "node build/minify.js",
     "clean": "rimraf dist && rimraf dts",
+    "postinstall": "typings install",
     "build": "npm run clean && npm run tsc && npm run umdify && npm run minify",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
