@@ -6,6 +6,9 @@
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
+  "engines": {
+    "node": "6.3.0"
+  },
   "scripts": {
     "tsc": "tsc -p tsconfig.json",
     "umdify": "node build/browserify.js",
