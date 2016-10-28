@@ -23,7 +23,7 @@ To install the stable version:
 
 #### Production
 
-You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers/dist/office.helpers.js), download them, or point your package manager to them.
+You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers/dist/office.helpers.min.js), download them, or point your package manager to them.
 
 You can also get the latest version from the [releases](https://github.com/OfficeDev/office-js-helpers/releases) tab
 
@@ -48,18 +48,15 @@ Reference the library inside of your `.html` page using:
 
 ### TypeScript
 
-In a TypeScript environment,
-**If you are just referencing the library using a script tag** then add a reference to `officehelpers.d.ts` either in your `tsconfig.json` or `typings.json` or use
-
-```typescript
-/// <reference path="path_to_lib/officehelpers.d.ts" />
-```
+**If you are just referencing the library using a script tag** then make sure to set your `moduleResolution` to `node` in your tsconfig.json to pickup the intellisense automatically. You will need to install the package via `npm install @microsoft/office-js-helpers`.
 
 > We will publish to DefinitelyTyped soon and then you can directly use `typings` to get access to the definitions.
 
 **If you are using any dependency loader** such as [RequireJS](http://requirejs.org/) or [SystemJS](https://github.com/systemjs/systemjs) or module bundler such as [browserify](http://browserify.org/), [webpack](https://webpack.github.io/), you can use TypeScript `import` syntax to import specific modules. For e.g.
 
 ```typescript
+import * as OfficeHelpers from '@microsoft/office-js-helpers';
+
 import {Authenticator, DefaultEndpoints} from '@microsoft/office-js-helpers';
 
 import {Authenticator, Storage} from '@microsoft/office-js-helpers';
@@ -160,6 +157,7 @@ authenticator
     .then(function (token) { /* Facebook Token */ })
     .catch(function(error) { /* handle error here */ });
 ```
+If the user, rejects the grant to the application then you will receive an error in the `catch` function.
 
 #### Getting a cached token
 By default the tokens are cached to the LocalStorage and upon expiry the AuthDialog is invoked again. You can also pass the `force` parameter as `true` as the second input to `authenticator.authenticate()` to re-authenticate the user.
@@ -194,7 +192,7 @@ authenticator
 // get the cached token if any. returns null otherwise.
 var token = authenticator.tokens.get('name of endpoint');
 ```
-
+If a cached token expires, then the dialog is automatically launched to re-authenticate the user.
 > Note on Refresh Tokens: By default, Implicit OAuth does not support Token Refresh as a security measure. This is because Access Tokens cannot be securely stored inside of a JavaScript client.
 
 ## Contributing
