@@ -200,7 +200,7 @@ If a cached token expires, then the dialog is automatically launched to re-authe
 
 ## Contributing
 
-Please read [CONTRIBUTING.md](CONTRIBUTING.md) for details on our code of conduct, and the process for submitting pull requests to us.
+Please read [Contributing](contributing.md) for details on our code of conduct, and the process for submitting pull requests to us.
 
 ## Versioning
 
@@ -208,4 +208,4 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details
+This project is licensed under the MIT License - see the [License](LICENSE) file for details

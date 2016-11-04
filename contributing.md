@@ -1,6 +1,6 @@
-# Contribute to this code sample
+# Contribute to this helper
 
-Thank you for your interest in our sample
+Thank you for your interest in our library
 
 * [Ways to contribute](#ways-to-contribute)
 * [To contribute using Git](#to-contribute-using-git)
@@ -10,20 +10,19 @@ Thank you for your interest in our sample
 
 ## Ways to contribute
 
-Here are some ways you can contribute to this sample:
+Here are some ways you can contribute to this library:
 
-* Add better comments to the sample code.
-* Fix issues opened in GitHub against this sample.
-* Add a new feature to the sample.
+* Add better comments to the library code.
+* Fix issues opened in GitHub against this library.
+* Add a new feature to the library.
 
-We want your contributions. Help the developer community by improving this sample.
-Contributions can include Bug fixes, new features, and better code documentation.
+We want your contributions. Help the developer community by improving this library.
 Submit code comment contributions where you want a better explanation of what's going on.
-See a good example of [code commenting](https://github.com/OfficeDev/O365-Android-Microsoft-Graph-Connect/blob/master/app/src/main/java/com/microsoft/office365/connectmicrosoftgraph/AuthenticationManager.java).
+See a good example of [code commenting](https://github.com/OfficeDev/office-js-helpers/blob/master/src/authentication/authenticator.ts).
 
-Another great way to improve the sample in this repository is to take on some of the open issues filed against the repository. You may have a solution to an bug in the sample code that hasn't been addressed. Fix the issue and then create a pull request following our [Contribute code](#contribute-code) guidance.
+Another great way to improve the library in this repository is to take on some of the open issues filed against the repository. You may have a solution to an bug in the library code that hasn't been addressed. Fix the issue and then create a pull request following our [Contribute code](#contribute-code) guidance.
 
-If you want to add a new feature to the sample, be sure you have the agreement of the repository owner before writing the code. Start by opening an issue in the repository. Use the new issue to propose the feature. The repository owner will respond and will usually ask you for more information. When the owner agrees to take the new feature, code it and submit a pull request.
+If you want to add a new feature to the library, be sure you have the agreement of the repository owner before writing the code. Start by opening an issue in the repository. Use the new issue to propose the feature. The repository owner will respond and will usually ask you for more information. When the owner agrees to take the new feature, code it and submit a pull request.
 
 ## To contribute using Git
 For most contributions, you'll be asked to sign a Contribution License Agreement (CLA). For those contributions that need it, The Office 365 organization on GitHub will send a link to the CLA that we want you to sign via email.
@@ -81,7 +80,7 @@ To make the contribution process as seamless as possible, follow these steps.
 
 Navigate to the repository on your computer. On a Windows  PC, the repository files are in `C:\Users\<yourusername>\<repo name>`.
 
-Use the IDE of your choice to modify and build the sample. Once you have completed your change, commented your code, and test, check the code
+Use the IDE of your choice to modify and build the library. Once you have completed your change, commented your code, and test, check the code
 into the remote branch on GitHub.
 
 #### Code contribution checklist
@@ -90,7 +89,7 @@ Be sure to satisfy all of the requirements in the following list before submitti
 
 -  Follow the code style found in the cloned repository code. Our Android code follows the style conventions found in the [Code Style for Contributors](https://source.android.com/source/code-style.html) guide.
 - Code must be tested.
-- Test the sample UI thoroughly to be sure nothing has been broken by your change.
+- Test the library UI thoroughly to be sure nothing has been broken by your change.
 - Keep the size of your code change reasonable. If the repository owner cannot review your code change in 4 hours or less, your pull request may not be reviewed and approved quickly.
 - Avoid unnecessary changes to cloned or forked code. The reviewer will use a tool to find the differences between your code and the original code. Whitespace changes are called out along with your code. Be sure your changes will help improve the content.
 
@@ -153,7 +152,7 @@ Once your changes are successfully merged into the main repository, delete the b
 2.	Next, at the command prompt, type `git branch -d <branch name>`. This deletes the branch on your computer only if it has been successfully merged to the upstream repository. (You can override this behavior with the `-D` flag, but first be sure you want to do this.)
 3.	Finally, type `git push origin :<branch name>` at the command prompt (a space before the colon and no space after it).  This will delete the branch on your github fork.
 
-Congratulations, you have successfully contributed to the sample app!
+Congratulations, you have successfully contributed to the library app!
 
 
 ## FAQ
@@ -174,7 +173,7 @@ When you submit your changes, via a pull request, our team will be notified and 
 
 ### Who approves pull requests?
 
-The owner of the sample repository approves pull requests.
+The owner of the library repository approves pull requests.
 
 ### How soon will I get a response about my change request?
 

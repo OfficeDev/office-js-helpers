@@ -19,7 +19,8 @@
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
-    "publish-minor": "npm version patch && npm publish"
+    "publish-minor": "npm version patch && npm publish",
+    "publish-beta": "npm publish --tag beta"
   },
   "main": "./dist/index.js",
   "jsnext:main": "./dist/index.js",
