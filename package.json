@@ -10,7 +10,7 @@
     "node": "6.3.0"
   },
   "scripts": {
-    "tsc": "tsc -p tsconfig.json",
+    "tsc": "tsc -p tsconfig.json && rimraf ./dist/**/*.spec.*",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "umdify": "node build/browserify.js",
     "minify": "node build/minify.js",
