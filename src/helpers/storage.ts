@@ -15,7 +15,7 @@ export type StorageObserver = (e: StorageEvent) => any;
  * @see Uses {@link Dictionary} to create an in-memory copy of
  * the storage for faster reads. Writes update the actual storage.
  */
-export class Storage<T> extends Dictionary<T>{
+export class Storage<T> extends Dictionary<T> {
     private _storage = null;
     static _observers: StorageObserver[] = [];
 
@@ -71,7 +71,7 @@ export class Storage<T> extends Dictionary<T>{
      * Extends Dictionary's implementation with a save to the storage.
      */
     remove(item: string) {
-        var value = super.remove(item);
+        let value = super.remove(item);
         this.save();
         return value;
     }
@@ -106,7 +106,7 @@ export class Storage<T> extends Dictionary<T>{
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        var items = JSON.parse(this._storage[this._container]);
+        let items = JSON.parse(this._storage[this._container]);
         this.items = Utilities.extend({}, items, this.items);
     }
 

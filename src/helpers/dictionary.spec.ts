@@ -12,9 +12,9 @@ export default describe('Testing Dictionary', () => {
 
         it('should initialize with items', () => {
             let items = {
-                "blah": 1,
-                "random": 2,
-                "items": 3
+                'blah': 1,
+                'random': 2,
+                'items': 3
             };
 
             let dictionary = new Dictionary<any>(items);
@@ -41,19 +41,19 @@ export default describe('Testing Dictionary', () => {
 
         beforeEach(() => {
             dictionary = new Dictionary<any>({
-                "Google": {
+                'Google': {
                     cliendId: 'clientId',
                     redirectUrl: 'redirectUrl',
                     scope: 'scope',
                     nonce: true
                 },
-                "Microsoft": {
+                'Microsoft': {
                     cliendId: 'clientId',
                     redirectUrl: 'redirectUrl',
                     scope: 'scope',
                     nonce: true
                 },
-                "Facebook": {
+                'Facebook': {
                     cliendId: 'clientId',
                     redirectUrl: 'redirectUrl',
                     scope: 'scope',

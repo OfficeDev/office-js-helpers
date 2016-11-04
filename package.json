@@ -11,6 +11,7 @@
   },
   "scripts": {
     "tsc": "tsc -p tsconfig.json",
+    "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "umdify": "node build/browserify.js",
     "minify": "node build/minify.js",
     "clean": "rimraf dist && rimraf dts",

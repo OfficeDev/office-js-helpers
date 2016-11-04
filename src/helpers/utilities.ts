@@ -11,18 +11,31 @@ export class Utilities {
      * Utility to clone or merge objects.
      */
     static extend(obj, ...defaults) {
-        var length = arguments.length;
-        if (length < 2 || obj == null) return obj; // if there are no objects to extend then return the current object
-        if (defaults) obj = Object(obj); // create a new object to extend if there are any extensions
+        let length = arguments.length;
+        if (length < 2 || obj == null) {
+            return obj; // if there are no objects to extend then return the current object
+        }
 
-        for (var index = 1; index < length; index++) {
-            var source = arguments[index]; // foreach object
-            if (source == null) continue; // move on if the object is null or undefined
-            var keys = Object.keys(source), // get all the keys
+        if (defaults) {
+            obj = Object(obj); // create a new object to extend if there are any extensions
+        }
+
+        for (let index = 1; index < length; index++) {
+            let source = arguments[index]; // foreach object
+
+            if (source == null) {
+                continue; // move on if the object is null or undefined
+            }
+
+            let keys = Object.keys(source), // get all the keys
                 l = keys.length; // cache the length
-            for (var i = 0; i < l; i++) {
-                var key = keys[i]; // for each key
-                if (!defaults || obj[key] === void 0) obj[key] = source[key]; // replace values
+
+            for (let i = 0; i < l; i++) {
+                let key = keys[i]; // for each key
+
+                if (!defaults || obj[key] === void 0) {
+                    obj[key] = source[key]; // replace values
+                }
             }
         }
         return obj;
@@ -38,7 +51,7 @@ export class Utilities {
                 window.hasOwnProperty('Excel') ||
                 window.hasOwnProperty('Word') ||
                 window.hasOwnProperty('OneNote')
-            )
+            );
     }
 
     /**
@@ -51,7 +64,7 @@ export class Utilities {
             logger(JSON.stringify(exception));
         }
         else {
-            console.group(exception.message || exception)
+            console.group(exception.message || exception);
             console.error(exception);
             if ((exception.stack == null)) {
                 console.groupCollapsed('Stack Trace');
