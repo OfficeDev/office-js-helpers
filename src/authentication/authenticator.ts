@@ -2,7 +2,7 @@
 
 import { EndpointManager, IEndpoint } from './endpoint.manager';
 import { TokenManager, IToken, ICode, IError } from './token.manager';
-import { error, isAddin } from '../helpers/utilities';
+import { Utilities } from '../helpers/utilities';
 
 /**
  * Custom error type to handle OAuth specific errors.
@@ -227,7 +227,7 @@ export class Authenticator {
         if (Authenticator._hasDialogAPI == null) {
             try {
                 Authenticator._hasDialogAPI =
-                    isAddin() &&
+                    Utilities.isAddin() &&
                     (
                         (<any>window).Office.context.requirements &&
                         (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1')

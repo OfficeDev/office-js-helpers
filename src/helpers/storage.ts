@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import { Dictionary } from './dictionary';
-import { extend } from './utilities';
+import { Utilities } from './utilities';
 
 export enum StorageType {
     LocalStorage,
@@ -107,7 +107,7 @@ export class Storage<T> extends Dictionary<T>{
      */
     load() {
         var items = JSON.parse(this._storage[this._container]);
-        this.items = extend({}, items, this.items);
+        this.items = Utilities.extend({}, items, this.items);
     }
 
     onStorage(observer: StorageObserver) {

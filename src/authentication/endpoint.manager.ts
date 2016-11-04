@@ -1,5 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
-import { extend } from '../helpers/utilities';
+
+import { Utilities } from '../helpers/utilities';
 import { Storage, StorageType } from '../helpers/storage';
 
 export const DefaultEndpoints = {
@@ -133,7 +134,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = extend({}, overrides, defaults);
+        var config = Utilities.extend({}, overrides, defaults);
         return this.add(DefaultEndpoints.Google, config);
     };
 
@@ -157,7 +158,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = extend({}, overrides, defaults);
+        var config = Utilities.extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Microsoft, config);
     };
 
@@ -181,7 +182,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = extend({}, overrides, defaults);
+        var config = Utilities.extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Facebook, config);
     };
 
@@ -205,7 +206,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = extend({}, overrides, defaults);
+        var config = Utilities.extend({}, overrides, defaults);
         this.add(DefaultEndpoints.AzureAD, config);
     };
 
