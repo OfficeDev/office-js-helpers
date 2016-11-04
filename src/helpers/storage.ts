@@ -1,11 +1,14 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import { Dictionary } from './dictionary';
+import { extend } from './utilities';
 
 export enum StorageType {
     LocalStorage,
     SessionStorage
 }
+
+export type StorageObserver = (e: StorageEvent) => any;
 
 /**
  * Helper for creating and querying Local Storage or Session Storage.
@@ -14,6 +17,7 @@ export enum StorageType {
  */
 export class Storage<T> extends Dictionary<T>{
     private _storage = null;
+    static _observers: StorageObserver[] = [];
 
     /**
      * @constructor
@@ -24,6 +28,7 @@ export class Storage<T> extends Dictionary<T>{
         super();
         type = type || StorageType.LocalStorage;
         this.switchStorage(type);
+        this._registerStorageEvent();
     }
 
     /**
@@ -93,6 +98,7 @@ export class Storage<T> extends Dictionary<T>{
      * Saves the current state to the storage.
      */
     save() {
+        this.load();
         this._storage[this._container] = JSON.stringify(this.items);
     }
 
@@ -100,9 +106,18 @@ export class Storage<T> extends Dictionary<T>{
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        super.clear();
-        this.items = JSON.parse(this._storage[this._container]);
-        if (this.items == null) this.items = {};
-        return this.items;
+        var items = JSON.parse(this._storage[this._container]);
+        this.items = extend({}, items, this.items);
+    }
+
+    onStorage(observer: StorageObserver) {
+        Storage._observers.push(observer);
+    }
+
+    private _registerStorageEvent() {
+        window.onstorage = event => {
+            this.load();
+            Storage._observers.forEach(observer => observer(event));
+        };
     }
 }

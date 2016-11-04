@@ -39,7 +39,7 @@ export class TokenManager extends Storage<IToken> {
     /**
      * Compute the expiration date based on the expires_in field in a OAuth token.
      */
-    setExpiry(token: IToken) {
+    static setExpiry(token: IToken) {
         var expire = seconds => seconds == null ? null : new Date(new Date().getTime() + ~~seconds * 1000);
         if (!(token == null) && token.expires_at == null) {
             token.expires_at = expire(token.expires_in);
@@ -47,55 +47,54 @@ export class TokenManager extends Storage<IToken> {
     }
 
     /**
-     * Extends Storage's default add method
-     * Adds a new OAuth Token after settings its expiry
-     *
-     * @param {string} provider Unique name of the corresponding OAuth Endpoint.
-     * @param {object} config valid Token
-     * @see {@link IEndpoint}.
-     * @return {object} Returns the added endpoint.
+     * Check if an OAuth token has expired.
      */
-    add(provider: string, value: IToken) {
-        value.provider = provider;
-        this.setExpiry(value);
-        return super.insert(provider, value);
+    static hasExpired(token: IToken): boolean {
+        if (token == null) {
+            return false;
+        }
+        if (token.expires_at == null) {
+            return false;
+        }
+        else {
+            token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
+            return token.expires_at.getTime() - new Date().getTime() < 0;
+        }
     }
 
     /**
-     * Extract the token from the URL
+     * Extends Storage's default get method
+     * Gets an OAuth Token after checking its expiry
      *
-     * @param {string} url The url to extract the token from.
-     * @param {string} exclude Exclude a particlaur string from the url, such as a query param or specific substring.
-     * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
-     * @return {object} Returns the extracted token.
+     * @param {string} provider Unique name of the corresponding OAuth Token.
+     * @return {object} Returns the token or null if its either expired or doesn't exist.
      */
-    static getToken(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
-        if (exclude) url = url.replace(exclude, '');
+    get(provider: string): IToken {
+        var token = super.get(token);
+        if (token == null) return token;
 
-        let parts = url.split(delimiter);
-        if (parts.length <= 0) return;
-
-        let rightPart = parts.length >= 2 ? parts[1] : parts[0];
-        rightPart = rightPart.replace('/', '');
-
-        if (rightPart.indexOf("?") !== -1) {
-            let queryPart = rightPart.split("?");
-            if (!queryPart || queryPart.length <= 0) return;
-            rightPart = queryPart[1];
+        var expired = TokenManager.hasExpired(token);
+        if (expired) {
+            super.remove(provider);
+            return null;
         }
-
-        return this._extractParams(rightPart);
+        else {
+            return token;
+        }
     }
 
-    private static _extractParams(segment: string): any {
-        let params: any = {},
-            regex = /([^&=]+)=([^&]*)/g,
-            matches;
-
-        while ((matches = regex.exec(segment)) !== null) {
-            params[decodeURIComponent(matches[1])] = decodeURIComponent(matches[2]);
-        }
-
-        return params;
+    /**
+     * Extends Storage's default add method
+     * Adds a new OAuth Token after settings its expiry
+     *
+     * @param {string} provider Unique name of the corresponding OAuth Token.
+     * @param {object} config valid Token
+     * @see {@link IToken}.
+     * @return {object} Returns the added token.
+     */
+    add(provider: string, value: IToken) {
+        value.provider = provider;
+        TokenManager.setExpiry(value);
+        return super.insert(provider, value);
     }
 }

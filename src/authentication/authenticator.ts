@@ -1,7 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { EndpointManager, IEndpoint } from '../authentication/endpoint.manager';
-import { TokenManager, IToken, ICode, IError } from '../authentication/token.manager';
+import { EndpointManager, IEndpoint } from './endpoint.manager';
+import { TokenManager, IToken, ICode, IError } from './token.manager';
+import { error, isAddin } from '../helpers/utilities';
 
 /**
  * Custom error type to handle OAuth specific errors.
@@ -64,19 +65,10 @@ export class Authenticator {
      */
     authenticate(provider: string, force: boolean = false): Promise<IToken> {
         let token = this.tokens.get(provider);
+        let hasTokenExpired = TokenManager.hasExpired(token);
 
-        if (token != null) {
-            if (token.expires_at != null) {
-                token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
-                if (token.expires_at.getTime() - new Date().getTime() < 0) {
-                    console.warn(`Token for provider: ${provider} has expired. Re-authenticating...`);
-                    force = true;
-                }
-            }
-
-            if (!force) {
-                return Promise.resolve(token);
-            }
+        if (!hasTokenExpired && !force) {
+            return Promise.resolve(token);
         }
 
         let endpoint = this.endpoints.get(provider);
@@ -175,9 +167,47 @@ export class Authenticator {
                 return false;
             }
 
-            Office.context.ui.messageParent(JSON.stringify(TokenManager.getToken()));
+            Office.context.ui.messageParent(location.href);
             return true;
         }
+    }
+
+    /**
+     * Extract the token from the URL
+     *
+     * @param {string} url The url to extract the token from.
+     * @param {string} exclude Exclude a particlaur string from the url, such as a query param or specific substring.
+     * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
+     * @return {object} Returns the extracted token.
+     */
+    static getToken(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
+        if (exclude) url = url.replace(exclude, '');
+
+        let parts = url.split(delimiter);
+        if (parts.length <= 0) return;
+
+        let rightPart = parts.length >= 2 ? parts[1] : parts[0];
+        rightPart = rightPart.replace('/', '');
+
+        if (rightPart.indexOf("?") !== -1) {
+            let queryPart = rightPart.split("?");
+            if (!queryPart || queryPart.length <= 0) return;
+            rightPart = queryPart[1];
+        }
+
+        return this._extractParams(rightPart);
+    }
+
+    private static _extractParams(segment: string): any {
+        let params: any = {},
+            regex = /([^&=]+)=([^&]*)/g,
+            matches;
+
+        while ((matches = regex.exec(segment)) !== null) {
+            params[decodeURIComponent(matches[1])] = decodeURIComponent(matches[2]);
+        }
+
+        return params;
     }
 
     /**
@@ -197,15 +227,10 @@ export class Authenticator {
         if (Authenticator._hasDialogAPI == null) {
             try {
                 Authenticator._hasDialogAPI =
-                    window.hasOwnProperty('Office') &&
+                    isAddin() &&
                     (
-                        (
-                            (<any>window).Office.context.requirements &&
-                            (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1')
-                        ) ||
-                        window.hasOwnProperty('Excel') ||
-                        window.hasOwnProperty('Word') ||
-                        window.hasOwnProperty('OneNote')
+                        (<any>window).Office.context.requirements &&
+                        (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1')
                     )
             }
             catch (e) {
@@ -231,7 +256,7 @@ export class Authenticator {
                             clearInterval(interval);
                             popupWindow.close();
 
-                            let result = TokenManager.getToken(popupWindow.document.URL, endpoint.redirectUrl);
+                            let result = Authenticator.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                             if (result == null) {
                                 return reject(new OAuthError('No access_token or code could be parsed.'));
                             }
@@ -278,23 +303,22 @@ export class Authenticator {
                 dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {
                     dialog.close();
                     try {
-                        if (args.message == null || args.message === '') {
+                        let result = Authenticator.getToken(args.message, endpoint.redirectUrl);
+                        if (result == null) {
                             return reject(new OAuthError('No access_token or code could be parsed.'));
                         }
-
-                        var json = JSON.parse(args.message);
-                        if (endpoint.state && +json.state !== params.state) {
+                        else if (endpoint.state && +result.state !== params.state) {
                             return reject(new OAuthError('State couldn\'t be verified'));
                         }
-                        else if ('code' in json) {
-                            return resolve(this.exchangeCodeForToken(endpoint, (<ICode>json)));
+                        else if ('code' in result) {
+                            return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
                         }
-                        else if ('access_token' in json) {
-                            this.tokens.add(endpoint.provider, json as IToken);
-                            return resolve(json as IToken);
+                        else if ('access_token' in result) {
+                            this.tokens.add(endpoint.provider, result as IToken);
+                            return resolve(result as IToken);
                         }
                         else {
-                            return reject(new OAuthError((json as IError).error, json.state));
+                            return reject(new OAuthError((result as IError).error, result.state));
                         }
                     }
                     catch (exception) {
