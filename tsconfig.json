@@ -12,9 +12,12 @@
     "declaration": true,
     "declarationDir": "./dts"
   },
+  "include": [
+    "src/**/*",
+    "typings/index.d.ts"
+  ],
   "exclude": [
     "node_modules",
-    "dist",
-    "tests"
+    "**/*.spec.ts"
   ]
 }
