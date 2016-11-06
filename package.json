@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
-  "version": "0.3.0-beta.4",
+  "version": "0.3.0-beta.5",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
@@ -21,7 +21,7 @@
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version patch && npm publish",
-    "publish-beta": "npm publish --tag beta"
+    "publish-beta": "npm run build && npm publish --tag beta"
   },
   "main": "./dist/index.js",
   "jsnext:main": "./dist/index.js",

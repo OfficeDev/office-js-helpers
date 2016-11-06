@@ -8,8 +8,6 @@ export enum StorageType {
     SessionStorage
 }
 
-export type StorageObserver = (e: StorageEvent) => any;
-
 /**
  * Helper for creating and querying Local Storage or Session Storage.
  * @see Uses {@link Dictionary} to create an in-memory copy of
@@ -17,7 +15,8 @@ export type StorageObserver = (e: StorageEvent) => any;
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage = null;
-    static _observers: StorageObserver[] = [];
+    static _observers: ((e: StorageEvent) => any)[] = [];
+    static _storageEventRegistered: boolean;
 
     /**
      * @constructor
@@ -86,7 +85,7 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     /**
-     * Clear all storages
+     * Clear all storages.
      * Completely clears both the localStorage and sessionStorage.
      */
     static clearAll() {
@@ -110,14 +109,26 @@ export class Storage<T> extends Dictionary<T> {
         this.items = Utilities.extend({}, items, this.items);
     }
 
-    onStorage(observer: StorageObserver) {
+    /**
+     * Registers an event handler for the window.storage event and
+     * triggers the observer when the storage event is fired.
+     *
+     * The window.storage event is registered only once.
+     */
+    onStorage(observer: (e: StorageEvent) => any) {
         Storage._observers.push(observer);
     }
 
     private _registerStorageEvent() {
+        this.onStorage(update => this.load());
+        if (Storage._storageEventRegistered) {
+            return;
+        }
+
         window.onstorage = event => {
-            this.load();
             Storage._observers.forEach(observer => observer(event));
         };
+
+        Storage._storageEventRegistered = true;
     }
 }
