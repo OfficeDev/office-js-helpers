@@ -1,6 +1,17 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 /**
+ * Enumeration for the execution context types
+ */
+export enum ContextTypes {
+    Web,
+    Word,
+    Excel,
+    PowerPoint,
+    OneNote
+}
+
+/**
  * Helper exposing useful Utilities for Office-Addins.
  */
 export class Utilities {
@@ -41,17 +52,37 @@ export class Utilities {
         return obj;
     };
 
+    static get context(): ContextTypes {
+        let context: ContextTypes = ContextTypes.Web;
+
+        try {
+            if (Office.context.requirements.isSetSupported('ExcelApi')) {
+                context = ContextTypes.Excel;
+            }
+            else if (Office.context.requirements.isSetSupported('WordApi')) {
+                context = ContextTypes.Word;
+            }
+            else if (Office.context.requirements.isSetSupported('OneNoteApi')) {
+                context = ContextTypes.OneNote;
+            }
+            else if (Office.context.requirements.isSetSupported('ActiveView')) {
+                context = ContextTypes.PowerPoint;
+            }
+            else if (Office.context.requirements.isSetSupported('OoxmlCoercion')) {
+                context = ContextTypes.Word;
+            }
+        }
+        catch (exception) {
+        }
+
+        return context;
+    }
+
     /**
      * Utility to check if the code is running inside of an add-in.
      */
     static isAddin() {
-        return window.hasOwnProperty('Office')
-            && window.hasOwnProperty('OfficeExtension')
-            && (
-                window.hasOwnProperty('Excel') ||
-                window.hasOwnProperty('Word') ||
-                window.hasOwnProperty('OneNote')
-            );
+        return Utilities.context !== ContextTypes.Web;
     }
 
     /**

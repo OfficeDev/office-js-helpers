@@ -236,12 +236,7 @@ export class Authenticator {
     static get hasDialogAPI() {
         if (Authenticator._hasDialogAPI == null) {
             try {
-                Authenticator._hasDialogAPI =
-                    Utilities.isAddin() &&
-                    (
-                        (<any>window).Office.context.requirements &&
-                        (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1')
-                    );
+                Authenticator._hasDialogAPI = Utilities.isAddin();
             }
             catch (e) {
                 Authenticator._hasDialogAPI = false;

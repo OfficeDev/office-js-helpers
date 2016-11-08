@@ -51,7 +51,7 @@ export class TokenManager extends Storage<IToken> {
      */
     static hasExpired(token: IToken): boolean {
         if (token == null) {
-            return false;
+            return true;
         }
         if (token.expires_at == null) {
             return false;
