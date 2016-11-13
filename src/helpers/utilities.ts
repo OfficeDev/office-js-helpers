@@ -97,7 +97,7 @@ export class Utilities {
     /**
      * Utility to print prettified errors.
      */
-    static log(exception: OfficeExtension.Error | Error | string) {
+    static log(exception: Error | string) {
         if (typeof exception === 'string') {
             console.error(exception);
         }
