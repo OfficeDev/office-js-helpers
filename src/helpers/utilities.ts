@@ -80,6 +80,12 @@ export class Utilities {
             else if (Office.context.document.getProjectFieldAsync) {
                 host = HostTypes.Project;
             }
+
+
+            /* Overriding the definition of toString() so that we can get the context name
+             * directly instead a number
+             */
+            host.toString = () => HostTypes[host];
         }
         catch (exception) {
         }
