@@ -10,7 +10,12 @@
     "rootDir": "./src",
     "outDir": "./dist",
     "declaration": true,
-    "declarationDir": "./dts"
+    "declarationDir": "./dts",
+    "lib": [
+      "dom",
+      "es2015.promise",
+      "es5"
+    ]
   },
   "include": [
     "src/**/*",

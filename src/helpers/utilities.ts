@@ -3,12 +3,13 @@
 /**
  * Enumeration for the execution context types
  */
-export enum ContextTypes {
+export enum HostTypes {
     Web,
     Word,
     Excel,
     PowerPoint,
-    OneNote
+    OneNote,
+    Project
 }
 
 /**
@@ -52,57 +53,63 @@ export class Utilities {
         return obj;
     };
 
-    static get context(): ContextTypes {
-        let context: ContextTypes = ContextTypes.Web;
+    static get host(): HostTypes {
+        let host: HostTypes = HostTypes.Web;
 
         try {
             if (Office.context.requirements.isSetSupported('ExcelApi')) {
-                context = ContextTypes.Excel;
+                host = HostTypes.Excel;
             }
             else if (Office.context.requirements.isSetSupported('WordApi')) {
-                context = ContextTypes.Word;
-            }
-            else if (Office.context.requirements.isSetSupported('OneNoteApi')) {
-                context = ContextTypes.OneNote;
-            }
-            else if (Office.context.requirements.isSetSupported('ActiveView')) {
-                context = ContextTypes.PowerPoint;
+                host = HostTypes.Word;
             }
             else if (Office.context.requirements.isSetSupported('OoxmlCoercion')) {
-                context = ContextTypes.Word;
+                host = HostTypes.Word;
+            }
+            else if (Office.context.requirements.isSetSupported('MatrixBinding')) {
+                // MatrixBinding is also supported in Word but since we have passed the
+                // check for Word 2013 & 2016 this has got to be Excel 2013.
+                host = HostTypes.Excel;
+            }
+            else if (Office.context.requirements.isSetSupported('OneNoteApi')) {
+                host = HostTypes.OneNote;
+            }
+            else if (Office.context.requirements.isSetSupported('ActiveView')) {
+                host = HostTypes.PowerPoint;
+            }
+            else if (Office.context.document.getProjectFieldAsync) {
+                host = HostTypes.Project;
             }
         }
         catch (exception) {
         }
 
-        return context;
+        return host;
     }
 
     /**
      * Utility to check if the code is running inside of an add-in.
      */
     static isAddin() {
-        return Utilities.context !== ContextTypes.Web;
+        return Utilities.host !== HostTypes.Web;
     }
 
     /**
      * Utility to print prettified errors.
      */
-    static error(exception: Error, logger?: any)
-    static error(exception: string, logger?: any)
-    static error(exception: any, logger?: any) {
-        if (logger) {
-            logger(JSON.stringify(exception));
+    static log(exception: OfficeExtension.Error | Error | string) {
+        if (typeof exception === 'string') {
+            console.error(exception);
         }
         else {
-            console.group(exception.message || exception);
+            console.group(exception.message || exception.name || 'Unhandled Exception');
             console.error(exception);
             if ((exception.stack == null)) {
                 console.groupCollapsed('Stack Trace');
                 console.error(exception.stack);
                 console.groupEnd();
             }
-            if (Utilities.isAddin() && exception instanceof (<any>window).OfficeExtension.Error) {
+            if ((window as any).OfficeExtenstion && exception instanceof OfficeExtension.Error) {
                 console.groupCollapsed('Debug Info');
                 console.error(exception.debugInfo);
                 console.groupEnd();
