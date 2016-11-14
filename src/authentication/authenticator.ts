@@ -37,7 +37,7 @@ export class OAuthError extends Error {
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
-    private _teamsAuth: boolean;
+    static teams: boolean;
 
     /**
      * @constructor
@@ -82,16 +82,12 @@ export class Authenticator {
         if (endpoint == null) {
             return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
-        else if (this._teamsAuth) {
+        else if (Authenticator.teams) {
             return this._openWithTeams(endpoint);
         }
         else {
             return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
         }
-    }
-
-    useMicrosoftTeamsAuth() {
-        this._teamsAuth = true;
     }
 
     /**
@@ -161,6 +157,10 @@ export class Authenticator {
 
             xhr.send(JSON.stringify(data));
         });
+    }
+
+    static useMicrosoftTeamsAuth() {
+        Authenticator.teams = true;
     }
 
     /**
