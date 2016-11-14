@@ -3,6 +3,7 @@
 import { EndpointManager, IEndpoint } from './endpoint.manager';
 import { TokenManager, IToken, ICode, IError } from './token.manager';
 import { Utilities } from '../helpers/utilities';
+declare var microsoftTeams: any;
 
 /**
  * Custom error type to handle OAuth specific errors.
@@ -36,6 +37,8 @@ export class OAuthError extends Error {
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
+    private _teamsAuth: boolean;
+
     /**
      * @constructor
      *
@@ -79,9 +82,16 @@ export class Authenticator {
         if (endpoint == null) {
             return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
+        else if (this._teamsAuth) {
+            return this._openWithTeams(endpoint);
+        }
         else {
             return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
         }
+    }
+
+    useMicrosoftTeamsAuth() {
+        this._teamsAuth = true;
     }
 
     /**
@@ -330,6 +340,54 @@ export class Authenticator {
                         return reject(new OAuthError('Error while parsing response: ' + JSON.stringify(exception)));
                     }
                 });
+            });
+        });
+    }
+
+    private _openWithTeams(endpoint: IEndpoint): Promise<IToken> {
+        let params = EndpointManager.getLoginParams(endpoint);
+        let windowSize = this._determineDialogSize();
+
+        return new Promise<IToken>((resolve, reject) => {
+            try {
+                microsoftTeams.initialize();
+            }
+            catch (e) {
+
+            }
+
+            microsoftTeams.authentication.authenticate({
+                url: params.url,
+                width: windowSize.toPixels().width,
+                height: windowSize.toPixels().height,
+                failureCallback: exception => {
+                    return reject(new OAuthError('Error while launching dialog: ' + JSON.stringify(exception)));
+                },
+                successCallback: message => {
+                    try {
+                        let result = Authenticator.getToken(message, endpoint.redirectUrl);
+
+                        if (result == null) {
+                            return reject(new OAuthError('No access_token or code could be parsed.'));
+                        }
+                        else if (endpoint.state && +result.state !== params.state) {
+                            return reject(new OAuthError('State couldn\'t be verified'));
+                        }
+                        else if ('code' in result) {
+                            return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
+                        }
+                        else if ('access_token' in result) {
+                            this.tokens.add(endpoint.provider, result as IToken);
+                            return resolve(result as IToken);
+                        }
+                        else {
+                            return reject(new OAuthError((result as IError).error, result.state));
+                        }
+                    }
+                    catch (exception) {
+                        return reject(new OAuthError('Error while parsing response: ' + JSON.stringify(exception)));
+                    }
+                }
             });
         });
     }
