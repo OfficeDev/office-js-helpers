@@ -98,14 +98,14 @@ export class Storage<T> extends Dictionary<T> {
      */
     save() {
         this.load();
-        this._storage[this._container] = JSON.stringify(this.items);
+        this._storage.set(this._container, JSON.stringify(this.items));
     }
 
     /**
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        let items = JSON.parse(this._storage[this._container]);
+        let items = JSON.parse(this._storage.getItem(this._container));
         this.items = Utilities.extend({}, items, this.items);
     }
 
