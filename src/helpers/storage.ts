@@ -98,7 +98,7 @@ export class Storage<T> extends Dictionary<T> {
      */
     save() {
         this.load();
-        this._storage.set(this._container, JSON.stringify(this.items));
+        this._storage.setItem(this._container, JSON.stringify(this.items));
     }
 
     /**
