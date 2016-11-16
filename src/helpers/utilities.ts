@@ -22,14 +22,14 @@ export class Utilities {
     /**
      * Utility to clone or merge objects.
      */
-    static extend(obj, ...defaults) {
+    static extend(dest, ...sources) {
         let length = arguments.length;
-        if (length < 2 || obj == null) {
-            return obj; // if there are no objects to extend then return the current object
+        if (length < 2 || dest == null) {
+            return dest; // if there are no objects to extend then return the current object
         }
 
-        if (defaults) {
-            obj = Object(obj); // create a new object to extend if there are any extensions
+        if (sources) {
+            dest = Object(dest); // create a new object to extend if there are any extensions
         }
 
         for (let index = 1; index < length; index++) {
@@ -45,12 +45,12 @@ export class Utilities {
             for (let i = 0; i < l; i++) {
                 let key = keys[i]; // for each key
 
-                if (!defaults || obj[key] === void 0) {
-                    obj[key] = source[key]; // replace values
+                if (!sources || dest[key] === void 0) {
+                    dest[key] = source[key]; // replace values
                 }
             }
         }
-        return obj;
+        return dest;
     };
 
     static get host(): HostTypes {

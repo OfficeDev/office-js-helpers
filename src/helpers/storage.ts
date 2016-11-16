@@ -106,7 +106,7 @@ export class Storage<T> extends Dictionary<T> {
      */
     load() {
         let items = JSON.parse(this._storage.getItem(this._container));
-        this.items = Utilities.extend({}, items, this.items);
+        this.items = Utilities.extend({}, this.items, items);
     }
 
     /**
