@@ -101,6 +101,7 @@ export class Storage<T> extends Dictionary<T> {
      */
     save() {
         this._storage.setItem(this._container, JSON.stringify(this.items));
+        this._notifyObservers();
     }
 
     /**
@@ -122,15 +123,15 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     private _registerStorageEvent() {
-        this.onStorage(update => this.load());
+        this.onStorage(event => this.load());
+
         if (Storage._storageEventRegistered) {
             return;
         }
 
-        window.onstorage = event => {
-            Storage._observers.forEach(observer => observer(event));
-        };
-
+        window.onstorage = event => this._notifyObservers(event);
         Storage._storageEventRegistered = true;
     }
+
+    private _notifyObservers = (event?: StorageEvent) => Storage._observers.forEach(observer => observer(event));
 }
