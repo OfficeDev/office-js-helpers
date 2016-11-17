@@ -120,6 +120,7 @@ export class Utilities {
                 console.error(exception.debugInfo);
                 console.groupEnd();
             }
+            console.groupEnd();
         }
     }
 }
