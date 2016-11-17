@@ -50,6 +50,7 @@ export class Storage<T> extends Dictionary<T> {
      * Extends Dictionary's implementation of add, with a save to the storage.
      */
     add(item: string, value: T): T {
+        this.load();
         super.add(item, value);
         this.save();
         return value;
@@ -60,6 +61,7 @@ export class Storage<T> extends Dictionary<T> {
      * Extends Dictionary's implementation of insert, with a save to the storage.
      */
     insert(item: string, value: T): T {
+        this.load();
         super.insert(item, value);
         this.save();
         return value;
@@ -70,6 +72,7 @@ export class Storage<T> extends Dictionary<T> {
      * Extends Dictionary's implementation with a save to the storage.
      */
     remove(item: string) {
+        this.load();
         let value = super.remove(item);
         this.save();
         return value;
@@ -97,7 +100,6 @@ export class Storage<T> extends Dictionary<T> {
      * Saves the current state to the storage.
      */
     save() {
-        this.load();
         this._storage.setItem(this._container, JSON.stringify(this.items));
     }
 
