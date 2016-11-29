@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
-  "version": "0.3.0-beta.16",
+  "version": "0.3.0-beta.17",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
@@ -20,16 +20,15 @@
     "clean": "concurrently \"npm run clean-src\" \"npm run clean-dist\"",
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate && npm run clean-src",
-    "version": "npm run build && git add -A dist",
-    "postversion": "git push && git push --tags",
-    "publish-patch": "npm version patch && npm publish",
-    "publish-minor": "npm version patch && npm publish",
+    "version": "npm run build",
+    "publish-patch": "concurrently npm version patch  \"npm publish && git push --tags\"",
+    "publish-minor": "concurrently npm version minor \"npm publish && git push --tags\"",
     "publish-beta": "npm run build && npm publish --tag beta",
-    "postinstall": "typigns install"
+    "postinstall": "typings install"
   },
-  "main": "./dist/index.js",
-  "jsnext:main": "./dist/index.js",
-  "typings": "./dts/index.d.ts",
+  "main": "./dist/office.helpers.js",
+  "jsnext:main": "./dist/office.helpers.js",
+  "typings": "./dist/office.helpers.d.ts",
   "license": "MIT",
   "files": [
     "dist/",
