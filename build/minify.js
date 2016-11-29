@@ -4,9 +4,11 @@
 "use strict;"
 
 var fs = require("fs");
+var path = require("path");
 var UglifyJS = require("uglify-js");
-var distInFile = "./dist/office.helpers.js";
-var distOutFileUnversioned = "./dist/office.helpers.min.js";
+var projectRoot = path.resolve(__dirname, '../');
+var distInFile = `${projectRoot}/dist/office.helpers.js`;
+var distOutFileUnversioned = `${projectRoot}/dist/office.helpers.min.js`;
 
 var result = UglifyJS.minify(distInFile, { mangle: true });
-fs.writeFileSync(distOutFileUnversioned, result.code, { encoding: "utf-8" });
+fs.writeFileSync(distOutFileUnversioned, result.code, { encoding: "utf-8", flags: "wx" });

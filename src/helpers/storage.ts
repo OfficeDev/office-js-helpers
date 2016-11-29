@@ -8,16 +8,15 @@ export enum StorageType {
     SessionStorage
 }
 
-export type StorageObserver = (e: StorageEvent) => any;
-
 /**
  * Helper for creating and querying Local Storage or Session Storage.
  * @see Uses {@link Dictionary} to create an in-memory copy of
  * the storage for faster reads. Writes update the actual storage.
  */
-export class Storage<T> extends Dictionary<T>{
+export class Storage<T> extends Dictionary<T> {
     private _storage = null;
-    static _observers: StorageObserver[] = [];
+    static _observers: ((e: StorageEvent) => any)[] = [];
+    static _storageEventRegistered: boolean;
 
     /**
      * @constructor
@@ -51,6 +50,7 @@ export class Storage<T> extends Dictionary<T>{
      * Extends Dictionary's implementation of add, with a save to the storage.
      */
     add(item: string, value: T): T {
+        this.load();
         super.add(item, value);
         this.save();
         return value;
@@ -61,6 +61,7 @@ export class Storage<T> extends Dictionary<T>{
      * Extends Dictionary's implementation of insert, with a save to the storage.
      */
     insert(item: string, value: T): T {
+        this.load();
         super.insert(item, value);
         this.save();
         return value;
@@ -71,7 +72,8 @@ export class Storage<T> extends Dictionary<T>{
      * Extends Dictionary's implementation with a save to the storage.
      */
     remove(item: string) {
-        var value = super.remove(item);
+        this.load();
+        let value = super.remove(item);
         this.save();
         return value;
     }
@@ -86,7 +88,7 @@ export class Storage<T> extends Dictionary<T>{
     }
 
     /**
-     * Clear all storages
+     * Clear all storages.
      * Completely clears both the localStorage and sessionStorage.
      */
     static clearAll() {
@@ -98,26 +100,37 @@ export class Storage<T> extends Dictionary<T>{
      * Saves the current state to the storage.
      */
     save() {
-        this.load();
-        this._storage[this._container] = JSON.stringify(this.items);
+        this._storage.setItem(this._container, JSON.stringify(this.items));
     }
 
     /**
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        var items = JSON.parse(this._storage[this._container]);
-        this.items = Utilities.extend({}, items, this.items);
+        let items = JSON.parse(this._storage.getItem(this._container));
+        this.items = Utilities.extend({}, this.items, items);
     }
 
-    onStorage(observer: StorageObserver) {
+    /**
+     * Registers an event handler for the window.storage event and
+     * triggers the observer when the storage event is fired.
+     *
+     * The window.storage event is registered only once.
+     */
+    onStorage(observer: (e: StorageEvent) => any) {
         Storage._observers.push(observer);
     }
 
     private _registerStorageEvent() {
-        window.onstorage = event => {
-            this.load();
-            Storage._observers.forEach(observer => observer(event));
-        };
+        this.onStorage(event => this.load());
+
+        if (Storage._storageEventRegistered) {
+            return;
+        }
+
+        window.onstorage = event => this._notifyObservers(event);
+        Storage._storageEventRegistered = true;
     }
+
+    private _notifyObservers = (event?: StorageEvent) => Storage._observers.forEach(observer => observer(event));
 }

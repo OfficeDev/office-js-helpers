@@ -70,7 +70,7 @@ export class Dictionary<T> {
         if (!this.contains(key)) {
             throw new Error(`Key: ${key} not found.`);
         }
-        var value = this.items[key];
+        let value = this.items[key];
         delete this.items[key];
         return value;
     };
@@ -101,7 +101,9 @@ export class Dictionary<T> {
      * @return {array} Returns all the keys.
      */
     keys(): string[] {
-        if (this.items == null) return [];
+        if (this.items == null) {
+            return [];
+        }
         return Object.keys(this.items);
     }
 

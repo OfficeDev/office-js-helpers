@@ -86,18 +86,6 @@ export class EndpointManager extends Storage<IEndpoint> {
         super('OAuth2Endpoints', StorageType.LocalStorage);
     }
 
-    private _currentHost: string;
-    /**
-     * Gets the current url to be specified as the default redirect url.
-     */
-    get currentHost(): string {
-        if (this._currentHost == null) {
-            this._currentHost = window.location.protocol + "//" + window.location.host;
-        }
-
-        return this._currentHost;
-    }
-
     /**
      * Extends Storage's default add method.
      * Registers a new OAuth Endpoint.
@@ -109,7 +97,7 @@ export class EndpointManager extends Storage<IEndpoint> {
      */
     add(provider: string, config: IEndpoint): IEndpoint {
         if (config.redirectUrl == null) {
-            config.redirectUrl = this.currentHost;
+            config.redirectUrl = window.location.origin;
         }
         config.provider = provider;
         return super.insert(provider, config);
@@ -124,7 +112,7 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @return {object} Returns the added endpoint.
      */
     registerGoogleAuth(clientId: string, overrides?: IEndpoint) {
-        var defaults = <IEndpoint>{
+        let defaults = <IEndpoint>{
             clientId: clientId,
             baseUrl: 'https://accounts.google.com',
             authorizeUrl: '/o/oauth2/v2/auth',
@@ -134,7 +122,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = Utilities.extend({}, overrides, defaults);
+        let config = Utilities.extend({}, overrides, defaults);
         return this.add(DefaultEndpoints.Google, config);
     };
 
@@ -147,7 +135,7 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @return {object} Returns the added endpoint.
      */
     registerMicrosoftAuth(clientId: string, overrides?: IEndpoint) {
-        var defaults = <IEndpoint>{
+        let defaults = <IEndpoint>{
             clientId: clientId,
             baseUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0',
             authorizeUrl: '/authorize',
@@ -158,7 +146,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = Utilities.extend({}, overrides, defaults);
+        let config = Utilities.extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Microsoft, config);
     };
 
@@ -171,7 +159,7 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @return {object} Returns the added endpoint.
      */
     registerFacebookAuth(clientId: string, overrides?: IEndpoint) {
-        var defaults = <IEndpoint>{
+        let defaults = <IEndpoint>{
             clientId: clientId,
             baseUrl: 'https://www.facebook.com',
             authorizeUrl: '/dialog/oauth',
@@ -182,7 +170,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = Utilities.extend({}, overrides, defaults);
+        let config = Utilities.extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Facebook, config);
     };
 
@@ -196,7 +184,7 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @return {object} Returns the added endpoint.
      */
     registerAzureADAuth(clientId: string, tenant: string, overrides?: IEndpoint) {
-        var defaults = <IEndpoint>{
+        let defaults = <IEndpoint>{
             clientId: clientId,
             baseUrl: `https://login.windows.net/${tenant}`,
             authorizeUrl: '/oauth2/authorize',
@@ -206,7 +194,7 @@ export class EndpointManager extends Storage<IEndpoint> {
             state: true
         };
 
-        var config = Utilities.extend({}, overrides, defaults);
+        let config = Utilities.extend({}, overrides, defaults);
         this.add(DefaultEndpoints.AzureAD, config);
     };
 
@@ -220,12 +208,12 @@ export class EndpointManager extends Storage<IEndpoint> {
         url: string,
         state: number
     } {
-        var scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
-        var resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
-        var state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
-        var nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
+        let scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
+        let resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
+        let state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
+        let nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
 
-        var urlSegments = [
+        let urlSegments = [
             'response_type=' + endpointConfig.responseType,
             'client_id=' + encodeURIComponent(endpointConfig.clientId),
             'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl)
@@ -254,7 +242,7 @@ export class EndpointManager extends Storage<IEndpoint> {
     }
 
     private static _generateCryptoSafeRandom() {
-        var random = new Uint32Array(1);
+        let random = new Uint32Array(1);
         if ('msCrypto' in window) {
             (<any>window).msCrypto.getRandomValues(random);
         }

@@ -17,16 +17,16 @@ export class OAuthError extends Error {
     */
     constructor(message: string, public state?: string) {
         super(message);
-        this.name = "OAuthError";
+        this.name = 'OAuthError';
         this.message = message;
         if ((Error as any).captureStackTrace) {
             (Error as any).captureStackTrace(this, this.constructor);
         }
         else {
-            var error = new Error();
+            let error = new Error();
             if (error.stack) {
-                var last_part = error.stack.match(/[^\s]+$/);
-                this.stack = this.name + " at " + last_part;
+                let last_part = error.stack.match(/[^\s]+$/);
+                this.stack = `${this.name} at ${last_part}`;
             }
         }
     }
@@ -36,6 +36,7 @@ export class OAuthError extends Error {
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
+
     /**
      * @constructor
      *
@@ -46,8 +47,12 @@ export class Authenticator {
         public endpoints?: EndpointManager,
         public tokens?: TokenManager
     ) {
-        if (endpoints == null) this.endpoints = new EndpointManager();
-        if (tokens == null) this.tokens = new TokenManager();
+        if (endpoints == null) {
+            this.endpoints = new EndpointManager();
+        }
+        if (tokens == null) {
+            this.tokens = new TokenManager();
+        }
     }
 
     /**
@@ -103,13 +108,13 @@ export class Authenticator {
                 return resolve(data);
             }
 
-            var xhr = new XMLHttpRequest();
+            let xhr = new XMLHttpRequest();
             xhr.open('POST', endpoint.tokenUrl);
 
             xhr.setRequestHeader('Accept', 'application/json');
             xhr.setRequestHeader('Content-Type', 'application/json');
 
-            for (var header in headers) {
+            for (let header in headers) {
                 if (header === 'Accept' || header === 'Content-Type') {
                     continue;
                 }
@@ -119,17 +124,17 @@ export class Authenticator {
 
             xhr.onerror = () => {
                 return reject(new OAuthError('Unable to send request due to a Network error'));
-            }
+            };
 
             xhr.onload = () => {
                 try {
                     if (xhr.status === 200) {
-                        var json = JSON.parse(xhr.responseText);
+                        let json = JSON.parse(xhr.responseText);
                         if (json == null) {
                             return reject(new OAuthError('No access_token or code could be parsed.'));
                         }
                         else if ('access_token' in json) {
-                            this.tokens.add(endpoint.provider, json)
+                            this.tokens.add(endpoint.provider, json);
                             return resolve(json as IToken);
                         }
                         else {
@@ -181,17 +186,23 @@ export class Authenticator {
      * @return {object} Returns the extracted token.
      */
     static getToken(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
-        if (exclude) url = url.replace(exclude, '');
+        if (exclude) {
+            url = url.replace(exclude, '');
+        }
 
         let parts = url.split(delimiter);
-        if (parts.length <= 0) return;
+        if (parts.length <= 0) {
+            return;
+        }
 
         let rightPart = parts.length >= 2 ? parts[1] : parts[0];
         rightPart = rightPart.replace('/', '');
 
-        if (rightPart.indexOf("?") !== -1) {
-            let queryPart = rightPart.split("?");
-            if (!queryPart || queryPart.length <= 0) return;
+        if (rightPart.indexOf('?') !== -1) {
+            let queryPart = rightPart.split('?');
+            if (!queryPart || queryPart.length <= 0) {
+                return;
+            }
             rightPart = queryPart[1];
         }
 
@@ -214,7 +225,7 @@ export class Authenticator {
      * Check if the supplied url has either access_token or code or error.
      */
     static isTokenUrl(url: string) {
-        var regex = /(access_token|code|error)/gi;
+        let regex = /(access_token|code|error)/gi;
         return regex.test(url);
     }
 
@@ -226,12 +237,7 @@ export class Authenticator {
     static get hasDialogAPI() {
         if (Authenticator._hasDialogAPI == null) {
             try {
-                Authenticator._hasDialogAPI =
-                    Utilities.isAddin() &&
-                    (
-                        (<any>window).Office.context.requirements &&
-                        (<any>window).Office.context.requirements.isSetSupported('DialogAPI', '1.1')
-                    )
+                Authenticator._hasDialogAPI = Utilities.isAddin();
             }
             catch (e) {
                 Authenticator._hasDialogAPI = false;
@@ -296,7 +302,7 @@ export class Authenticator {
 
         return new Promise<IToken>((resolve, reject) => {
             Office.context.ui.displayDialogAsync(params.url, windowSize, result => {
-                var dialog = result.value;
+                let dialog = result.value;
                 if (dialog == null) {
                     return reject(new OAuthError(result.error.message));
                 }
@@ -330,8 +336,8 @@ export class Authenticator {
     }
 
     private _determineDialogSize() {
-        var screenHeight = window.screen.height;
-        var screenWidth = window.screen.width;
+        let screenHeight = window.screen.height;
+        let screenWidth = window.screen.width;
 
         if (screenWidth <= 640) {
             return this._createSizeObject(640, 480, screenWidth, screenHeight);
@@ -345,12 +351,12 @@ export class Authenticator {
     }
 
     private _createSizeObject(width: number, height: number, screenWidth: number, screenHeight: number) {
-        var minOrDefault = (value: number, isHorizontal: boolean) => {
-            var dimension = isHorizontal ? screenWidth : screenHeight;
+        let minOrDefault = (value: number, isHorizontal: boolean) => {
+            let dimension = isHorizontal ? screenWidth : screenHeight;
             return value < dimension ? value : dimension - 30;
-        }
+        };
 
-        var percentage = (value: number, isHorizontal: boolean) => isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight);
+        let percentage = (value: number, isHorizontal: boolean) => isHorizontal ? (value * 100 / screenWidth) : (value * 100 / screenHeight);
 
         return {
             width: percentage(minOrDefault(width, true), true),
@@ -359,8 +365,8 @@ export class Authenticator {
                 return {
                     width: minOrDefault(width, true),
                     height: minOrDefault(height, false)
-                }
+                };
             }
-        }
+        };
     }
 }
