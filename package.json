@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
-  "version": "0.3.0-beta.15",
+  "version": "0.3.0-beta.16",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
@@ -10,14 +10,16 @@
     "node": "6.3.0"
   },
   "scripts": {
-    "tsc": "tsc -p tsconfig.json && rimraf ./dist/**/*.spec.*",
+    "tsc": "tsc -p tsconfig.json && rimraf ./bundle/**/*.spec.*",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "umdify": "node build/browserify.js",
     "minify": "node build/minify.js",
     "gendts": "node build/generate-dts.js",
-    "clean": "rimraf dist && rimraf dts",
-    "postinstall": "typings install",
-    "build": "npm run clean && npm run tsc && npm run umdify && npm run minify && npm run gendts",
+    "clean-src": "rimraf bundle && rimraf dts",
+    "clean-dist": "rimraf dist",
+    "clean": "concurrently \"npm run clean-src\" \"npm run clean-dist\"",
+    "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
+    "build": "npm run clean && npm run tsc && npm run generate && npm run clean-src",
     "version": "npm run build && git add -A dist",
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
@@ -36,11 +38,12 @@
     "core-js": "^2.4.1"
   },
   "devDependencies": {
-    "typings": "^1.4.0",
-    "typescript": "^2.0.9",
+    "concurrently": "^3.1.0",
+    "typings": "^2.0.0",
+    "typescript": "^2.0.10",
     "dts-builder": "^1.0.8",
     "rimraf": "^2.5.4",
-    "tslint": "^3.15.1",
+    "tslint": "^4.0.2",
     "jasmine-core": "^2.5.2",
     "browserify": "^13.1.1",
     "uglify-js": "^2.7.4"

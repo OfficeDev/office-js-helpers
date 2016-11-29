@@ -58,3 +58,4 @@ typings/**
 npm-debug.log
 dist/**
 dts/**
+bundle/**

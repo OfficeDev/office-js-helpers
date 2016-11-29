@@ -8,9 +8,12 @@
     "removeComments": false,
     "sourceMap": true,
     "rootDir": "./src",
-    "outDir": "./dist",
+    "outDir": "./bundle",
     "declaration": true,
-    "declarationDir": "./dts"
+    "lib": [
+      "dom",
+      "es2015"
+    ]
   },
   "include": [
     "src/**/*",
