@@ -28,7 +28,7 @@ setTimeout(function() {
 
         var result = replace(data)
             (/officeJsHelpers/gm, 'OfficeHelpers')
-            (/declare module 'OfficeHelpers'/gm, 'declare module \'office-js-helpers\'')
+            (/declare module 'OfficeHelpers'/gm, 'declare module \'@microsoft/office-js-helpers\'')
             (/^import OfficeHelpers.*/g, '')
             (/^var _default: void;/, '')
             (/export default _default;/, '')
