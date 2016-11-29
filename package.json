@@ -24,7 +24,8 @@
     "postversion": "git push && git push --tags",
     "publish-patch": "npm version patch && npm publish",
     "publish-minor": "npm version patch && npm publish",
-    "publish-beta": "npm run build && npm publish --tag beta"
+    "publish-beta": "npm run build && npm publish --tag beta",
+    "postinstall": "typigns install"
   },
   "main": "./dist/index.js",
   "jsnext:main": "./dist/index.js",
