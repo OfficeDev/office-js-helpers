@@ -134,31 +134,31 @@ To authenticate against the registered endpoint, do the following:
 authenticator
     .authenticate('name of endpoint')
     .then(function(token) { /* handle success here */ })
-    .catch(function(error) { /* handle error here */ });
+    .catch(OfficeHelpers.Utilities.log);
 
 // for the default Microsoft endpoint
 authenticator
     .authenticate(OfficeHelpers.DefaultEndpoints.Microsoft)
     .then(function (token) { /* Microsoft Token */ })
-    .catch(function(error) { /* handle error here */ });
+    .catch(OfficeHelpers.Utilities.log);
 
 // for the default AzureAD endpoint
 authenticator
     .authenticate(OfficeHelpers.DefaultEndpoints.AzureAD)
     .then(function (token) { /* Microsoft Token */ })
-    .catch(function(error) { /* handle error here */ });
+    .catch(OfficeHelpers.Utilities.log);
 
 // for the default Google endpoint
 authenticator
     .authenticate(OfficeHelpers.DefaultEndpoints.Google)
     .then(function (token) { /* Google Token */ })
-    .catch(function(error) { /* handle error here */ });
+    .catch(OfficeHelpers.Utilities.log);
 
 // for the default Facebook endpoint
 authenticator
     .authenticate(OfficeHelpers.DefaultEndpoints.Facebook)
     .then(function (token) { /* Facebook Token */ })
-    .catch(function(error) { /* handle error here */ });
+    .catch(OfficeHelpers.Utilities.log);
 ```
 If the user, rejects the grant to the application then you will receive an error in the `catch` function.
 
@@ -173,11 +173,7 @@ authenticator
         `token` is either cached or newly obtained upon expiry.
     */
     })
-    .catch(function(exception) {
-    /*
-        exception in obtaining token.
-    */
-    });
+    .catch(OfficeHelpers.Utilities.log);
 
 authenticator
     .authenticate('name of endpoint', true /* force re-authentication */)
@@ -186,11 +182,7 @@ authenticator
         `token` is newly obtained.
     */
     })
-    .catch(function(exception) {
-    /*
-        exception in obtaining token.
-    */
-    });
+    .catch(OfficeHelpers.Utilities.log);
 
 // get the cached token if any. returns null otherwise.
 var token = authenticator.tokens.get('name of endpoint');
