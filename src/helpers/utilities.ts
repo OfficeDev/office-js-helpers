@@ -3,14 +3,14 @@
 /**
  * Enumeration for the execution context types
  */
-export enum HostTypes {
-    Web,
-    Word,
-    Excel,
-    PowerPoint,
-    OneNote,
-    Project
-}
+export const HostTypes = {
+    WEB: 'Web',
+    WORD: 'Word',
+    EXCEL: 'Excel',
+    POWERPOINT: 'PowerPoint',
+    ONENOTE: 'OneNote',
+    PROJECT: 'Project',
+};
 
 /**
  * Helper exposing useful Utilities for Office-Addins.
@@ -53,32 +53,32 @@ export class Utilities {
         return dest;
     };
 
-    static get host(): HostTypes {
-        let host: HostTypes = HostTypes.Web;
+    static get host(): string {
+        let host = HostTypes.WEB;
 
         try {
             if (Office.context.requirements.isSetSupported('ExcelApi')) {
-                host = HostTypes.Excel;
+                host = HostTypes.EXCEL;
             }
             else if (Office.context.requirements.isSetSupported('WordApi')) {
-                host = HostTypes.Word;
+                host = HostTypes.WORD;
             }
             else if (Office.context.requirements.isSetSupported('OoxmlCoercion')) {
-                host = HostTypes.Word;
+                host = HostTypes.WORD;
             }
             else if (Office.context.requirements.isSetSupported('MatrixBinding')) {
                 // MatrixBinding is also supported in Word but since we have passed the
                 // check for Word 2013 & 2016 this has got to be Excel 2013.
-                host = HostTypes.Excel;
+                host = HostTypes.EXCEL;
             }
             else if (Office.context.requirements.isSetSupported('OneNoteApi')) {
-                host = HostTypes.OneNote;
+                host = HostTypes.ONENOTE;
             }
             else if (Office.context.requirements.isSetSupported('ActiveView')) {
-                host = HostTypes.PowerPoint;
+                host = HostTypes.POWERPOINT;
             }
             else if (Office.context.document.getProjectFieldAsync) {
-                host = HostTypes.Project;
+                host = HostTypes.PROJECT;
             }
 
 
@@ -97,7 +97,7 @@ export class Utilities {
      * Utility to check if the code is running inside of an add-in.
      */
     static isAddin() {
-        return Utilities.host !== HostTypes.Web;
+        return Utilities.host !== HostTypes.WEB;
     }
 
     /**

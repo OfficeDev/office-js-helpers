@@ -37,8 +37,6 @@ export class OAuthError extends Error {
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
  */
 export class Authenticator {
-    static teams: boolean;
-
     /**
      * @constructor
      *
@@ -82,12 +80,24 @@ export class Authenticator {
         if (endpoint == null) {
             return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
-        else if (Authenticator.teams) {
-            return this._openWithTeams(endpoint);
+
+        return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+    }
+
+    useMicrosoftTeamsAuth(provider: string, force: boolean = false): Promise<IToken> {
+        let token = this.tokens.get(provider);
+        let hasTokenExpired = TokenManager.hasExpired(token);
+
+        if (!hasTokenExpired && !force) {
+            return Promise.resolve(token);
         }
-        else {
-            return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+
+        let endpoint = this.endpoints.get(provider);
+        if (endpoint == null) {
+            return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
+
+        return this._openWithTeams(endpoint);
     }
 
     /**
@@ -159,10 +169,6 @@ export class Authenticator {
         });
     }
 
-    static useMicrosoftTeamsAuth() {
-        Authenticator.teams = true;
-    }
-
     /**
      * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
      * If true then it calls messageParent by extracting the token information, thereby closing the dialog.
@@ -184,6 +190,15 @@ export class Authenticator {
             Office.context.ui.messageParent(location.href);
             return true;
         }
+    }
+
+    static isTeamsDialog(): boolean {
+        if (!Authenticator.isTokenUrl(location.href)) {
+            return false;
+        }
+
+        microsoftTeams.authentication.notifySuccess(location.href);
+        return true;
     }
 
     /**
@@ -349,13 +364,6 @@ export class Authenticator {
         let windowSize = this._determineDialogSize();
 
         return new Promise<IToken>((resolve, reject) => {
-            try {
-                microsoftTeams.initialize();
-            }
-            catch (e) {
-
-            }
-
             microsoftTeams.authentication.authenticate({
                 url: params.url,
                 width: windowSize.toPixels().width,
