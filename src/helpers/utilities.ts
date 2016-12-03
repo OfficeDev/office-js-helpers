@@ -1,15 +1,26 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 /**
- * Enumeration for the execution context types
+ * Enumeration for the Office host types
  */
 export const HostTypes = {
-    WEB: 'Web',
-    WORD: 'Word',
-    EXCEL: 'Excel',
-    POWERPOINT: 'PowerPoint',
-    ONENOTE: 'OneNote',
-    PROJECT: 'Project',
+    ACCESS: 'ACCESS',
+    EXCEL: 'EXCEL',
+    ONENOTE: 'ONENOTE',
+    OUTLOOK: 'OUTLOOK',
+    POWERPOINT: 'POWERPOINT',
+    PROJECT: 'PROJECT',
+    WORD: 'WORD'
+};
+
+/**
+ * Enumeration for the Office host platforms
+ */
+export const PlatformTypes = {
+    IOS: 'IOS',
+    MAC: 'MAC',
+    OFFICE_ONLINE: 'OFFICE_ONLINE',
+    PC: 'PC'
 };
 
 /**
@@ -53,52 +64,61 @@ export class Utilities {
         return dest;
     };
 
-    static get host(): string {
-        let host = HostTypes.WEB;
-
-        try {
-            if (Office.context.requirements.isSetSupported('ExcelApi')) {
-                host = HostTypes.EXCEL;
-            }
-            else if (Office.context.requirements.isSetSupported('WordApi')) {
-                host = HostTypes.WORD;
-            }
-            else if (Office.context.requirements.isSetSupported('OoxmlCoercion')) {
-                host = HostTypes.WORD;
-            }
-            else if (Office.context.requirements.isSetSupported('MatrixBinding')) {
-                // MatrixBinding is also supported in Word but since we have passed the
-                // check for Word 2013 & 2016 this has got to be Excel 2013.
-                host = HostTypes.EXCEL;
-            }
-            else if (Office.context.requirements.isSetSupported('OneNoteApi')) {
-                host = HostTypes.ONENOTE;
-            }
-            else if (Office.context.requirements.isSetSupported('ActiveView')) {
-                host = HostTypes.POWERPOINT;
-            }
-            else if (Office.context.document.getProjectFieldAsync) {
-                host = HostTypes.PROJECT;
-            }
-
-
-            /* Overriding the definition of toString() so that we can get the context name
-             * directly instead a number
-             */
-            host.toString = () => HostTypes[host];
+    static get host(): 'ACCESS' | 'EXCEL' | 'ONENOTE' | 'OUTLOOK' | 'POWERPOINT' | 'PROJECT' | 'WORD' {
+        var hostInfo = Utilities.getHostInfo();
+        if (!hostInfo) {
+            return null;
         }
-        catch (exception) {
+        
+        var host = HostTypes[hostInfo.host.toUpperCase()];
+        return host || null;
+    }
+
+    static get platform(): 'IOS' | 'MAC' | 'OFFICE_ONLINE' | 'PC' {
+        var hostInfo = Utilities.getHostInfo();
+        if (!hostInfo) {
+            return null;
         }
 
-        return host;
+        return {
+            "ios": PlatformTypes.IOS,
+            "mac": PlatformTypes.MAC,
+            "web": PlatformTypes.OFFICE_ONLINE,
+            "win32": PlatformTypes.PC
+        }[hostInfo.platform] || null;
+    }
+
+    private static getHostInfo() : { host: string, platform: string } {
+        if (!window || !window.sessionStorage) {
+            return null;
+        }
+        
+        var hostInfoValue = window.sessionStorage["hostInfoValue"];
+        if (!hostInfoValue) {
+            return null;
+        }
+
+        // Try parsing using the '$' delimiter.
+        var items = hostInfoValue.split("$");
+        // Older hosts used "|", so check for that as well:
+        if (typeof items[2] == "undefined") {
+            items = hostInfoValue.split("|");
+        }
+
+        return {
+            host: (typeof items[0] == "undefined") ? "" : items[0].toLowerCase(),
+            platform: (typeof items[1] == "undefined") ? "" : items[1].toLowerCase()
+        };
     }
 
     /**
      * Utility to check if the code is running inside of an add-in.
      */
     static isAddin() {
-        return Utilities.host !== HostTypes.WEB;
+        return Utilities.host != null;
     }
+
+
 
     /**
      * Utility to print prettified errors.
