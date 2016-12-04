@@ -37,7 +37,7 @@ function getHostInfo() {
     let extras = null;
 
     try {
-        if (!window.hasOwnProperty('sessionStorage')) {
+        if (window.sessionStorage == null) {
             throw new Error(`Session Storage isn't supported`);
         }
 
@@ -136,10 +136,10 @@ export class Utilities {
         }
 
         let platforms = {
-            'ios': PlatformTypes.IOS,
-            'mac': PlatformTypes.MAC,
-            'web': PlatformTypes.OFFICE_ONLINE,
-            'win32': PlatformTypes.PC
+            'IOS': PlatformTypes.IOS,
+            'MAC': PlatformTypes.MAC,
+            'WEB': PlatformTypes.OFFICE_ONLINE,
+            'WIN32': PlatformTypes.PC
         };
 
         return platforms[hostInfo.platform] || null;
