@@ -64,6 +64,15 @@ export class Utilities {
         return dest;
     };
 
+    /*
+     * Returns the host application's name ("EXCEL", "WORD", etc.), in ALL CAPS.
+     * See "HostTypes" for all available names.
+     * 
+     * Note that this code currently uses a workaround that relies on the internals of Office.js.
+     * A more robus approach is forthcoming within the Office.js library.  Once it is released,
+     * this implementation will simply re-route to the Office.js official implementation.
+     * Please be sure to check for updates to this library in the coming weeks.
+     */
     static get host(): 'ACCESS' | 'EXCEL' | 'ONENOTE' | 'OUTLOOK' | 'POWERPOINT' | 'PROJECT' | 'WORD' {
         var hostInfo = Utilities.getHostInfo();
         if (!hostInfo) {
@@ -74,6 +83,15 @@ export class Utilities {
         return host || null;
     }
 
+    /*
+     * Returns the host application's platform ("IOS", "MAC", "OFFICE_ONLINE", or "PC").
+     * The platform is in ALL-CAPS. See "PlatformTypes" for constants corresonding to the strings above.
+     * 
+     * Note that this code currently uses a workaround that relies on the internals of Office.js.
+     * A more robus approach is forthcoming within the Office.js library.  Once it is released,
+     * this implementation will simply re-route to the Office.js official implementation.
+     * Please be sure to check for updates to this library in the coming weeks.
+     */
     static get platform(): 'IOS' | 'MAC' | 'OFFICE_ONLINE' | 'PC' {
         var hostInfo = Utilities.getHostInfo();
         if (!hostInfo) {
