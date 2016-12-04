@@ -53,7 +53,6 @@ function getHostInfo() {
         platform = platform.toUpperCase() || null;
     }
     catch (error) {
-        console.info(error);
     }
 
     return { host, platform };
