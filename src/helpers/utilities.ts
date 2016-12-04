@@ -106,6 +106,15 @@ export class Utilities {
         }[hostInfo.platform] || null;
     }
 
+    /*
+     * Retrieves host info using a workaround that utilizes the internals of the
+     * Office.js library.  Such workarounds should be avoided, as they can lead to
+     * a break in behavior, if the internals are ever changed.  In this case, however,
+     * Office.js will soon be delivering a new API to provide the host and platform
+     * information, so the "hack" is a temporary workaround for an API that is forthcoming.
+     * Once the API is released, this function will cease to be necessary, so
+     * please be sure to check for updates to this library in the coming weeks.
+     */
     private static getHostInfo() : { host: string, platform: string } {
         if (!window || !window.sessionStorage) {
             return null;
