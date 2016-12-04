@@ -1,9 +1,10 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 /**
- * Enumeration for the Office host types
- */
+* Constant strings for the host types
+*/
 export const HostTypes = {
+    WEB: 'WEB',
     ACCESS: 'ACCESS',
     EXCEL: 'EXCEL',
     ONENOTE: 'ONENOTE',
@@ -14,8 +15,8 @@ export const HostTypes = {
 };
 
 /**
- * Enumeration for the Office host platforms
- */
+* Constant strings for the host platforms
+*/
 export const PlatformTypes = {
     IOS: 'IOS',
     MAC: 'MAC',
@@ -24,8 +25,8 @@ export const PlatformTypes = {
 };
 
 /**
- * Helper exposing useful Utilities for Office-Addins.
- */
+* Helper exposing useful Utilities for Office-Addins.
+*/
 export class Utilities {
     // Underscore.js implementation of extend.
     // https://github.com/jashkenas/underscore/blob/master/underscore.js
@@ -65,32 +66,37 @@ export class Utilities {
     };
 
     /*
-     * Returns the host application's name ("EXCEL", "WORD", etc.), in ALL CAPS.
-     * See "HostTypes" for all available names.
-     * 
-     * Note that this code currently uses a workaround that relies on the internals of Office.js.
-     * A more robus approach is forthcoming within the Office.js library.  Once it is released,
-     * this implementation will simply re-route to the Office.js official implementation.
-     * Please be sure to check for updates to this library in the coming weeks.
+     * Returns the current host which is either the name of the application where the
+     * Office Add-in is running ("EXCEL", "WORD", etc.) or simply "WEB" for all other platforms.
+     * The property is always returned in ALL_CAPS.
+     * Note that this property is guranteed to return the correct value ONLY after Office has
+     * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+     *
+     * This code currently uses a workaround that relies on the internals of Office.js.
+     * A more robust approach is forthcoming within the official  Office.js library.
+     * Once the new approach is released, this implementation will switch to using it
+     * instead of the current workaround.
      */
     static get host(): 'ACCESS' | 'EXCEL' | 'ONENOTE' | 'OUTLOOK' | 'POWERPOINT' | 'PROJECT' | 'WORD' {
-        var hostInfo = Utilities.getHostInfo();
+        let hostInfo = Utilities.getHostInfo();
         if (!hostInfo) {
             return null;
         }
-        
-        var host = HostTypes[hostInfo.host.toUpperCase()];
-        return host || null;
+
+        return HostTypes[hostInfo.host.toUpperCase()] || null;
     }
 
     /*
      * Returns the host application's platform ("IOS", "MAC", "OFFICE_ONLINE", or "PC").
-     * The platform is in ALL-CAPS. See "PlatformTypes" for constants corresonding to the strings above.
-     * 
-     * Note that this code currently uses a workaround that relies on the internals of Office.js.
-     * A more robus approach is forthcoming within the Office.js library.  Once it is released,
-     * this implementation will simply re-route to the Office.js official implementation.
-     * Please be sure to check for updates to this library in the coming weeks.
+     * This is only valid for Office Add-ins, and hence returns null if the HostType is WEB.
+     * The platform is in ALL-CAPS.
+     * Note that this property is guranteed to return the correct value ONLY after Office has
+     * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+     *
+     * This code currently uses a workaround that relies on the internals of Office.js.
+     * A more robust approach is forthcoming within the official  Office.js library.
+     * Once the new approach is released, this implementation will switch to using it
+     * instead of the current workaround.
      */
     static get platform(): 'IOS' | 'MAC' | 'OFFICE_ONLINE' | 'PC' {
         var hostInfo = Utilities.getHostInfo();
