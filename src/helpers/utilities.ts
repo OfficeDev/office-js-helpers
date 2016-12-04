@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 /**
-* Constant strings for the host types
-*/
+ * Constant strings for the host types
+ */
 export const HostTypes = {
     WEB: 'WEB',
     ACCESS: 'ACCESS',
@@ -15,8 +15,8 @@ export const HostTypes = {
 };
 
 /**
-* Constant strings for the host platforms
-*/
+ * Constant strings for the host platforms
+ */
 export const PlatformTypes = {
     IOS: 'IOS',
     MAC: 'MAC',
@@ -24,9 +24,44 @@ export const PlatformTypes = {
     PC: 'PC'
 };
 
-/**
-* Helper exposing useful Utilities for Office-Addins.
+/*
+* Retrieves host info using a workaround that utilizes the internals of the
+* Office.js library. Such workarounds should be avoided, as they can lead to
+* a break in behavior, if the internals are ever changed. In this case, however,
+* Office.js will soon be delivering a new API to provide the host and platform
+* information.
 */
+function getHostInfo() {
+    let host = 'WEB';
+    let platform: string = null;
+    let extras = null;
+
+    try {
+        if (!window.hasOwnProperty('sessionStorage')) {
+            throw new Error(`Session Storage isn't supported`);
+        }
+
+        let hostInfoValue = window.sessionStorage['hostInfoValue'];
+        [host, platform, extras] = hostInfoValue.split('$');
+
+        // Older hosts used "|", so check for that as well:
+        if (extras == null) {
+            [host, platform] = hostInfoValue.split('|');
+        }
+
+        host = host.toUpperCase() || 'WEB';
+        platform = platform.toUpperCase() || null;
+    }
+    catch (error) {
+        console.info(error);
+    }
+
+    return { host, platform };
+};
+
+/**
+ * Helper exposing useful Utilities for Office-Addins.
+ */
 export class Utilities {
     // Underscore.js implementation of extend.
     // https://github.com/jashkenas/underscore/blob/master/underscore.js
@@ -77,78 +112,45 @@ export class Utilities {
      * Once the new approach is released, this implementation will switch to using it
      * instead of the current workaround.
      */
-    static get host(): 'ACCESS' | 'EXCEL' | 'ONENOTE' | 'OUTLOOK' | 'POWERPOINT' | 'PROJECT' | 'WORD' {
-        let hostInfo = Utilities.getHostInfo();
-        if (!hostInfo) {
-            return null;
-        }
-
-        return HostTypes[hostInfo.host.toUpperCase()] || null;
+    static get host(): string {
+        let hostInfo = getHostInfo();
+        return HostTypes[hostInfo.host];
     }
 
     /*
-     * Returns the host application's platform ("IOS", "MAC", "OFFICE_ONLINE", or "PC").
-     * This is only valid for Office Add-ins, and hence returns null if the HostType is WEB.
-     * The platform is in ALL-CAPS.
-     * Note that this property is guranteed to return the correct value ONLY after Office has
-     * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
-     *
-     * This code currently uses a workaround that relies on the internals of Office.js.
-     * A more robust approach is forthcoming within the official  Office.js library.
-     * Once the new approach is released, this implementation will switch to using it
-     * instead of the current workaround.
-     */
-    static get platform(): 'IOS' | 'MAC' | 'OFFICE_ONLINE' | 'PC' {
-        var hostInfo = Utilities.getHostInfo();
-        if (!hostInfo) {
+    * Returns the host application's platform ("IOS", "MAC", "OFFICE_ONLINE", or "PC").
+    * This is only valid for Office Add-ins, and hence returns null if the HostType is WEB.
+    * The platform is in ALL-CAPS.
+    * Note that this property is guranteed to return the correct value ONLY after Office has
+    * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+    *
+    * This code currently uses a workaround that relies on the internals of Office.js.
+    * A more robust approach is forthcoming within the official  Office.js library.
+    * Once the new approach is released, this implementation will switch to using it
+    * instead of the current workaround.
+    */
+    static get platform(): string {
+        let hostInfo = getHostInfo();
+
+        if (Utilities.host === HostTypes.WEB) {
             return null;
         }
 
-        return {
-            "ios": PlatformTypes.IOS,
-            "mac": PlatformTypes.MAC,
-            "web": PlatformTypes.OFFICE_ONLINE,
-            "win32": PlatformTypes.PC
-        }[hostInfo.platform] || null;
-    }
-
-    /*
-     * Retrieves host info using a workaround that utilizes the internals of the
-     * Office.js library.  Such workarounds should be avoided, as they can lead to
-     * a break in behavior, if the internals are ever changed.  In this case, however,
-     * Office.js will soon be delivering a new API to provide the host and platform
-     * information, so this is merely a temporary workaround in anticipation of the official API.
-     * Once the API is released, this function will cease to be necessary, so
-     * please be sure to check for updates to this library in the coming weeks.
-     */
-    private static getHostInfo() : { host: string, platform: string } {
-        if (!window || !window.sessionStorage) {
-            return null;
-        }
-        
-        var hostInfoValue = window.sessionStorage["hostInfoValue"];
-        if (!hostInfoValue) {
-            return null;
-        }
-
-        // Try parsing using the '$' delimiter.
-        var items = hostInfoValue.split("$");
-        // Older hosts used "|", so check for that as well:
-        if (typeof items[2] == "undefined") {
-            items = hostInfoValue.split("|");
-        }
-
-        return {
-            host: (typeof items[0] == "undefined") ? "" : items[0].toLowerCase(),
-            platform: (typeof items[1] == "undefined") ? "" : items[1].toLowerCase()
+        let platforms = {
+            'ios': PlatformTypes.IOS,
+            'mac': PlatformTypes.MAC,
+            'web': PlatformTypes.OFFICE_ONLINE,
+            'win32': PlatformTypes.PC
         };
+
+        return platforms[hostInfo.platform] || null;
     }
 
     /**
      * Utility to check if the code is running inside of an add-in.
      */
     static isAddin() {
-        return Utilities.host && (Utilities.host !== HostTypes.WEB);
+        return Utilities.host !== HostTypes.WEB;
     }
 
     /**
