@@ -1,15 +1,61 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 /**
- * Enumeration for the execution context types
+ * Constant strings for the host types
  */
 export const HostTypes = {
-    WEB: 'Web',
-    WORD: 'Word',
-    EXCEL: 'Excel',
-    POWERPOINT: 'PowerPoint',
-    ONENOTE: 'OneNote',
-    PROJECT: 'Project',
+    WEB: 'WEB',
+    ACCESS: 'ACCESS',
+    EXCEL: 'EXCEL',
+    ONENOTE: 'ONENOTE',
+    OUTLOOK: 'OUTLOOK',
+    POWERPOINT: 'POWERPOINT',
+    PROJECT: 'PROJECT',
+    WORD: 'WORD'
+};
+
+/**
+ * Constant strings for the host platforms
+ */
+export const PlatformTypes = {
+    IOS: 'IOS',
+    MAC: 'MAC',
+    OFFICE_ONLINE: 'OFFICE_ONLINE',
+    PC: 'PC'
+};
+
+/*
+* Retrieves host info using a workaround that utilizes the internals of the
+* Office.js library. Such workarounds should be avoided, as they can lead to
+* a break in behavior, if the internals are ever changed. In this case, however,
+* Office.js will soon be delivering a new API to provide the host and platform
+* information.
+*/
+function getHostInfo() {
+    let host = 'WEB';
+    let platform: string = null;
+    let extras = null;
+
+    try {
+        if (window.sessionStorage == null) {
+            throw new Error(`Session Storage isn't supported`);
+        }
+
+        let hostInfoValue = window.sessionStorage['hostInfoValue'];
+        [host, platform, extras] = hostInfoValue.split('$');
+
+        // Older hosts used "|", so check for that as well:
+        if (extras == null) {
+            [host, platform] = hostInfoValue.split('|');
+        }
+
+        host = host.toUpperCase() || 'WEB';
+        platform = platform.toUpperCase() || null;
+    }
+    catch (error) {
+    }
+
+    return { host, platform };
 };
 
 /**
@@ -53,44 +99,50 @@ export class Utilities {
         return dest;
     };
 
+    /*
+     * Returns the current host which is either the name of the application where the
+     * Office Add-in is running ("EXCEL", "WORD", etc.) or simply "WEB" for all other platforms.
+     * The property is always returned in ALL_CAPS.
+     * Note that this property is guranteed to return the correct value ONLY after Office has
+     * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+     *
+     * This code currently uses a workaround that relies on the internals of Office.js.
+     * A more robust approach is forthcoming within the official  Office.js library.
+     * Once the new approach is released, this implementation will switch to using it
+     * instead of the current workaround.
+     */
     static get host(): string {
-        let host = HostTypes.WEB;
+        let hostInfo = getHostInfo();
+        return HostTypes[hostInfo.host];
+    }
 
-        try {
-            if (Office.context.requirements.isSetSupported('ExcelApi')) {
-                host = HostTypes.EXCEL;
-            }
-            else if (Office.context.requirements.isSetSupported('WordApi')) {
-                host = HostTypes.WORD;
-            }
-            else if (Office.context.requirements.isSetSupported('OoxmlCoercion')) {
-                host = HostTypes.WORD;
-            }
-            else if (Office.context.requirements.isSetSupported('MatrixBinding')) {
-                // MatrixBinding is also supported in Word but since we have passed the
-                // check for Word 2013 & 2016 this has got to be Excel 2013.
-                host = HostTypes.EXCEL;
-            }
-            else if (Office.context.requirements.isSetSupported('OneNoteApi')) {
-                host = HostTypes.ONENOTE;
-            }
-            else if (Office.context.requirements.isSetSupported('ActiveView')) {
-                host = HostTypes.POWERPOINT;
-            }
-            else if (Office.context.document.getProjectFieldAsync) {
-                host = HostTypes.PROJECT;
-            }
+    /*
+    * Returns the host application's platform ("IOS", "MAC", "OFFICE_ONLINE", or "PC").
+    * This is only valid for Office Add-ins, and hence returns null if the HostType is WEB.
+    * The platform is in ALL-CAPS.
+    * Note that this property is guranteed to return the correct value ONLY after Office has
+    * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+    *
+    * This code currently uses a workaround that relies on the internals of Office.js.
+    * A more robust approach is forthcoming within the official  Office.js library.
+    * Once the new approach is released, this implementation will switch to using it
+    * instead of the current workaround.
+    */
+    static get platform(): string {
+        let hostInfo = getHostInfo();
 
-
-            /* Overriding the definition of toString() so that we can get the context name
-             * directly instead a number
-             */
-            host.toString = () => HostTypes[host];
-        }
-        catch (exception) {
+        if (Utilities.host === HostTypes.WEB) {
+            return null;
         }
 
-        return host;
+        let platforms = {
+            'IOS': PlatformTypes.IOS,
+            'MAC': PlatformTypes.MAC,
+            'WEB': PlatformTypes.OFFICE_ONLINE,
+            'WIN32': PlatformTypes.PC
+        };
+
+        return platforms[hostInfo.platform] || null;
     }
 
     /**
