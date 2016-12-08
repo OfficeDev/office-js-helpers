@@ -1,4 +1,5 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+import { Utilities } from './utilities';
 
 export class DialogError extends Error {
     /**
@@ -25,8 +26,6 @@ export class DialogError extends Error {
 }
 
 export class Dialog {
-    private _dialog;
-
     /**
      * @constructor
      *
@@ -36,14 +35,15 @@ export class Dialog {
     */
     constructor(
         public url: string = location.origin,
-        public width: 640,
-        public height: 480
+        private width: number = 640,
+        private height: number = 480
     ) {
+        if (!Utilities.isAddin()) {
+            throw new DialogError('This API cannot be used outside of Office.js');
+        }
+
         if (!(/^https/.test(url))) {
             throw new DialogError('URL has to be loaded over HTTPS.');
-        }
-        else {
-
         }
     }
 
@@ -60,24 +60,25 @@ export class Dialog {
                     throw new DialogError(result.error.message);
                 }
                 else {
-                    this._dialog = result.value;
-                    this._dialog.addEventHandler(Office.EventType.DialogMessageReceived, args => {
+                    let dialog = result.value;
+                    dialog.addEventHandler(Office.EventType.DialogMessageReceived, args => {
                         try {
-                            return resolve(args.message);
+                            resolve(args.message);
                         }
                         catch (exception) {
-                            return new DialogError('An unexpected error in the dialog has occured.', 12006, exception) as any;
+                            reject(new DialogError('An unexpected error in the dialog has occured.', 12006, exception));
                         }
                     });
-                    this._dialog.addEventHandler(Office.EventType.DialogEventReceived, args => {
+
+                    dialog.addEventHandler(Office.EventType.DialogEventReceived, args => {
                         try {
                             let error = this._errorHandler(args.error);
                             if (!(error == null)) {
-                                return reject(error);
+                                reject(error);
                             }
                         }
                         catch (exception) {
-                            return new DialogError('An unexpected error in the dialog has occured.', 12006, exception) as any;
+                            reject(new DialogError('An unexpected error in the dialog has occured.', 12006, exception));
                         }
                     });
                 }
@@ -87,10 +88,14 @@ export class Dialog {
 
     /**
      * Close any open dialog by providing an optional message.
-     * The method is static as only one given dialog can be open at a time.
-     * If more than one dialogs are attempted to be opened and expcetion will be created.
+     * If more than one dialogs are attempted to be opened
+     * an expcetion will be created.
      */
     static close(message?: string) {
+        if (!Utilities.isAddin()) {
+            throw new DialogError('This API cannot be used outside of Office.js');
+        }
+
         Office.context.ui.messageParent(message);
     }
 
