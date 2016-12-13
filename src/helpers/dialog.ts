@@ -3,7 +3,7 @@ import { Utilities } from './utilities';
 import { DialogError } from '../errors/dialog';
 
 interface DialogResult {
-    type: 'string' | 'object' | null,
+    parse: boolean,
     value: any
 }
 
@@ -72,7 +72,7 @@ export class Dialog<T> {
      * The promise only resolves if the dialog was closed using the `close` function.
      * If the user dismisses the dialog, the promise rejects.
      */
-    private _open(): Promise<string> {
+    private _open(): Promise<T> {
         return new Promise<string>((resolve, reject) => {
             Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
                 if (result.status === Office.AsyncResultStatus.Failed) {
@@ -82,7 +82,13 @@ export class Dialog<T> {
                     let dialog = result.value as Office.DialogHandler;
                     dialog.addEventHandler(Office.EventType.DialogMessageReceived, args => {
                         try {
-                            resolve(args.message);
+                            let result = this._safeParse(args.message) as DialogResult;
+                            if (result.parse) {
+                                resolve(this._safeParse(result.value));
+                            }
+                            else {
+                                resolve(result.value);
+                            }
                         }
                         catch (exception) {
                             reject(new DialogError('An unexpected error in the dialog has occured.', exception));
@@ -118,23 +124,19 @@ export class Dialog<T> {
             throw new DialogError('This API cannot be used outside of Office.js');
         }
 
-        let type;
+        let parse = false;
+        let value = message;
 
-        if (message == null) {
-            type = null;
-        }
-        else if (typeof message === 'string') {
-            type = 'string';
+        if ((!(value == null)) && typeof value === 'object') {
+            parse = true;
+            value = JSON.stringify(value);
         }
         else if (typeof message === 'function') {
             throw new DialogError('Invalid message. Canno\'t pass functions as arguments');
         }
-        else {
-            type = 'object';
-        }
 
         try {
-            Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ type, value: message }));
+            Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
         }
         catch (error) {
             throw new DialogError('Canno\'t close dialog', error);
