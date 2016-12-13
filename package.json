@@ -22,7 +22,7 @@
     "version": "npm run build && npm run clean",
     "publish-patch": "npm version patch && npm run push-tags",
     "publish-minor": "npm version minor && npm run push-tags",
-    "publish-beta": "npm version prerelease && npm run push",
+    "publish-beta": "npm version prerelease && concurrently \"npm publish --tag beta\" \"npm run push\"",
     "push": "git push",
     "push-tags": "concurrentlty \"git push --tags\" \"npm run push\""
   },
