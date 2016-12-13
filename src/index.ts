@@ -6,6 +6,7 @@ export * from './helpers/dialog'
 export * from './helpers/utilities';
 export * from './helpers/dictionary';
 export * from './helpers/storage';
+export * from './helpers/dialog';
 export * from './authentication/token.manager';
 export * from './authentication/endpoint.manager';
 export * from './authentication/authenticator';
