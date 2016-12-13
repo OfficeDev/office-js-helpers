@@ -7,7 +7,7 @@
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
   "engines": {
-    "node": "6.3.0"
+    "node": ">6.3.0"
   },
   "scripts": {
     "tsc": "tsc -p tsconfig.json && rimraf ./bundle/**/*.spec.*",
@@ -40,7 +40,7 @@
   "devDependencies": {
     "concurrently": "^3.1.0",
     "typings": "^2.0.0",
-    "typescript": "^2.0.10",
+    "typescript": "^2.1.4",
     "dts-builder": "^1.0.8",
     "rimraf": "^2.5.4",
     "tslint": "^4.0.2",

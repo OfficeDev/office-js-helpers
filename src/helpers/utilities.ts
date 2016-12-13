@@ -148,7 +148,7 @@ export class Utilities {
     /**
      * Utility to check if the code is running inside of an add-in.
      */
-    static isAddin() {
+    static get isAddin() {
         return Utilities.host !== HostTypes.WEB;
     }
 

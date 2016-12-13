@@ -3,35 +3,10 @@
 import { EndpointManager, IEndpoint } from './endpoint.manager';
 import { TokenManager, IToken, ICode, IError } from './token.manager';
 import { Utilities } from '../helpers/utilities';
+import { Dialog } from '../helpers/dialog';
+import { AuthError } from '../errors/auth';
+
 declare var microsoftTeams: any;
-
-/**
- * Custom error type to handle OAuth specific errors.
- */
-
-export class OAuthError extends Error {
-    /**
-     * @constructor
-     *
-     * @param message Error message to be propagated.
-     * @param state OAuth state if available.
-    */
-    constructor(message: string, public state?: string) {
-        super(message);
-        this.name = 'OAuthError';
-        this.message = message;
-        if ((Error as any).captureStackTrace) {
-            (Error as any).captureStackTrace(this, this.constructor);
-        }
-        else {
-            let error = new Error();
-            if (error.stack) {
-                let last_part = error.stack.match(/[^\s]+$/);
-                this.stack = `${this.name} at ${last_part}`;
-            }
-        }
-    }
-}
 
 /**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
@@ -78,10 +53,10 @@ export class Authenticator {
 
         let endpoint = this.endpoints.get(provider);
         if (endpoint == null) {
-            return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
+            return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
 
-        return (Authenticator.hasDialogAPI) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
+        return (Utilities.isAddin) ? this._openInDialog(endpoint) : this._openInWindowPopup(endpoint);
     }
 
     useMicrosoftTeamsAuth(provider: string, force: boolean = false): Promise<IToken> {
@@ -94,7 +69,7 @@ export class Authenticator {
 
         let endpoint = this.endpoints.get(provider);
         if (endpoint == null) {
-            return Promise.reject(new OAuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
+            return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
 
         return this._openWithTeams(endpoint);
@@ -138,7 +113,7 @@ export class Authenticator {
             }
 
             xhr.onerror = () => {
-                return reject(new OAuthError('Unable to send request due to a Network error'));
+                return reject(new AuthError('Unable to send request due to a Network error'));
             };
 
             xhr.onload = () => {
@@ -146,22 +121,22 @@ export class Authenticator {
                     if (xhr.status === 200) {
                         let json = JSON.parse(xhr.responseText);
                         if (json == null) {
-                            return reject(new OAuthError('No access_token or code could be parsed.'));
+                            return reject(new AuthError('No access_token or code could be parsed.'));
                         }
                         else if ('access_token' in json) {
                             this.tokens.add(endpoint.provider, json);
                             return resolve(json as IToken);
                         }
                         else {
-                            return reject(new OAuthError(json.error, json.state));
+                            return reject(new AuthError(json.error, json.state));
                         }
                     }
                     else if (xhr.status !== 200) {
-                        return reject(new OAuthError('Request failed. ' + xhr.response));
+                        return reject(new AuthError('Request failed. ' + xhr.response));
                     }
                 }
                 catch (e) {
-                    return reject(new OAuthError('An error occured while parsing the response'));
+                    return reject(new AuthError('An error occured while parsing the response'));
                 }
             };
 
@@ -179,11 +154,11 @@ export class Authenticator {
      * or is not running inside of a dialog at all.
      */
     static isAuthDialog(): boolean {
-        if (!Authenticator.hasDialogAPI) {
+        if (!Utilities.isAddin) {
             return false;
         }
         else {
-            if (!Authenticator.isTokenUrl(location.href)) {
+            if (/(access_token|code|error)/gi.test(location.href)) {
                 return false;
             }
 
@@ -193,7 +168,7 @@ export class Authenticator {
     }
 
     static isTeamsDialog(): boolean {
-        if (!Authenticator.isTokenUrl(location.href)) {
+        if (/(access_token|code|error)/gi.test(location.href)) {
             return false;
         }
 
@@ -245,32 +220,6 @@ export class Authenticator {
         return params;
     }
 
-    /**
-     * Check if the supplied url has either access_token or code or error.
-     */
-    static isTokenUrl(url: string) {
-        let regex = /(access_token|code|error)/gi;
-        return regex.test(url);
-    }
-
-    /**
-     * Check if the code is running inside of an Addin versus a Web Context.
-     * The checks for Office and Word, Excel or OneNote objects.
-     */
-    private static _hasDialogAPI: boolean;
-    static get hasDialogAPI() {
-        if (Authenticator._hasDialogAPI == null) {
-            try {
-                Authenticator._hasDialogAPI = Utilities.isAddin();
-            }
-            catch (e) {
-                Authenticator._hasDialogAPI = false;
-            }
-        }
-
-        return Authenticator._hasDialogAPI;
-    }
-
     private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {
         let params = EndpointManager.getLoginParams(endpoint);
         let windowSize = this._determineDialogSize().toPixels();
@@ -288,10 +237,10 @@ export class Authenticator {
 
                             let result = Authenticator.getToken(popupWindow.document.URL, endpoint.redirectUrl);
                             if (result == null) {
-                                return reject(new OAuthError('No access_token or code could be parsed.'));
+                                return reject(new AuthError('No access_token or code could be parsed.'));
                             }
                             else if (endpoint.state && +result.state !== params.state) {
-                                return reject(new OAuthError('State couldn\'t be verified'));
+                                return reject(new AuthError('State couldn\'t be verified'));
                             }
                             else if ('code' in result) {
                                 return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
@@ -301,62 +250,44 @@ export class Authenticator {
                                 return resolve(result as IToken);
                             }
                             else {
-                                return reject(new OAuthError((result as IError).error, result.state));
+                                return reject(new AuthError((result as IError).error, result.state));
                             }
                         }
                     }
                     catch (exception) {
                         if (!popupWindow) {
                             clearInterval(interval);
-                            return reject(new OAuthError('Popup window was closed'));
+                            return reject(new AuthError('Popup window was closed'));
                         }
                     }
                 }, POLL_INTERVAL);
             }
             catch (exception) {
                 popupWindow.close();
-                return reject(new OAuthError('Unexpected error occured while creating popup'));
+                return reject(new AuthError('Unexpected error occured while creating popup'));
             }
         });
     }
 
-    private _openInDialog(endpoint: IEndpoint): Promise<IToken> {
+    private async _openInDialog(endpoint: IEndpoint): Promise<IToken> {
         let params = EndpointManager.getLoginParams(endpoint);
-        let windowSize = this._determineDialogSize();
-
-        return new Promise<IToken>((resolve, reject) => {
-            Office.context.ui.displayDialogAsync(params.url, windowSize, result => {
-                let dialog = result.value;
-                if (dialog == null) {
-                    return reject(new OAuthError(result.error.message));
-                }
-                dialog.addEventHandler((<any>Office).EventType.DialogMessageReceived, args => {
-                    dialog.close();
-                    try {
-                        let result = Authenticator.getToken(args.message, endpoint.redirectUrl);
-                        if (result == null) {
-                            return reject(new OAuthError('No access_token or code could be parsed.'));
-                        }
-                        else if (endpoint.state && +result.state !== params.state) {
-                            return reject(new OAuthError('State couldn\'t be verified'));
-                        }
-                        else if ('code' in result) {
-                            return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
-                        }
-                        else if ('access_token' in result) {
-                            this.tokens.add(endpoint.provider, result as IToken);
-                            return resolve(result as IToken);
-                        }
-                        else {
-                            return reject(new OAuthError((result as IError).error, result.state));
-                        }
-                    }
-                    catch (exception) {
-                        return reject(new OAuthError('Error while parsing response: ' + JSON.stringify(exception)));
-                    }
-                });
-            });
-        });
+        let redirectUrl = await new Dialog<string>(params.url).result;
+        let result = Authenticator.getToken(redirectUrl, endpoint.redirectUrl);
+        if (result == null) {
+            throw new AuthError('No access_token or code could be parsed.');
+        }
+        else if (endpoint.state && +result.state !== params.state) {
+            throw new AuthError('State couldn\'t be verified');
+        }
+        else if ('code' in result) {
+            return this.exchangeCodeForToken(endpoint, (<ICode>result));
+        }
+        else if ('access_token' in result) {
+            return this.tokens.add(endpoint.provider, result as IToken);
+        }
+        else {
+            throw new AuthError((result as IError).error, result.state);
+        }
     }
 
     private _openWithTeams(endpoint: IEndpoint): Promise<IToken> {
@@ -369,17 +300,17 @@ export class Authenticator {
                 width: windowSize.toPixels().width,
                 height: windowSize.toPixels().height,
                 failureCallback: exception => {
-                    return reject(new OAuthError('Error while launching dialog: ' + JSON.stringify(exception)));
+                    return reject(new AuthError('Error while launching dialog: ' + JSON.stringify(exception)));
                 },
                 successCallback: message => {
                     try {
                         let result = Authenticator.getToken(message, endpoint.redirectUrl);
 
                         if (result == null) {
-                            return reject(new OAuthError('No access_token or code could be parsed.'));
+                            return reject(new AuthError('No access_token or code could be parsed.'));
                         }
                         else if (endpoint.state && +result.state !== params.state) {
-                            return reject(new OAuthError('State couldn\'t be verified'));
+                            return reject(new AuthError('State couldn\'t be verified'));
                         }
                         else if ('code' in result) {
                             return resolve(this.exchangeCodeForToken(endpoint, (<ICode>result)));
@@ -389,11 +320,11 @@ export class Authenticator {
                             return resolve(result as IToken);
                         }
                         else {
-                            return reject(new OAuthError((result as IError).error, result.state));
+                            return reject(new AuthError((result as IError).error, result.state));
                         }
                     }
                     catch (exception) {
-                        return reject(new OAuthError('Error while parsing response: ' + JSON.stringify(exception)));
+                        return reject(new AuthError('Error while parsing response: ' + JSON.stringify(exception)));
                     }
                 }
             });
