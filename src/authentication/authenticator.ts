@@ -158,17 +158,17 @@ export class Authenticator {
             return false;
         }
         else {
-            if (/(access_token|code|error)/gi.test(location.href)) {
+            if (!/(access_token|code|error)/gi.test(location.href)) {
                 return false;
             }
 
-            Office.context.ui.messageParent(location.href);
+            Dialog.close(location.href);
             return true;
         }
     }
 
     static isTeamsDialog(): boolean {
-        if (/(access_token|code|error)/gi.test(location.href)) {
+        if (!/(access_token|code|error)/gi.test(location.href)) {
             return false;
         }
 
