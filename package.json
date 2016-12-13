@@ -21,9 +21,10 @@
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate && npm run clean-src",
     "version": "npm run build",
-    "publish-patch": "npm version patch && concurrently \"npm publish\" \"git push --tags\" \"git push\"",
-    "publish-minor": "npm version minor && concurrently \"npm publish\" \"git push --tags\" \"git push\"",
-    "publish-beta": "npm run build && npm publish --tag beta",
+    "publish-patch": "npm version patch",
+    "publish-minor": "npm version minor",
+    "publish-beta": "npm version prerelease && npm publish --tag beta",
+    "push": "concurrentlty \"git push --tags\" \"git push\"",
     "postinstall": "typings install"
   },
   "main": "./dist/office.helpers.js",
