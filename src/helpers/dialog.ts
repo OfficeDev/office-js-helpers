@@ -73,7 +73,7 @@ export class Dialog<T> {
      * If the user dismisses the dialog, the promise rejects.
      */
     private _open(): Promise<T> {
-        return new Promise<string>((resolve, reject) => {
+        return new Promise((resolve, reject) => {
             Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
                 if (result.status === Office.AsyncResultStatus.Failed) {
                     throw new DialogError(result.error.message);
