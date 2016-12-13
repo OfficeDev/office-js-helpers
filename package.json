@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
-  "version": "0.3.5-beta.7",
+  "version": "0.3.5-beta.8",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
