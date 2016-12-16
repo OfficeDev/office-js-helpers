@@ -210,8 +210,8 @@ export class EndpointManager extends Storage<IEndpoint> {
     } {
         let scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
         let resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
-        let state = endpointConfig.state && EndpointManager._generateCryptoSafeRandom();
-        let nonce = endpointConfig.nonce && EndpointManager._generateCryptoSafeRandom();
+        let state = endpointConfig.state && EndpointManager.generateCryptoSafeRandom();
+        let nonce = endpointConfig.nonce && EndpointManager.generateCryptoSafeRandom();
 
         let urlSegments = [
             'response_type=' + endpointConfig.responseType,
@@ -241,7 +241,7 @@ export class EndpointManager extends Storage<IEndpoint> {
         };
     }
 
-    private static _generateCryptoSafeRandom() {
+    static generateCryptoSafeRandom() {
         let random = new Uint32Array(1);
         if ('msCrypto' in window) {
             (<any>window).msCrypto.getRandomValues(random);
