@@ -1,6 +1,8 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+
 import { Utilities } from './utilities';
 import { DialogError } from '../errors/dialog';
+declare var microsoftTeams: any;
 
 interface DialogResult {
     parse: boolean,
@@ -42,8 +44,9 @@ export class Dialog<T> {
     */
     constructor(
         public url: string = location.origin,
-        private width?: number,
-        private height?: number
+        private width: number = 1024,
+        private height: number = 768,
+        public useTeamsDialog: boolean = false
     ) {
         if (!Utilities.isAddin) {
             throw new DialogError('This API cannot be used outside of Office.js');
@@ -59,7 +62,7 @@ export class Dialog<T> {
     private _result: Promise<T>;
     get result(): Promise<T> {
         if (this._result == null) {
-            this._result = this._open();
+            this._result = this.useTeamsDialog ? this._teamsDialog() : this._addinDialog();
         }
 
         return this._result;
@@ -67,12 +70,7 @@ export class Dialog<T> {
 
     size: IDialogSize;
 
-    /**
-     * Opens a new dialog and returns a promise.
-     * The promise only resolves if the dialog was closed using the `close` function.
-     * If the user dismisses the dialog, the promise rejects.
-     */
-    private _open(): Promise<T> {
+    private _addinDialog(): Promise<T> {
         return new Promise((resolve, reject) => {
             Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
                 if (result.status === Office.AsyncResultStatus.Failed) {
@@ -114,12 +112,24 @@ export class Dialog<T> {
         });
     }
 
+    private _teamsDialog(): Promise<T> {
+        return new Promise((resolve, reject) => {
+            microsoftTeams.authentication.authenticate({
+                url: this.url,
+                width: this.size.width,
+                height: this.size.height,
+                failureCallback: exception => reject(new DialogError('Error while launching dialog', exception)),
+                successCallback: message => resolve(message)
+            });
+        });
+    }
+
     /**
      * Close any open dialog by providing an optional message.
      * If more than one dialogs are attempted to be opened
      * an expcetion will be created.
      */
-    static close(message?: any) {
+    static close(message?: any, useTeamsDialog: boolean = false) {
         if (!Utilities.isAddin) {
             throw new DialogError('This API cannot be used outside of Office.js');
         }
@@ -136,7 +146,12 @@ export class Dialog<T> {
         }
 
         try {
-            Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
+            if (useTeamsDialog) {
+                microsoftTeams.authentication.notifySuccess(JSON.stringify(<DialogResult>{ parse, value }));
+            }
+            else {
+                Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
+            }
         }
         catch (error) {
             throw new DialogError('Canno\'t close dialog', error);

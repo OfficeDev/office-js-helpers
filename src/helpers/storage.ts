@@ -14,7 +14,7 @@ export enum StorageType {
  * the storage for faster reads. Writes update the actual storage.
  */
 export class Storage<T> extends Dictionary<T> {
-    private _storage = null;
+    private _storage: typeof localStorage | typeof sessionStorage = null;
     static _observers: ((e: StorageEvent) => any)[] = [];
     static _storageEventRegistered: boolean;
 
@@ -23,7 +23,7 @@ export class Storage<T> extends Dictionary<T> {
      * @param {string} container Container name to be created in the LocalStorage.
      * @param {StorageType} type[optional] Storage Type to be used, defaults to Local Storage.
     */
-    constructor(private _container: string, type?: StorageType) {
+    constructor(public container: string, type?: StorageType) {
         super();
         type = type || StorageType.LocalStorage;
         this.switchStorage(type);
@@ -38,8 +38,8 @@ export class Storage<T> extends Dictionary<T> {
      */
     switchStorage(type: StorageType) {
         this._storage = type === StorageType.LocalStorage ? localStorage : sessionStorage;
-        if (!this._storage.hasOwnProperty(this._container)) {
-            this._storage[this._container] = null;
+        if (!this._storage.hasOwnProperty(this.container)) {
+            this._storage[this.container] = null;
         }
 
         this.load();
@@ -84,7 +84,7 @@ export class Storage<T> extends Dictionary<T> {
      */
     clear() {
         super.clear();
-        this._storage[this._container] = null;
+        this._storage.removeItem(this.container);
     }
 
     /**
@@ -100,14 +100,14 @@ export class Storage<T> extends Dictionary<T> {
      * Saves the current state to the storage.
      */
     save() {
-        this._storage.setItem(this._container, JSON.stringify(this.items));
+        this._storage.setItem(this.container, JSON.stringify(this.items));
     }
 
     /**
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        let items = JSON.parse(this._storage.getItem(this._container));
+        let items = JSON.parse(this._storage.getItem(this.container));
         this.items = Utilities.extend({}, this.items, items);
     }
 
