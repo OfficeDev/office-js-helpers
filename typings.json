@@ -2,7 +2,7 @@
   "name": "office-js-helpers",
   "dependencies": {},
   "globalDependencies": {
-    "jasmine": "registry:dt/jasmine#2.5.0+20161003201800",
+    "jasmine": "registry:dt/jasmine#2.5.0+20161119044246",
     "jquery": "registry:dt/jquery#1.10.0+20160929162922",
     "office-js": "registry:dt/office-js#0.0.0+20161003175149"
   }

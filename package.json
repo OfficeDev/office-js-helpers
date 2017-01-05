@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
@@ -10,6 +10,7 @@
     "node": ">6.3.0"
   },
   "scripts": {
+    "typings": "typings install",
     "tsc": "tsc -p tsconfig.json && rimraf ./bundle/**/*.spec.*",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "umdify": "node build/browserify.js",
@@ -18,13 +19,12 @@
     "clean": "concurrently \"rimraf bundle\" \"rimraf dts\" \"rimraf dist\"",
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate",
-    "version": "npm run build && npm run clean",
-    "publish-patch": "npm version patch && npm run push-tags",
-    "publish-minor": "npm version minor && npm run push-tags",
-    "publish-beta": "npm version prerelease && npm run push",
+    "version": "npm run build",
+    "publish-patch": "npm version patch && npm run push-tags && npm run clean",
+    "publish-minor": "npm version minor && npm run push-tags && npm run clean",
+    "publish-beta": "npm version prerelease && concurrently \"npm publish --tag beta\" \"npm run push\" && npm run clean",
     "push": "git push",
-    "push-tags": "concurrently \"git push --tags\" \"npm run push\"",
-    "postinstall": "typings install"
+    "push-tags": "concurrentlty \"git push --tags\" \"npm run push\""
   },
   "main": "./dist/office.helpers.js",
   "jsnext:main": "./dist/office.helpers.js",

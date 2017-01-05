@@ -3,7 +3,7 @@
 /**
  * Constant strings for the host types
  */
-export const HostTypes = {
+export const HostType = {
     WEB: 'WEB',
     ACCESS: 'ACCESS',
     EXCEL: 'EXCEL',
@@ -17,7 +17,7 @@ export const HostTypes = {
 /**
  * Constant strings for the host platforms
  */
-export const PlatformTypes = {
+export const PlatformType = {
     IOS: 'IOS',
     MAC: 'MAC',
     OFFICE_ONLINE: 'OFFICE_ONLINE',
@@ -113,7 +113,7 @@ export class Utilities {
      */
     static get host(): string {
         let hostInfo = getHostInfo();
-        return HostTypes[hostInfo.host];
+        return HostType[hostInfo.host];
     }
 
     /*
@@ -131,15 +131,15 @@ export class Utilities {
     static get platform(): string {
         let hostInfo = getHostInfo();
 
-        if (Utilities.host === HostTypes.WEB) {
+        if (Utilities.host === HostType.WEB) {
             return null;
         }
 
         let platforms = {
-            'IOS': PlatformTypes.IOS,
-            'MAC': PlatformTypes.MAC,
-            'WEB': PlatformTypes.OFFICE_ONLINE,
-            'WIN32': PlatformTypes.PC
+            'IOS': PlatformType.IOS,
+            'MAC': PlatformType.MAC,
+            'WEB': PlatformType.OFFICE_ONLINE,
+            'WIN32': PlatformType.PC
         };
 
         return platforms[hostInfo.platform] || null;
@@ -148,15 +148,18 @@ export class Utilities {
     /**
      * Utility to check if the code is running inside of an add-in.
      */
-    static isAddin() {
-        return Utilities.host !== HostTypes.WEB;
+    static get isAddin() {
+        return Utilities.host !== HostType.WEB;
     }
 
     /**
      * Utility to print prettified errors.
      */
     static log(exception: Error | string) {
-        if (typeof exception === 'string') {
+        if (exception == null) {
+            console.error(exception);
+        }
+        else if (typeof exception === 'string') {
             console.error(exception);
         }
         else {
