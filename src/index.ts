@@ -10,4 +10,3 @@ export * from './helpers/dialog';
 export * from './authentication/token.manager';
 export * from './authentication/endpoint.manager';
 export * from './authentication/authenticator';
-export * from './ui/ui';
