@@ -74,7 +74,7 @@ export class Authenticator {
      * Returns false if the code is running inside of a dialog without the required information
      * or is not running inside of a dialog at all.
      */
-    static isAuthDialog(): boolean {
+    static isAuthDialog(useMicrosoftTeams: boolean = false): boolean {
         if (!Utilities.isAddin) {
             return false;
         }
@@ -83,7 +83,7 @@ export class Authenticator {
                 return false;
             }
 
-            Dialog.close(location.href);
+            Dialog.close(location.href, useMicrosoftTeams);
             return true;
         }
     }
