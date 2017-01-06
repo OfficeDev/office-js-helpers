@@ -241,7 +241,7 @@ export class Authenticator {
             regex = /([^&=]+)=([^&]*)/g,
             matchParts;
 
-        while ((matcheParts = regex.exec(segment)) !== null) {
+        while ((matchParts = regex.exec(segment)) !== null) {
             params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
         }
 
