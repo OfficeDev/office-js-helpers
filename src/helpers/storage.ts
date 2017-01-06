@@ -10,8 +10,8 @@ export enum StorageType {
 
 /**
  * Helper for creating and querying Local Storage or Session Storage.
- * @see Uses {@link Dictionary} to create an in-memory copy of
- * the storage for faster reads. Writes update the actual storage.
+ * Uses {@link Dictionary} so all the data is encapsulated in a single
+ * storage namespace. Writes update the actual storage.
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage: typeof localStorage | typeof sessionStorage = null;
