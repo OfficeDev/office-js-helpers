@@ -239,7 +239,7 @@ export class Authenticator {
 
         let params: any = {},
             regex = /([^&=]+)=([^&]*)/g,
-            matcheParts;
+            matchParts;
 
         while ((matcheParts = regex.exec(segment)) !== null) {
             params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
