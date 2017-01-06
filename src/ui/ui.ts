@@ -1,5 +1,5 @@
 import { Authenticator } from '../authentication/authenticator';
-import { IEndpoint } from '../authentication/endpoint.manager';
+import { IEndpointConfiguration } from '../authentication/endpoint.manager';
 import { IToken } from '../authentication/token.manager';
 
 const authenticator = new Authenticator();
@@ -12,7 +12,7 @@ export class UI {
     static microsoftLogin(
         container: HTMLButtonElement | JQuery,
         clientId: string,
-        microsoftAuthConfig?: IEndpoint
+        microsoftAuthConfig?: IEndpointConfiguration
     ) {
         let element: HTMLButtonElement;
         authenticator.endpoints.registerMicrosoftAuth(clientId, microsoftAuthConfig);
