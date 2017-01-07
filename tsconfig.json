@@ -8,7 +8,8 @@
     "removeComments": false,
     "sourceMap": true,
     "rootDir": "./src",
-    "outDir": "./bundle",
+    "outDir": "./dist",
+    "declarationDir": "./dts",
     "declaration": true,
     "lib": [
       "dom",

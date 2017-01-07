@@ -48,10 +48,6 @@ export class Dialog<T> {
         private height: number = 768,
         public useTeamsDialog: boolean = false
     ) {
-        if (!Utilities.isAddin) {
-            throw new DialogError('This API cannot be used outside of Office.js');
-        }
-
         if (!(/^https/.test(url))) {
             throw new DialogError('URL has to be loaded over HTTPS.');
         }
@@ -114,6 +110,12 @@ export class Dialog<T> {
 
     private _teamsDialog(): Promise<T> {
         return new Promise((resolve, reject) => {
+            try {
+                microsoftTeams.initialize();
+            }
+            catch (e) {
+
+            }
             microsoftTeams.authentication.authenticate({
                 url: this.url,
                 width: this.size.width,
@@ -147,6 +149,12 @@ export class Dialog<T> {
 
         try {
             if (useTeamsDialog) {
+                try {
+                    microsoftTeams.initialize();
+                }
+                catch (e) {
+
+                }
                 microsoftTeams.authentication.notifySuccess(JSON.stringify(<DialogResult>{ parse, value }));
             }
             else {
