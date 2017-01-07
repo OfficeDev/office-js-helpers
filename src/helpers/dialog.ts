@@ -132,10 +132,6 @@ export class Dialog<T> {
      * an expcetion will be created.
      */
     static close(message?: any, useTeamsDialog: boolean = false) {
-        if (!Utilities.isAddin) {
-            throw new DialogError('This API cannot be used outside of Office.js');
-        }
-
         let parse = false;
         let value = message;
 
@@ -157,7 +153,7 @@ export class Dialog<T> {
                 }
                 microsoftTeams.authentication.notifySuccess(JSON.stringify(<DialogResult>{ parse, value }));
             }
-            else {
+            else if (Utilities.isAddin) {
                 Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
             }
         }

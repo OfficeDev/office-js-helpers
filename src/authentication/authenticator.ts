@@ -75,7 +75,7 @@ export class Authenticator {
      * or is not running inside of a dialog at all.
      */
     static isAuthDialog(useMicrosoftTeams: boolean = false): boolean {
-        if (!Utilities.isAddin) {
+        if (useMicrosoftTeams === false && !Utilities.isAddin) {
             return false;
         }
         else {
