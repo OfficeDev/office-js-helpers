@@ -60,9 +60,9 @@ export class Authenticator {
         else if (Utilities.isAddin) {
             return this._openAuthDialog(provider, false);
         }
-        // else {
-        //     return this._openInWindowPopup(provider);
-        // }
+        else {
+            return this._openInWindowPopup(provider);
+        }
     }
 
     /**
