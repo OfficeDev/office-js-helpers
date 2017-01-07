@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "An open-source collection of helpers for developing Office Add-ins",
-  "version": "0.4.1",
+  "version": "0.4.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
@@ -20,7 +20,7 @@
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate",
     "version": "npm run build",
-    "push-tags": "concurrentlty \"git push\" \"git push --tags\"",
+    "push-tags": "concurrently \"git push\" \"git push --tags\"",
     "publish-patch": "npm version patch && npm run push-tags && npm run clean",
     "publish-minor": "npm version minor && npm run push-tags && npm run clean",
     "publish-beta": "npm version prerelease && npm publish --tag beta && npm run clean"
