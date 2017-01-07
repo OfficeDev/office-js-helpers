@@ -96,20 +96,20 @@ export class Authenticator {
         }
 
         /** Set the authentication state to redirect and begin the auth flow */
-        let {state, url } = EndpointManager.getLoginParams(endpoint);
+        let {state, url} = EndpointManager.getLoginParams(endpoint);
 
         /**
          * Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
          * url where we expect the call to isAuthDialog to be available.
          */
-        let redirectUrl = await new Dialog<string>(endpoint.redirectUrl, 1024, 768, useMicrosoftTeams).result;
+        let redirectUrl = await new Dialog<string>(url, 1024, 768, useMicrosoftTeams).result;
 
         /** Try and extract the result and pass it along */
         return this._handleTokenResult(redirectUrl, endpoint, state);
     }
 
     private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {
-        let {state, url } = EndpointManager.getLoginParams(endpoint);
+        let {state, url} = EndpointManager.getLoginParams(endpoint);
         let windowFeatures = `width=${1024},height=${768},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
