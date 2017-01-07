@@ -108,7 +108,13 @@ export class Authenticator {
         return this._handleTokenResult(redirectUrl, endpoint, state);
     }
 
-    private _openInWindowPopup(endpoint: IEndpoint): Promise<IToken> {
+    private _openInWindowPopup(provider: string): Promise<IToken> {
+        /** Get the endpoint configuration for the given provider and verify that it exists. */
+        let endpoint = this.endpoints.get(provider);
+        if (endpoint == null) {
+            return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
+        }
+
         let {state, url} = EndpointManager.getLoginParams(endpoint);
         let windowFeatures = `width=${1024},height=${768},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);

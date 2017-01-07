@@ -40,7 +40,7 @@ Reference the library inside of your `.html` page using:
 <script src="https://unpkg.com/core-js/client/core.min.js"></script>
 
 <!-- Office JavaScript API Helpers (via CDN) -->
-<script src="https://unpkg.com/@microsoft/office-js-helpers@0.3.5/dist/office.helpers.min.js"></script>
+<script src="https://unpkg.com/@microsoft/office-js-helpers@0.4.1/dist/office.helpers.min.js"></script>
 
 <!-- Office JavaScript API Helpers (via npm) -->
 <script src="node_modules/@microsoft/office-js-helpers/dist/office.helpers.min.js"></script>
