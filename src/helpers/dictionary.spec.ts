@@ -128,7 +128,7 @@ export default describe('Testing Dictionary', () => {
             }).not.toThrowError();
 
             expect(() => {
-                let alreadyInDictionary = dictionary.insert(null, {});
+                dictionary.insert(null, {});
             }).toThrowError();
         });
 

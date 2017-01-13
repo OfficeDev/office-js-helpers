@@ -4,7 +4,6 @@ import { EndpointManager, IEndpoint } from './endpoint.manager';
 import { TokenManager, IToken, ICode, IError } from './token.manager';
 import { Utilities } from '../helpers/utilities';
 import { Dialog } from '../helpers/dialog';
-import { Storage } from '../helpers/storage';
 import { AuthError } from '../errors/auth';
 
 /**
@@ -231,8 +230,7 @@ export class Authenticator {
         let tokenString = right == null ? left : right;
 
         if (tokenString.indexOf('?') !== -1) {
-            let [ignore, queryPart] = tokenString.split('?');
-            tokenString = queryPart;
+            tokenString = tokenString.split('?')[1];
         }
 
         return this._extractParams(tokenString);

@@ -122,7 +122,7 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     private _registerStorageEvent() {
-        this.onStorage(event => this.load());
+        this.onStorage(this.load);
 
         if (Storage._storageEventRegistered) {
             return;
