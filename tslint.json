@@ -18,7 +18,6 @@
             "spaces"
         ],
         "label-position": true,
-        "label-undefined": true,
         "no-arg": true,
         "no-var-keyword": true,
         "no-console": [
