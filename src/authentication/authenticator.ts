@@ -239,7 +239,7 @@ export class Authenticator {
     }
 
     private _extractParams(segment: string): any {
-        if (segment == null || segment.trim() == '') {
+        if (segment == null || segment.trim() === '') {
             return null;
         }
 
