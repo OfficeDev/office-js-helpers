@@ -162,23 +162,6 @@ export class Dialog<T> {
         }
     }
 
-    private _getSize(width: number, height: number) {
-        let screenWidth = window.screen.width;
-
-        if (width && height) {
-            return this._optimizeSize(width, height);
-        }
-        else if (screenWidth <= 640) {
-            return this._optimizeSize(640, 480);
-        }
-        else if (screenWidth <= 1366) {
-            return this._optimizeSize(1024, 768);
-        }
-        else if (screenWidth <= 1920) {
-            return this._optimizeSize(1600, 900);
-        }
-    }
-
     private _optimizeSize(width: number, height: number): IDialogSize {
         let screenWidth = window.screen.width;
         let screenHeight = window.screen.height;
