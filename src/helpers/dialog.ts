@@ -44,8 +44,8 @@ export class Dialog<T> {
     */
     constructor(
         public url: string = location.origin,
-        private width: number = 1024,
-        private height: number = 768,
+        width: number = 1024,
+        height: number = 768,
         public useTeamsDialog: boolean = false
     ) {
         if (!(/^https/.test(url))) {
