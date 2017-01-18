@@ -1,17 +1,13 @@
 {
   "name": "@microsoft/office-js-helpers",
-  "description": "An open-source collection of helpers for developing Office Add-ins",
+  "description": "A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs",
   "version": "0.4.1",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
-  "engines": {
-    "node": ">6.3.0"
-  },
   "scripts": {
     "clean": "concurrently \"rimraf dts\" \"rimraf dist\"",
-    "typings": "typings install",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "tsc": "tsc -p tsconfig.json && rimraf ./dist/**/*.spec.*",
     "umdify": "node build/browserify.js",
@@ -34,18 +30,18 @@
     "dts/"
   ],
   "dependencies": {
-    "core-js": "^2.4.1"
+    "core-js": "^2.4.1",
+    "@types/jquery": "^2.0.39",
+    "@types/office-js": "^0.0.37"
   },
   "devDependencies": {
     "concurrently": "^3.1.0",
-    "typings": "^2.0.0",
-    "typescript": "^2.1.4",
+    "typescript": "^2.1.5",
     "dts-builder": "^1.0.8",
     "rimraf": "^2.5.4",
-    "tslint": "^4.0.2",
-    "jasmine-core": "^2.5.2",
-    "browserify": "^13.1.1",
-    "uglify-js": "^2.7.4"
+    "tslint": "^4.3.1",
+    "browserify": "^13.3.0",
+    "uglify-js": "^2.7.5"
   },
   "keywords": [
     "Office Add-ins",
