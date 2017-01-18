@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { EndpointManager, IEndpoint } from './endpoint.manager';
-import { TokenManager, IToken, ICode, IError } from './token.manager';
+import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
+import { TokenStorage, IToken, ICode, IError } from './token.manager';
 import { Utilities } from '../helpers/utilities';
 import { Dialog } from '../helpers/dialog';
 import { Storage } from '../helpers/storage';
@@ -14,18 +14,18 @@ export class Authenticator {
     /**
      * @constructor
      *
-     * @param endpointManager Depends on an instance of EndpointManager.
-     * @param TokenManager Depends on an instance of TokenManager.
+     * @param endpoints Depends on an instance of EndpointStorage.
+     * @param tokens Depends on an instance of TokenStorage.
     */
     constructor(
-        public endpoints?: EndpointManager,
-        public tokens?: TokenManager
+        public endpoints?: EndpointStorage,
+        public tokens?: TokenStorage
     ) {
         if (endpoints == null) {
-            this.endpoints = new EndpointManager();
+            this.endpoints = new EndpointStorage();
         }
         if (tokens == null) {
-            this.tokens = new TokenManager();
+            this.tokens = new TokenStorage();
         }
     }
 
@@ -36,7 +36,7 @@ export class Authenticator {
      * If the cached token has expired then the authentication dialog is displayed.
      *
      * NOTE: you have to manually check the expires_in or expires_at property to determine
-     * if the token has expired. Not all OAuth providers support refresh token flows.
+     * if the token has expired.
      *
      * @param {string} provider Link to the provider.
      * @param {boolean} force Force re-authentication.
@@ -48,7 +48,7 @@ export class Authenticator {
         useMicrosoftTeams: boolean = false
     ): Promise<IToken> {
         let token = this.tokens.get(provider);
-        let hasTokenExpired = TokenManager.hasExpired(token);
+        let hasTokenExpired = TokenStorage.hasExpired(token);
 
         if (!hasTokenExpired && !force) {
             return Promise.resolve(token);
@@ -96,7 +96,7 @@ export class Authenticator {
         }
 
         /** Set the authentication state to redirect and begin the auth flow */
-        let {state, url} = EndpointManager.getLoginParams(endpoint);
+        let {state, url } = EndpointStorage.getLoginParams(endpoint);
 
         /**
          * Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
@@ -115,7 +115,7 @@ export class Authenticator {
             return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
 
-        let {state, url} = EndpointManager.getLoginParams(endpoint);
+        let {state, url } = EndpointStorage.getLoginParams(endpoint);
         let windowFeatures = `width=${1024},height=${768},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
@@ -157,7 +157,7 @@ export class Authenticator {
      * @param {object} headers Headers to be sent to the tokenUrl.     *
      * @return {Promise<IToken>} Returns a promise of the token or error.
      */
-    private _exchangeCodeForToken(endpoint: IEndpoint, data: any, headers?: any): Promise<IToken> {
+    private _exchangeCodeForToken(endpoint: IEndpointConfiguration, data: any, headers?: any): Promise<IToken> {
         return new Promise((resolve, reject) => {
             if (endpoint.tokenUrl == null) {
                 console.warn(
@@ -245,16 +245,16 @@ export class Authenticator {
 
         let params: any = {},
             regex = /([^&=]+)=([^&]*)/g,
-            matches;
+            matchParts;
 
-        while ((matches = regex.exec(segment)) !== null) {
-            params[decodeURIComponent(matches[1])] = decodeURIComponent(matches[2]);
+        while ((matchParts = regex.exec(segment)) !== null) {
+            params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
         }
 
         return params;
     }
 
-    private _handleTokenResult(redirectUrl: string, endpoint: IEndpoint, state: number) {
+    private _handleTokenResult(redirectUrl: string, endpoint: IEndpointConfiguration, state: number) {
         let result = this._getToken(redirectUrl, endpoint.redirectUrl);
         if (result == null) {
             throw new AuthError('No access_token or code could be parsed.');
