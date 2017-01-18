@@ -4,7 +4,6 @@ import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
 import { TokenStorage, IToken, ICode, IError } from './token.manager';
 import { Utilities } from '../helpers/utilities';
 import { Dialog } from '../helpers/dialog';
-import { Storage } from '../helpers/storage';
 import { AuthError } from '../errors/auth';
 
 /**
@@ -231,15 +230,14 @@ export class Authenticator {
         let tokenString = right == null ? left : right;
 
         if (tokenString.indexOf('?') !== -1) {
-            let [ignore, queryPart] = tokenString.split('?');
-            tokenString = queryPart;
+            tokenString = tokenString.split('?')[1];
         }
 
         return this._extractParams(tokenString);
     }
 
     private _extractParams(segment: string): any {
-        if (segment == null || segment.trim() == '') {
+        if (segment == null || segment.trim() === '') {
             return null;
         }
 

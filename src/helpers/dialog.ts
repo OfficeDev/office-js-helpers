@@ -44,8 +44,8 @@ export class Dialog<T> {
     */
     constructor(
         public url: string = location.origin,
-        private width: number = 1024,
-        private height: number = 768,
+        width: number = 1024,
+        height: number = 768,
         public useTeamsDialog: boolean = false
     ) {
         if (!(/^https/.test(url))) {
@@ -159,23 +159,6 @@ export class Dialog<T> {
         }
         catch (error) {
             throw new DialogError('Canno\'t close dialog', error);
-        }
-    }
-
-    private _getSize(width: number, height: number) {
-        let screenWidth = window.screen.width;
-
-        if (width && height) {
-            return this._optimizeSize(width, height);
-        }
-        else if (screenWidth <= 640) {
-            return this._optimizeSize(640, 480);
-        }
-        else if (screenWidth <= 1366) {
-            return this._optimizeSize(1024, 768);
-        }
-        else if (screenWidth <= 1920) {
-            return this._optimizeSize(1600, 900);
         }
     }
 
