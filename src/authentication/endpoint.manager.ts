@@ -10,7 +10,7 @@ export const DefaultEndpoints = {
     AzureAD: 'AzureAD'
 };
 
-export interface IEndpoint {
+export interface IEndpointConfiguration {
     /**
      * Unique name for the Endpoint
      */
@@ -78,7 +78,7 @@ export interface IEndpoint {
 /**
  * Helper for creating and registering OAuth Endpoints.
  */
-export class EndpointManager extends Storage<IEndpoint> {
+export class EndpointStorage extends Storage<IEndpointConfiguration> {
     /**
      * @constructor
     */
@@ -92,10 +92,10 @@ export class EndpointManager extends Storage<IEndpoint> {
      *
      * @param {string} provider Unique name for the registered OAuth Endpoint.
      * @param {object} config Valid Endpoint configuration.
-     * @see {@link IEndpoint}.
+     * @see {@link IEndpointConfiguration}.
      * @return {object} Returns the added endpoint.
      */
-    add(provider: string, config: IEndpoint): IEndpoint {
+    add(provider: string, config: IEndpointConfiguration): IEndpointConfiguration {
         if (config.redirectUrl == null) {
             config.redirectUrl = window.location.origin;
         }
@@ -111,8 +111,8 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
-    registerGoogleAuth(clientId: string, overrides?: IEndpoint) {
-        let defaults = <IEndpoint>{
+    registerGoogleAuth(clientId: string, overrides?: IEndpointConfiguration) {
+        let defaults = <IEndpointConfiguration>{
             clientId: clientId,
             baseUrl: 'https://accounts.google.com',
             authorizeUrl: '/o/oauth2/v2/auth',
@@ -134,8 +134,8 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
-    registerMicrosoftAuth(clientId: string, overrides?: IEndpoint) {
-        let defaults = <IEndpoint>{
+    registerMicrosoftAuth(clientId: string, overrides?: IEndpointConfiguration) {
+        let defaults = <IEndpointConfiguration>{
             clientId: clientId,
             baseUrl: 'https://login.microsoftonline.com/common/oauth2/v2.0',
             authorizeUrl: '/authorize',
@@ -158,8 +158,8 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
-    registerFacebookAuth(clientId: string, overrides?: IEndpoint) {
-        let defaults = <IEndpoint>{
+    registerFacebookAuth(clientId: string, overrides?: IEndpointConfiguration) {
+        let defaults = <IEndpointConfiguration>{
             clientId: clientId,
             baseUrl: 'https://www.facebook.com',
             authorizeUrl: '/dialog/oauth',
@@ -183,8 +183,8 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @param {object} config Valid Endpoint configuration to override the defaults.
      * @return {object} Returns the added endpoint.
      */
-    registerAzureADAuth(clientId: string, tenant: string, overrides?: IEndpoint) {
-        let defaults = <IEndpoint>{
+    registerAzureADAuth(clientId: string, tenant: string, overrides?: IEndpointConfiguration) {
+        let defaults = <IEndpointConfiguration>{
             clientId: clientId,
             baseUrl: `https://login.windows.net/${tenant}`,
             authorizeUrl: '/oauth2/authorize',
@@ -204,14 +204,14 @@ export class EndpointManager extends Storage<IEndpoint> {
      * @param {object} config Valid Endpoint configuration.
      * @return {object} Returns the added endpoint.
      */
-    static getLoginParams(endpointConfig: IEndpoint): {
+    static getLoginParams(endpointConfig: IEndpointConfiguration): {
         url: string,
         state: number
     } {
         let scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
         let resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
-        let state = endpointConfig.state && EndpointManager.generateCryptoSafeRandom();
-        let nonce = endpointConfig.nonce && EndpointManager.generateCryptoSafeRandom();
+        let state = endpointConfig.state && EndpointStorage.generateCryptoSafeRandom();
+        let nonce = endpointConfig.nonce && EndpointStorage.generateCryptoSafeRandom();
 
         let urlSegments = [
             'response_type=' + endpointConfig.responseType,

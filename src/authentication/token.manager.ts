@@ -28,7 +28,7 @@ export interface IError {
 /**
  * Helper for caching and managing OAuth Tokens.
  */
-export class TokenManager extends Storage<IToken> {
+export class TokenStorage extends Storage<IToken> {
     /**
      * @constructor
     */
@@ -57,6 +57,7 @@ export class TokenManager extends Storage<IToken> {
             return false;
         }
         else {
+			// If the token was stored, it's Date type property was stringified, so it needs to be converted back to Date.
             token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
             return token.expires_at.getTime() - new Date().getTime() < 0;
         }
@@ -75,7 +76,7 @@ export class TokenManager extends Storage<IToken> {
             return token;
         }
 
-        let expired = TokenManager.hasExpired(token);
+        let expired = TokenStorage.hasExpired(token);
         if (expired) {
             super.remove(provider);
             return null;
@@ -96,7 +97,7 @@ export class TokenManager extends Storage<IToken> {
      */
     add(provider: string, value: IToken) {
         value.provider = provider;
-        TokenManager.setExpiry(value);
+        TokenStorage.setExpiry(value);
         return super.insert(provider, value);
     }
 }
