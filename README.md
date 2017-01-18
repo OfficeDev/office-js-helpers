@@ -4,11 +4,14 @@
 [![npm version](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers.svg)](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers)
 [![dependencies](https://david-dm.org/officedev/office-js-helpers.svg)](https://david-dm.org/officedev/office-js-helpers)
 
-
-Office JavaScript API Helpers are a collection of helpers to ease development of Office Add-ins. These helpers address features as Storage Management, Authentication, helpful utilities etc.
+A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs. These helpers address features as Storage Management, Authentication, Dialogs and other helpful utilities etc.
 
 The current version includes the following helpers:
 - [Authentication](#authentication)
+- Dialogs
+- Error Logging
+- Storage Helpers
+- Dictionary
 
 ## Getting Started
 
