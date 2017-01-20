@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { extend } from 'lodash';
-import { Storage, StorageType } from '../helpers/storage';
+import extend = require('lodash/extend');
+import { Storage } from '../helpers/storage';
 
 export const DefaultEndpoints = {
     Google: 'Google',
@@ -83,7 +83,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
      * @constructor
     */
     constructor() {
-        super('OAuth2Endpoints', StorageType.LocalStorage);
+        super('OAuth2Endpoints');
     }
 
     /**

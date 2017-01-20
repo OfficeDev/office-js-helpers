@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { Storage, StorageType } from '../helpers/storage';
+import { Storage } from '../helpers/storage';
 
 export interface IToken {
     provider: string;
@@ -33,7 +33,7 @@ export class TokenStorage extends Storage<IToken> {
      * @constructor
     */
     constructor() {
-        super('OAuth2Tokens', StorageType.LocalStorage);
+        super('OAuth2Tokens');
     }
 
     /**
@@ -57,7 +57,7 @@ export class TokenStorage extends Storage<IToken> {
             return false;
         }
         else {
-			// If the token was stored, it's Date type property was stringified, so it needs to be converted back to Date.
+            // If the token was stored, it's Date type property was stringified, so it needs to be converted back to Date.
             token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
             return token.expires_at.getTime() - new Date().getTime() < 0;
         }

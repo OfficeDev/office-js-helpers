@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { extend } from 'lodash';
+import extend = require('lodash/extend');
 import { Dictionary } from './dictionary';
 
 export enum StorageType {
