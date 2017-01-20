@@ -62,43 +62,6 @@ function getHostInfo() {
  * Helper exposing useful Utilities for Office-Addins.
  */
 export class Utilities {
-    // Underscore.js implementation of extend.
-    // https://github.com/jashkenas/underscore/blob/master/underscore.js
-
-    /**
-     * Utility to clone or merge objects.
-     */
-    static extend(dest, ...sources) {
-        let length = arguments.length;
-        if (length < 2 || dest == null) {
-            return dest; // if there are no objects to extend then return the current object
-        }
-
-        if (sources) {
-            dest = Object(dest); // create a new object to extend if there are any extensions
-        }
-
-        for (let index = 1; index < length; index++) {
-            let source = arguments[index]; // foreach object
-
-            if (source == null) {
-                continue; // move on if the object is null or undefined
-            }
-
-            let keys = Object.keys(source), // get all the keys
-                l = keys.length; // cache the length
-
-            for (let i = 0; i < l; i++) {
-                let key = keys[i]; // for each key
-
-                if (!sources || dest[key] === void 0) {
-                    dest[key] = source[key]; // replace values
-                }
-            }
-        }
-        return dest;
-    };
-
     /*
      * Returns the current host which is either the name of the application where the
      * Office Add-in is running ("EXCEL", "WORD", etc.) or simply "WEB" for all other platforms.

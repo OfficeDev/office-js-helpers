@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
+import { extend } from 'lodash';
 import { Dictionary } from './dictionary';
-import { Utilities } from './utilities';
 
 export enum StorageType {
     LocalStorage,
@@ -15,8 +15,7 @@ export enum StorageType {
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage: typeof localStorage | typeof sessionStorage = null;
-    static _observers: ((e: StorageEvent) => any)[] = [];
-    static _storageEventRegistered: boolean;
+    private _storageEventRegistered: boolean;
 
     /**
      * @constructor
@@ -50,9 +49,8 @@ export class Storage<T> extends Dictionary<T> {
      * Extends Dictionary's implementation of add, with a save to the storage.
      */
     add(item: string, value: T): T {
-        this.load();
         super.add(item, value);
-        this.save();
+        this.save(item);
         return value;
     }
 
@@ -61,9 +59,8 @@ export class Storage<T> extends Dictionary<T> {
      * Extends Dictionary's implementation of insert, with a save to the storage.
      */
     insert(item: string, value: T): T {
-        this.load();
         super.insert(item, value);
-        this.save();
+        this.save(item);
         return value;
     }
 
@@ -97,10 +94,17 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     /**
-     * Saves the current state to the storage.
+     * Synchronizes the current state to the storage.
      */
-    save() {
-        this._storage.setItem(this.container, JSON.stringify(this.items));
+    save(item?: string) {
+        let items = JSON.parse(this._storage.getItem(this.container));
+        if (!(item == null) && item.trim() !== '') {
+            items = extend({}, items, { item: this.items[item] });
+        }
+        else {
+            items = extend({}, items, this.items);
+        }
+        this._storage.setItem(this.container, JSON.stringify(items));
     }
 
     /**
@@ -108,29 +112,21 @@ export class Storage<T> extends Dictionary<T> {
      */
     load() {
         let items = JSON.parse(this._storage.getItem(this.container));
-        this.items = Utilities.extend({}, this.items, items);
-    }
-
-    /**
-     * Registers an event handler for the window.storage event and
-     * triggers the observer when the storage event is fired.
-     *
-     * The window.storage event is registered only once.
-     */
-    onStorage(observer: (e: StorageEvent) => any) {
-        Storage._observers.push(observer);
+        this.items = extend({}, this.items, items);
     }
 
     private _registerStorageEvent() {
-        this.onStorage(this.load);
-
-        if (Storage._storageEventRegistered) {
+        if (this._storageEventRegistered) {
             return;
         }
 
-        window.onstorage = event => this._notifyObservers(event);
-        Storage._storageEventRegistered = true;
-    }
+        window.onstorage = event => {
+            if (event.key === this.container) {
+                console.log('Reading from localStorage');
+                this.load();
+            }
+        };
 
-    private _notifyObservers = (event?: StorageEvent) => Storage._observers.forEach(observer => observer(event));
+        this._storageEventRegistered = true;
+    }
 }

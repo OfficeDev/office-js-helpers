@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { Utilities } from '../helpers/utilities';
+import { extend } from 'lodash';
 import { Storage, StorageType } from '../helpers/storage';
 
 export const DefaultEndpoints = {
@@ -122,7 +122,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = Utilities.extend({}, overrides, defaults);
+        let config = extend({}, overrides, defaults);
         return this.add(DefaultEndpoints.Google, config);
     };
 
@@ -146,7 +146,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = Utilities.extend({}, overrides, defaults);
+        let config = extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Microsoft, config);
     };
 
@@ -170,7 +170,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = Utilities.extend({}, overrides, defaults);
+        let config = extend({}, overrides, defaults);
         this.add(DefaultEndpoints.Facebook, config);
     };
 
@@ -194,7 +194,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = Utilities.extend({}, overrides, defaults);
+        let config = extend({}, overrides, defaults);
         this.add(DefaultEndpoints.AzureAD, config);
     };
 
