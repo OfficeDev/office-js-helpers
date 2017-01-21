@@ -15,18 +15,27 @@ export enum StorageType {
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage: typeof localStorage | typeof sessionStorage = null;
-    private _storageEventRegistered: boolean;
 
     /**
      * @constructor
      * @param {string} container Container name to be created in the LocalStorage.
      * @param {StorageType} type[optional] Storage Type to be used, defaults to Local Storage.
     */
-    constructor(public container: string, type?: StorageType) {
+    constructor(
+        public container: string,
+        private _type?: StorageType
+    ) {
         super();
-        type = type || StorageType.LocalStorage;
-        this.switchStorage(type);
-        this._registerStorageEvent();
+        this._type = this._type || StorageType.LocalStorage;
+        this.switchStorage(this._type);
+        window.addEventListener('storage', (event: StorageEvent) => {
+            if (this.container === event.key) {
+                this.load();
+                if (this.notify) {
+                    this.notify(event);
+                }
+            }
+        });
     }
 
     /**
@@ -50,7 +59,7 @@ export class Storage<T> extends Dictionary<T> {
      */
     add(item: string, value: T): T {
         super.add(item, value);
-        this.save(item);
+        this._sync(item, value);
         return value;
     }
 
@@ -60,7 +69,7 @@ export class Storage<T> extends Dictionary<T> {
      */
     insert(item: string, value: T): T {
         super.insert(item, value);
-        this.save(item);
+        this._sync(item, value);
         return value;
     }
 
@@ -69,9 +78,8 @@ export class Storage<T> extends Dictionary<T> {
      * Extends Dictionary's implementation with a save to the storage.
      */
     remove(item: string) {
-        this.load();
         let value = super.remove(item);
-        this.save();
+        this._sync(item, null);
         return value;
     }
 
@@ -94,39 +102,30 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     /**
-     * Synchronizes the current state to the storage.
-     */
-    save(item?: string) {
-        let items = JSON.parse(this._storage.getItem(this.container));
-        if (!(item == null) && item.trim() !== '') {
-            items = extend({}, items, { item: this.items[item] });
-        }
-        else {
-            items = extend({}, items, this.items);
-        }
-        this._storage.setItem(this.container, JSON.stringify(items));
-    }
-
-    /**
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        let items = JSON.parse(this._storage.getItem(this.container));
-        this.items = extend({}, this.items, items);
+        let items = extend({}, this.items, JSON.parse(this._storage.getItem(this.container)));
+        this.items = items;
     }
 
-    private _registerStorageEvent() {
-        if (this._storageEventRegistered) {
-            return;
+    /**
+     * Triggered when the storage is updated from an external source.
+     */
+    notify: (event?: StorageEvent) => any;
+
+    /**
+     * Synchronizes the current state to the storage.
+     */
+    private _sync(item: string, value: any) {
+        let items = extend({}, JSON.parse(this._storage.getItem(this.container)));
+        if (value == null) {
+            delete items[item];
         }
-
-        window.onstorage = event => {
-            if (event.key === this.container) {
-                console.log('Reading from localStorage');
-                this.load();
-            }
-        };
-
-        this._storageEventRegistered = true;
+        else {
+            items[item] = value;
+        }
+        this._storage.setItem(this.container, JSON.stringify(items));
+        this.items = items;
     }
 }
