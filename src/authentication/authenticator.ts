@@ -87,6 +87,45 @@ export class Authenticator {
         }
     }
 
+    /**
+     * Extract the token from the URL
+     *
+     * @param {string} url The url to extract the token from.
+     * @param {string} exclude Exclude a particlaur string from the url, such as a query param or specific substring.
+     * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
+     * @return {object} Returns the extracted token.
+     */
+    static getUrlParams(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
+        if (exclude) {
+            url = url.replace(exclude, '');
+        }
+
+        let [left, right] = url.split(delimiter);
+        let tokenString = right == null ? left : right;
+
+        if (tokenString.indexOf('?') !== -1) {
+            tokenString = tokenString.split('?')[1];
+        }
+
+        return Authenticator.extractParams(tokenString);
+    }
+
+    static extractParams(segment: string): any {
+        if (segment == null || segment.trim() === '') {
+            return null;
+        }
+
+        let params: any = {},
+            regex = /([^&=]+)=([^&]*)/g,
+            matchParts;
+
+        while ((matchParts = regex.exec(segment)) !== null) {
+            params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
+        }
+
+        return params;
+    }
+
     private async _openAuthDialog(provider: string, useMicrosoftTeams: boolean): Promise<IToken> {
         /** Get the endpoint configuration for the given provider and verify that it exists. */
         let endpoint = this.endpoints.get(provider);
@@ -213,47 +252,8 @@ export class Authenticator {
         });
     }
 
-    /**
-     * Extract the token from the URL
-     *
-     * @param {string} url The url to extract the token from.
-     * @param {string} exclude Exclude a particlaur string from the url, such as a query param or specific substring.
-     * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
-     * @return {object} Returns the extracted token.
-     */
-    private _getToken(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
-        if (exclude) {
-            url = url.replace(exclude, '');
-        }
-
-        let [left, right] = url.split(delimiter);
-        let tokenString = right == null ? left : right;
-
-        if (tokenString.indexOf('?') !== -1) {
-            tokenString = tokenString.split('?')[1];
-        }
-
-        return this._extractParams(tokenString);
-    }
-
-    private _extractParams(segment: string): any {
-        if (segment == null || segment.trim() === '') {
-            return null;
-        }
-
-        let params: any = {},
-            regex = /([^&=]+)=([^&]*)/g,
-            matchParts;
-
-        while ((matchParts = regex.exec(segment)) !== null) {
-            params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
-        }
-
-        return params;
-    }
-
     private _handleTokenResult(redirectUrl: string, endpoint: IEndpointConfiguration, state: number) {
-        let result = this._getToken(redirectUrl, endpoint.redirectUrl);
+        let result = Authenticator.getUrlParams(redirectUrl, endpoint.redirectUrl);
         if (result == null) {
             throw new AuthError('No access_token or code could be parsed.');
         }

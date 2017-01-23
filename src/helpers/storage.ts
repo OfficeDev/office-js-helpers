@@ -29,11 +29,9 @@ export class Storage<T> extends Dictionary<T> {
         this._type = this._type || StorageType.LocalStorage;
         this.switchStorage(this._type);
         window.addEventListener('storage', (event: StorageEvent) => {
-            if (this.container === event.key) {
-                this.load();
-                if (this.notify) {
-                    this.notify(event);
-                }
+            this.load();
+            if (this.notify) {
+                this.notify(event);
             }
         });
     }
