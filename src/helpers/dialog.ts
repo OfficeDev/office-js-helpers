@@ -14,22 +14,22 @@ interface DialogResult {
  */
 export interface IDialogSize {
     /**
-     * Max available width in pixels
+     * Width in pixels
      */
     width: number;
 
     /**
-     * Max available width in percentage
+     * Width in percentage
      */
     width$: number;
 
     /**
-     * Max available height in pixels
+     * Height in pixels
      */
     height: number;
 
     /**
-     * Max available height in percentage
+     * Height in percentage
      */
     height$: number;
 }
@@ -140,7 +140,7 @@ export class Dialog<T> {
             value = JSON.stringify(value);
         }
         else if (typeof message === 'function') {
-            throw new DialogError('Invalid message. Canno\'t pass functions as arguments');
+            throw new DialogError('Invalid message. Cannot pass functions as arguments');
         }
 
         try {
@@ -158,7 +158,7 @@ export class Dialog<T> {
             }
         }
         catch (error) {
-            throw new DialogError('Canno\'t close dialog', error);
+            throw new DialogError('Cannot close dialog', error);
         }
     }
 
