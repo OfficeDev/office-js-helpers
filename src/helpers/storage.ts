@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import extend = require('lodash/extend');
+import debounce = require('lodash/debounce');
 import { Dictionary } from './dictionary';
 
 export enum StorageType {
@@ -28,12 +29,18 @@ export class Storage<T> extends Dictionary<T> {
         super();
         this._type = this._type || StorageType.LocalStorage;
         this.switchStorage(this._type);
-        window.addEventListener('storage', (event: StorageEvent) => {
+
+        let debouncedUpdate = debounce((event: StorageEvent) => {
+            if (event.key !== this.container) {
+                return;
+            }
             this.load();
             if (this.notify) {
                 this.notify(event);
             }
-        });
+        }, 250);
+
+        window.addEventListener('storage', debouncedUpdate);
     }
 
     /**
