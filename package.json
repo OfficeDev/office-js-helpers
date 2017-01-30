@@ -16,7 +16,7 @@
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate",
     "version": "npm run build",
-    "push-tags": "concurrently \"git push\" \"git push --tags\"",
+    "push-tags": "git push origin --tags && git push origin master",
     "publish-patch": "npm version patch && npm run push-tags && npm run clean",
     "publish-minor": "npm version minor && npm run push-tags && npm run clean",
     "publish-beta": "npm version prerelease && npm publish --tag beta && npm run clean"
