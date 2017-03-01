@@ -12,6 +12,6 @@ export * from './authentication/token.manager';
 export * from './authentication/endpoint.manager';
 export * from './authentication/authenticator';
 
-export const excel = {
-    utilities: ExcelUtilities
+export const Excel = {
+    Utilities: ExcelUtilities
 };
