@@ -33,7 +33,6 @@
     "core-js": "^2.4.1",
     "lodash": "^4.17.4",
     "@types/jquery": "^2.0.39",
-    "@types/office-js": "^0.0.37",
     "@types/lodash": "^4.14.50"
   },
   "devDependencies": {
