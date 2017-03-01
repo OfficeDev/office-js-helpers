@@ -3,7 +3,7 @@
 /**
  * Helper exposing useful Utilities for Excel-Addins.
  */
-export class ExcelUtilities {
+export class Utilities {
     /**
      * Utility to delete a worksheet if it already exists.
      * @returns true if the sheet had existed before being deleted.
