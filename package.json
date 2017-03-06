@@ -30,19 +30,20 @@
     "dts/"
   ],
   "dependencies": {
-    "core-js": "^2.4.1",
-    "lodash": "^4.17.4",
-    "@types/jquery": "^2.0.39",
-    "@types/lodash": "^4.14.50"
+    "core-js": "2.4.1",
+    "lodash": "4.17.4",
+    "@types/jquery": "2.0.40",
+    "@types/lodash": "4.14.54",
+    "@types/office-js": "^0.0.37"
   },
   "devDependencies": {
-    "concurrently": "^3.1.0",
-    "typescript": "^2.1.5",
-    "dts-builder": "^1.0.8",
-    "rimraf": "^2.5.4",
-    "tslint": "^4.3.1",
-    "browserify": "^13.3.0",
-    "uglify-js": "^2.7.5"
+    "concurrently": "3.4.0",
+    "typescript": "2.1.5",
+    "dts-builder": "1.1.0",
+    "rimraf": "2.6.1",
+    "tslint": "4.5.1",
+    "browserify": "14.1.0",
+    "uglify-js": "2.8.7"
   },
   "keywords": [
     "Office Add-ins",
