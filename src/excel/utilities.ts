@@ -5,35 +5,45 @@ import { APIError } from '../errors/api';
 /**
  * Helper exposing useful Utilities for Excel-Addins.
  */
-class ExcelUtilities {
+export class ExcelUtilities {
     /**
      * Utility to delete a worksheet if it already exists.
      * @returns true if the sheet had existed before being deleted.
      */
-    static async deleteSheetIfExists(sheetName: string): Promise<boolean> {
-        if (sheetName === '') {
+    async forceCreateSheet(worksheets: Excel.WorksheetCollection, sheetName: string): Promise<Excel.Worksheet> {
+        if (sheetName == null || sheetName.trim() === '') {
             throw new APIError('Sheet name cannot be blank.');
         }
 
-        // For compatibility with ExcelApi 1.1, using a throwing-behavior check to determine whether the item exists and delete it.
-        // In ExcelApi 1.4, this code could instead have been in-lined into the caller by simply doing:
-        // context.workbook.worksheets.getItemOrNullObject(sheetName).delete()
-        try {
-            return await Excel.run(async context => {
-                const sheet = context.workbook.worksheets.getItem(sheetName);
-                sheet.delete();
-                await context.sync();
-                return true;
-            });
-        }
-        catch (error) {
-            if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
-                return false;
-            }
+        const { context } = worksheets;
+        const newSheet = context.workbook.worksheets.add();
 
-            throw new APIError('Unexpected error while trying to delete sheet.', error);
+        if (1.1) {
+            // For compatibility with ExcelApi 1.1, using a throwing-behavior check to determine whether the item exists and delete it.
+            // In ExcelApi 1.4, this code could instead have been in-lined into the caller by simply doing:
+            // context.workbook.worksheets.getItemOrNullObject(sheetName).delete()
+            await context.sync();
+            try {
+                const oldSheet = context.workbook.worksheets.getItem(sheetName);
+                oldSheet.delete();
+                await context.sync();
+            }
+            catch (error) {
+                if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
+                    return false;
+                }
+
+                throw new APIError('Unexpected error while trying to delete sheet.', error);
+            }
         }
+        else {
+            // For compatibility with ExcelApi 1.1, using a throwing-behavior check to determine whether the item exists and delete it.
+            // In ExcelApi 1.4, this code could instead have been in-lined into the caller by simply doing:
+            // context.workbook.worksheets.getItemOrNullObject(sheetName).delete()
+            context.workbook.worksheets.getItemOrNullObject(sheetName).delete();
+        }
+
+        newSheet.name = sheetName;
+        return newSheet;
     }
 }
-
-export { ExcelUtilities as Excel };
