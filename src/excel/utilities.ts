@@ -1,37 +1,39 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+
+import { APIError } from '../errors/api';
 
 /**
  * Helper exposing useful Utilities for Excel-Addins.
  */
-export class Utilities {
+class ExcelUtilities {
     /**
      * Utility to delete a worksheet if it already exists.
      * @returns true if the sheet had existed before being deleted.
      */
-    static deleteSheetIfExists(sheetName : string): OfficeExtension.Promise<boolean> {
-        if (sheetName == "") {
-            throw new Error("Sheet name cannot be blank.");
+    static async deleteSheetIfExists(sheetName: string): Promise<boolean> {
+        if (sheetName === '') {
+            throw new APIError('Sheet name cannot be blank.');
         }
 
         // For compatibility with ExcelApi 1.1, using a throwing-behavior check to determine whether the item exists and delete it.
         // In ExcelApi 1.4, this code could instead have been in-lined into the caller by simply doing:
         // context.workbook.worksheets.getItemOrNullObject(sheetName).delete()
-
-        return Excel.run(context => {
-            const sheet = context.workbook.worksheets.getItem(sheetName);
-            sheet.delete();
-            return context.sync().then(() => {
-                // Sheet was found and was able to be deleted
+        try {
+            return await Excel.run(async context => {
+                const sheet = context.workbook.worksheets.getItem(sheetName);
+                sheet.delete();
+                await context.sync();
                 return true;
             });
-        })
-        .catch(error => {
+        }
+        catch (error) {
             if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
                 return false;
             }
 
-            // Otherwise, re-throw the error:
-            throw error;
-        });
+            throw new APIError('Unexpected error while trying to delete sheet.', error);
+        }
     }
 }
+
+export { ExcelUtilities as Excel };
