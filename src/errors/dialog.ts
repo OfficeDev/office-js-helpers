@@ -1,3 +1,9 @@
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+
+/**
+ * Custom error type to handle Dialog specific errors.
+ */
+
 export class DialogError extends Error {
     /**
      * @constructor
