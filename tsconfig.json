@@ -19,12 +19,5 @@
       "dom",
       "es2015"
     ]
-  },
-  "include": [
-    "src/**/*",
-    "typings/index.d.ts"
-  ],
-  "exclude": [
-    "node_modules"
-  ]
+  }
 }

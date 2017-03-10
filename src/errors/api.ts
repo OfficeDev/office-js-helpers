@@ -1,19 +1,19 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
 
 /**
- * Custom error type to handle Dialog specific errors.
+ * Custom error type to handle API specific errors.
  */
 
-export class DialogError extends Error {
+export class APIError extends Error {
     /**
      * @constructor
      *
      * @param message Error message to be propagated.
      * @param state OAuth state if available.
     */
-    constructor(message: string, public innerError?: Error | Office.AsyncResult) {
+    constructor(message: string, public innerError?: Error | any) {
         super(message);
-        this.name = 'DialogError';
+        this.name = 'APIError';
         this.message = message;
         if ((Error as any).captureStackTrace) {
             (Error as any).captureStackTrace(this, this.constructor);
