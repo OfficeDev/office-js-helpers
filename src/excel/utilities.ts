@@ -4,7 +4,7 @@ import { APIError } from '../errors/api';
 /**
  * Helper exposing useful Utilities for Excel-Addins.
  */
-export class ExcelUtilities {
+class ExcelUtilities {
     /**
      * Utility to delete a worksheet if it already exists.
      * @returns true if the sheet had existed before being deleted.
@@ -48,3 +48,5 @@ export class ExcelUtilities {
         return newSheet;
     }
 }
+
+export { ExcelUtilities as Excel };
