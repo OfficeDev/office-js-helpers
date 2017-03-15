@@ -21,10 +21,12 @@ export class ExcelUtilities {
             (context as any).workbook.worksheets.getItemOrNullObject(sheetName).delete();
         }
         else {
-            // For compatibility with ExcelApi 1.1, using a throwing-behavior check to determine whether the item exists and delete it.
-            // In ExcelApi 1.4, this code could instead have been in-lined into the caller by simply doing:
-            // context.workbook.worksheets.getItemOrNullObject(sheetName).delete()
+            /**
+             * Flush anything already in the queue, so that the error,
+             * so as to scope the error handling logic below.
+             */
             await context.sync();
+
             try {
                 const oldSheet = (context as Excel.RequestContext).workbook.worksheets.getItem(sheetName);
                 oldSheet.delete();
@@ -32,10 +34,13 @@ export class ExcelUtilities {
             }
             catch (error) {
                 if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
-                    return null;
+                    /**
+                     * This is an expected case where the sheet didnt exist. Hence no-op.
+                     */
                 }
-
-                throw new APIError('Unexpected error while trying to delete sheet.', error);
+                else {
+                    throw new APIError('Unexpected error while trying to delete sheet.', error);
+                }
             }
         }
 
