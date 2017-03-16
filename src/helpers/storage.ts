@@ -17,7 +17,6 @@ export enum StorageType {
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage: typeof localStorage | typeof sessionStorage = null;
-    private _notify: (event?: StorageEvent) => void;
 
     /**
      * @constructor
@@ -104,18 +103,6 @@ export class Storage<T> extends Dictionary<T> {
         this.items = items;
     }
 
-    get notify() {
-        return this._notify;
-    }
-
-    /**
-     * Triggered when the storage is updated.
-     */
-    set notify(value: () => any) {
-        this._update();
-        this._notify = value;
-    }
-
     /**
      * Synchronizes the current state to the storage.
      */
@@ -135,8 +122,8 @@ export class Storage<T> extends Dictionary<T> {
      * Notify that the storage has changed only if the 'notify'
      * property has been subscribed to.
      */
-    private _update() {
-        if (this._notify == null) {
+    notify(callback: () => void) {
+        if (callback == null) {
             return;
         }
 
@@ -148,18 +135,18 @@ export class Storage<T> extends Dictionary<T> {
         let pollInterval = setInterval(() => {
             this.load();
             console.log('polling...');
-            if (this._notify) {
+            if (this.notify) {
                 /* If the last count isn't the same as the current count */
                 if (this.count !== lastCount) {
                     lastCount = this.count;
-                    this._notify();
+                    callback();
                 }
                 else {
                     const hash = md5(JSON.stringify(this.items)).toString();
                     /* If the last hash isn't the same as the current hash */
                     if (hash !== lastHash) {
                         lastHash = hash;
-                        this._notify();
+                        callback();
                     }
                 }
             }
@@ -172,8 +159,8 @@ export class Storage<T> extends Dictionary<T> {
                 return;
             }
             this.load();
-            if (this._notify) {
-                this._notify();
+            if (this.notify) {
+                callback();
             }
         }, 300);
 
