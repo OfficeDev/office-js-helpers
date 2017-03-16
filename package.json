@@ -28,18 +28,19 @@
   "dependencies": {
     "core-js": "2.4.1",
     "lodash": "4.17.4",
-    "@types/jquery": "2.0.40",
-    "@types/lodash": "4.14.54",
-    "@types/office-js": "^0.0.37"
+    "crypto-js": "3.1.9-1",
+    "@types/jquery": "2.0.41",
+    "@types/lodash": "4.14.55",
+    "@types/office-js": "0.0.39"
   },
   "devDependencies": {
     "concurrently": "3.4.0",
-    "typescript": "2.1.5",
+    "typescript": "2.2.1",
     "dts-builder": "1.1.0",
     "rimraf": "2.6.1",
     "tslint": "4.5.1",
     "browserify": "14.1.0",
-    "uglify-js": "2.8.7"
+    "uglify-js": "2.8.13"
   },
   "keywords": [
     "Office Add-ins",
