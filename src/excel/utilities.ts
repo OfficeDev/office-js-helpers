@@ -4,18 +4,26 @@ import { APIError } from '../errors/api';
 /**
  * Helper exposing useful Utilities for Excel-Addins.
  */
-class ExcelUtilities {
+export class ExcelUtilities {
     /**
      * Utility to delete a worksheet if it already exists.
      * @returns true if the sheet had existed before being deleted.
      */
-    static async forceCreateSheet(worksheets: Excel.WorksheetCollection, sheetName: string): Promise<Excel.Worksheet> {
+    static async forceCreateSheet(workbook: Excel.Workbook, sheetName: string): Promise<Excel.Worksheet> {
+        if (workbook == null && typeof workbook !== typeof Excel.Workbook) {
+            throw new APIError('Invalid workbook parameter.');
+        }
+
         if (sheetName == null || sheetName.trim() === '') {
             throw new APIError('Sheet name cannot be blank.');
         }
 
-        const { context } = worksheets;
-        const newSheet = (context as Excel.RequestContext).workbook.worksheets.add();
+        if (sheetName.length > 31) {
+            throw new APIError('Sheet name cannot be greater than 31 characters.');
+        }
+
+        const { context } = workbook;
+        const newSheet = workbook.worksheets.add();
 
         if (Office.context.requirements.isSetSupported('ExcelApi', 1.4)) {
             (context as any).workbook.worksheets.getItemOrNullObject(sheetName).delete();
@@ -28,7 +36,7 @@ class ExcelUtilities {
             await context.sync();
 
             try {
-                const oldSheet = (context as Excel.RequestContext).workbook.worksheets.getItem(sheetName);
+                const oldSheet = workbook.worksheets.getItem(sheetName);
                 oldSheet.delete();
                 await context.sync();
             }
@@ -48,5 +56,3 @@ class ExcelUtilities {
         return newSheet;
     }
 }
-
-export { ExcelUtilities as Excel };
