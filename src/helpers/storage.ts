@@ -3,6 +3,7 @@
 import extend = require('lodash/extend');
 import debounce = require('lodash/debounce');
 import { Dictionary } from './dictionary';
+import * as md5 from 'crypto-js/md5';
 
 export enum StorageType {
     LocalStorage,
@@ -16,6 +17,7 @@ export enum StorageType {
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage: typeof localStorage | typeof sessionStorage = null;
+    private _notify: (event?: StorageEvent) => void;
 
     /**
      * @constructor
@@ -29,18 +31,6 @@ export class Storage<T> extends Dictionary<T> {
         super();
         this._type = this._type || StorageType.LocalStorage;
         this.switchStorage(this._type);
-
-        let debouncedUpdate = debounce((event: StorageEvent) => {
-            if (event.key !== this.container) {
-                return;
-            }
-            this.load();
-            if (this.notify) {
-                this.notify(event);
-            }
-        }, 250);
-
-        window.addEventListener('storage', debouncedUpdate);
     }
 
     /**
@@ -114,10 +104,17 @@ export class Storage<T> extends Dictionary<T> {
         this.items = items;
     }
 
+    get notify() {
+        return this._notify;
+    }
+
     /**
-     * Triggered when the storage is updated from an external source.
+     * Triggered when the storage is updated.
      */
-    notify: (event?: StorageEvent) => any;
+    set notify(value: () => any) {
+        this._update();
+        this._notify = value;
+    }
 
     /**
      * Synchronizes the current state to the storage.
@@ -132,5 +129,54 @@ export class Storage<T> extends Dictionary<T> {
         }
         this._storage.setItem(this.container, JSON.stringify(items));
         this.items = items;
+    }
+
+    /**
+     * Notify that the storage has changed only if the 'notify'
+     * property has been subscribed to.
+     */
+    private _update() {
+        if (this._notify == null) {
+            return;
+        }
+
+        /* Determine the initial count and hash for this loop */
+        let lastCount = this.count;
+        let lastHash = md5(JSON.stringify(this.items)).toString();
+
+        /* Begin the polling at 300ms */
+        let pollInterval = setInterval(() => {
+            this.load();
+            console.log('polling...');
+            if (this._notify) {
+                /* If the last count isn't the same as the current count */
+                if (this.count !== lastCount) {
+                    lastCount = this.count;
+                    this._notify();
+                }
+                else {
+                    const hash = md5(JSON.stringify(this.items)).toString();
+                    /* If the last hash isn't the same as the current hash */
+                    if (hash !== lastHash) {
+                        lastHash = hash;
+                        this._notify();
+                    }
+                }
+            }
+        }, 300);
+
+        let debouncedUpdate = debounce((event: StorageEvent) => {
+            console.log('stopped polling... switching to events...');
+            clearInterval(pollInterval);
+            if (event.key !== this.container) {
+                return;
+            }
+            this.load();
+            if (this._notify) {
+                this._notify();
+            }
+        }, 300);
+
+        window.addEventListener('storage', debouncedUpdate);
     }
 }
