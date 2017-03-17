@@ -1,7 +1,7 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs",
-  "version": "0.6.1-beta.5",
+  "version": "0.6.0-beta",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
@@ -15,7 +15,8 @@
     "gendts": "node build/generate-dts.js",
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate",
-    "version": "npm run build"
+    "version": "npm run build",
+    "beta": "npm verison prerelease && npm publish --beta && git push && git push --tags"
   },
   "main": "./dist/index.js",
   "jsnext:main": "./dist/index.js",
