@@ -134,7 +134,7 @@ export class Authenticator {
         }
 
         /** Set the authentication state to redirect and begin the auth flow */
-        let {state, url } = EndpointStorage.getLoginParams(endpoint);
+        let { state, url } = EndpointStorage.getLoginParams(endpoint);
 
         /**
          * Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
@@ -153,7 +153,7 @@ export class Authenticator {
             return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
         }
 
-        let {state, url } = EndpointStorage.getLoginParams(endpoint);
+        let { state, url } = EndpointStorage.getLoginParams(endpoint);
         let windowFeatures = `width=${1024},height=${768},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
         let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
 
