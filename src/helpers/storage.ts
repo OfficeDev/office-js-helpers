@@ -4,6 +4,7 @@ import extend = require('lodash/extend');
 import debounce = require('lodash/debounce');
 import { Dictionary } from './dictionary';
 import * as md5 from 'crypto-js/md5';
+import { Observable } from 'rxjs/Observable';
 
 export enum StorageType {
     LocalStorage,
@@ -104,6 +105,68 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     /**
+     * Notify that the storage has changed only if the 'notify'
+     * property has been subscribed to.
+     */
+    notify = () => new Observable<void>((observer) => {
+        /* Determine the initial count and hash for this loop */
+        let lastCount = this.count;
+        let lastHash = md5(JSON.stringify(this.items)).toString();
+
+        /* Begin the polling at 300ms */
+        let pollInterval = setInterval(() => {
+            try {
+                this.load();
+
+                /* If the last count isn't the same as the current count */
+                if (this.count !== lastCount) {
+                    lastCount = this.count;
+                    observer.next();
+                }
+                else {
+                    const hash = md5(JSON.stringify(this.items)).toString();
+
+                    /* If the last hash isn't the same as the current hash */
+                    if (hash !== lastHash) {
+                        lastHash = hash;
+                        observer.next();
+                    }
+                }
+            }
+            catch (e) {
+                observer.error(e);
+            }
+        }, 300);
+
+        /* Debounced listener to localStorage events given that they fire any change */
+        let debouncedUpdate = debounce((event: StorageEvent) => {
+            try {
+                clearInterval(pollInterval);
+
+                /* If the change is on the current container */
+                if (event.key === this.container) {
+                    this.load();
+                    observer.next();
+                }
+            }
+            catch (e) {
+                observer.error(e);
+            }
+        }, 300);
+
+        window.addEventListener('storage', debouncedUpdate, false);
+
+        /* Teardown */
+        return () => {
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+            window.removeEventListener('storage', debouncedUpdate, false);
+        };
+    })
+
+
+    /**
      * Synchronizes the current state to the storage.
      */
     private _sync(item: string, value: any) {
@@ -116,54 +179,5 @@ export class Storage<T> extends Dictionary<T> {
         }
         this._storage.setItem(this.container, JSON.stringify(items));
         this.items = items;
-    }
-
-    /**
-     * Notify that the storage has changed only if the 'notify'
-     * property has been subscribed to.
-     */
-    notify(callback: () => void) {
-        if (callback == null) {
-            return;
-        }
-
-        /* Determine the initial count and hash for this loop */
-        let lastCount = this.count;
-        let lastHash = md5(JSON.stringify(this.items)).toString();
-
-        /* Begin the polling at 300ms */
-        let pollInterval = setInterval(() => {
-            this.load();
-            console.log('polling...');
-            if (this.notify) {
-                /* If the last count isn't the same as the current count */
-                if (this.count !== lastCount) {
-                    lastCount = this.count;
-                    callback();
-                }
-                else {
-                    const hash = md5(JSON.stringify(this.items)).toString();
-                    /* If the last hash isn't the same as the current hash */
-                    if (hash !== lastHash) {
-                        lastHash = hash;
-                        callback();
-                    }
-                }
-            }
-        }, 300);
-
-        let debouncedUpdate = debounce((event: StorageEvent) => {
-            console.log('stopped polling... switching to events...');
-            clearInterval(pollInterval);
-            if (event.key !== this.container) {
-                return;
-            }
-            this.load();
-            if (this.notify) {
-                callback();
-            }
-        }, 300);
-
-        window.addEventListener('storage', debouncedUpdate);
     }
 }
