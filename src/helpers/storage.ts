@@ -108,7 +108,7 @@ export class Storage<T> extends Dictionary<T> {
      * Notify that the storage has changed only if the 'notify'
      * property has been subscribed to.
      */
-    notify = () => new Observable<void>((observer) => {
+    notify = (): any => new Observable<void>((observer) => {
         /* Determine the initial count and hash for this loop */
         let lastCount = this.count;
         let lastHash = md5(JSON.stringify(this.items)).toString();
