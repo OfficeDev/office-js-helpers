@@ -16,7 +16,7 @@
     "generate": "concurrently \"npm run umdify && npm run minify\" \"npm run gendts\"",
     "build": "npm run clean && npm run tsc && npm run generate",
     "version": "npm run build",
-    "beta": "npm verison prerelease && npm publish --beta && git push && git push --tags"
+    "beta": "npm verison prerelease && npm publish tag --beta && git push && git push --tags"
   },
   "main": "./dist/index.js",
   "jsnext:main": "./dist/index.js",
