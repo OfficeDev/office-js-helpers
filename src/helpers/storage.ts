@@ -11,6 +11,26 @@ export enum StorageType {
     SessionStorage
 }
 
+export interface Listener {
+    subscribe(): Subscription;
+    subscribe(next?: () => void, error?: (error: any) => void, complete?: () => void): Subscription;
+}
+
+export interface Subscription {
+    /**
+     * A flag to indicate whether this Subscription has already been unsubscribed.
+     * @type {boolean}
+     */
+    closed: boolean;
+    /**
+     * Disposes the resources held by the subscription. May, for instance, cancel
+     * an ongoing Observable execution or cancel any other type of work that
+     * started when the Subscription was created.
+     * @return {void}
+     */
+    unsubscribe(): void;
+}
+
 /**
  * Helper for creating and querying Local Storage or Session Storage.
  * Uses {@link Dictionary} so all the data is encapsulated in a single
@@ -18,6 +38,10 @@ export enum StorageType {
  */
 export class Storage<T> extends Dictionary<T> {
     private _storage: typeof localStorage | typeof sessionStorage = null;
+
+    private get _current() {
+        return JSON.parse(this._storage.getItem(this.container));
+    }
 
     /**
      * @constructor
@@ -100,77 +124,78 @@ export class Storage<T> extends Dictionary<T> {
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        let items = extend({}, this.items, JSON.parse(this._storage.getItem(this.container)));
+        let items = extend({}, this.items, this._current);
         this.items = items;
+        this.notify().subscribe()
     }
 
     /**
      * Notify that the storage has changed only if the 'notify'
      * property has been subscribed to.
      */
-    notify = (): any => new Observable<void>((observer) => {
-        /* Determine the initial count and hash for this loop */
-        let lastCount = this.count;
-        let lastHash = md5(JSON.stringify(this.items)).toString();
+    notify = () =>
+        new Observable<void>((observer) => {
+            /* Determine the initial count and hash for this loop */
+            let lastCount = this.count;
+            let lastHash = md5(JSON.stringify(this.items)).toString();
 
-        /* Begin the polling at 300ms */
-        let pollInterval = setInterval(() => {
-            try {
-                this.load();
+            /* Begin the polling at 300ms */
+            let pollInterval = setInterval(() => {
+                try {
+                    this.load();
 
-                /* If the last count isn't the same as the current count */
-                if (this.count !== lastCount) {
-                    lastCount = this.count;
-                    observer.next();
+                    /* If the last count isn't the same as the current count */
+                    if (this.count !== lastCount) {
+                        lastCount = this.count;
+                        observer.next();
+                    }
+                    else {
+                        const hash = md5(JSON.stringify(this.items)).toString();
+
+                        /* If the last hash isn't the same as the current hash */
+                        if (hash !== lastHash) {
+                            lastHash = hash;
+                            observer.next();
+                        }
+                    }
                 }
-                else {
-                    const hash = md5(JSON.stringify(this.items)).toString();
+                catch (e) {
+                    observer.error(e);
+                }
+            }, 300);
 
-                    /* If the last hash isn't the same as the current hash */
-                    if (hash !== lastHash) {
-                        lastHash = hash;
+            /* Debounced listener to localStorage events given that they fire any change */
+            let debouncedUpdate = debounce((event: StorageEvent) => {
+                try {
+                    clearInterval(pollInterval);
+
+                    /* If the change is on the current container */
+                    if (event.key === this.container) {
+                        this.load();
                         observer.next();
                     }
                 }
-            }
-            catch (e) {
-                observer.error(e);
-            }
-        }, 300);
-
-        /* Debounced listener to localStorage events given that they fire any change */
-        let debouncedUpdate = debounce((event: StorageEvent) => {
-            try {
-                clearInterval(pollInterval);
-
-                /* If the change is on the current container */
-                if (event.key === this.container) {
-                    this.load();
-                    observer.next();
+                catch (e) {
+                    observer.error(e);
                 }
-            }
-            catch (e) {
-                observer.error(e);
-            }
-        }, 300);
+            }, 300);
 
-        window.addEventListener('storage', debouncedUpdate, false);
+            window.addEventListener('storage', debouncedUpdate, false);
 
-        /* Teardown */
-        return () => {
-            if (pollInterval) {
-                clearInterval(pollInterval);
-            }
-            window.removeEventListener('storage', debouncedUpdate, false);
-        };
-    })
-
+            /* Teardown */
+            return () => {
+                if (pollInterval) {
+                    clearInterval(pollInterval);
+                }
+                window.removeEventListener('storage', debouncedUpdate, false);
+            };
+        }) as Listener
 
     /**
      * Synchronizes the current state to the storage.
      */
-    private _sync(item: string, value: any) {
-        let items = extend({}, JSON.parse(this._storage.getItem(this.container)));
+    private _sync(item: string, value: T) {
+        let items = extend<{ [index: string]: T }>({}, this._current);
         if (value == null) {
             delete items[item];
         }
