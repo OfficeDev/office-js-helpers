@@ -4,7 +4,22 @@ import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
 import { TokenStorage, IToken, ICode, IError } from './token.manager';
 import { Utilities } from '../helpers/utilities';
 import { Dialog } from '../helpers/dialog';
-import { AuthError } from '../errors/auth';
+import { CustomError } from '../errors/custom.error';
+
+/**
+ * Custom error type to handle OAuth specific errors.
+ */
+export class AuthError extends CustomError {
+    /**
+     * @constructor
+     *
+     * @param message Error message to be propagated.
+     * @param state OAuth state if available.
+    */
+    constructor(message: string, public innerError?: Error) {
+        super('AuthError', message, innerError);
+    }
+}
 
 /**
  * Helper for performing Implicit OAuth Authentication with registered endpoints.
@@ -267,7 +282,7 @@ export class Authenticator {
             return this.tokens.add(endpoint.provider, result as IToken);
         }
         else {
-            throw new AuthError((result as IError).error, result.state);
+            throw new AuthError((result as IError).error);
         }
     }
 }
