@@ -222,16 +222,16 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
         ];
 
         if (scope) {
-            urlSegments.push('scope=' + scope);
+            urlSegments.push(`scope=${scope}`);
         }
         if (resource) {
-            urlSegments.push('resource=' + resource);
+            urlSegments.push(`resource=${resource}`);
         }
         if (state) {
-            urlSegments.push('state=' + state);
+            urlSegments.push(`state=${state}`);
         }
         if (nonce) {
-            urlSegments.push('nonce=' + nonce);
+            urlSegments.push(`nonce=${nonce}`);
         }
         if (endpointConfig.extraQueryParameters) {
             for (let param of Object.keys(endpointConfig.extraQueryParameters)) {
@@ -240,7 +240,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
         }
 
         return {
-            url: endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&'),
+            url: `${endpointConfig.baseUrl}${endpointConfig.authorizeUrl}?${urlSegments.join('&')}`,
             state: state
         };
     }
@@ -254,7 +254,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             window.crypto.getRandomValues(random);
         }
         else {
-            throw new Error('The platform doesn\'t support generation of Cryptographically Safe Randoms. Please disable the state flag and try again');
+            throw new Error('The platform doesn\'t support generation of cryptographically safe randoms. Please disable the state flag and try again.');
         }
         return random[0];
     }
