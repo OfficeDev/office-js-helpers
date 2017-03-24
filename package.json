@@ -16,7 +16,7 @@
     "generate": "npm-run-all -s umdify minify -p gendts",
     "build": "npm-run-all -s clean tsc generate",
     "version": "npm run build",
-    "beta": "npm version prerelease && npm publish --tag beta && git push"
+    "beta": "npm version prerelease && npm publish --tag beta"
   },
   "main": "./dist/index.js",
   "jsnext:main": "./dist/index.js",
