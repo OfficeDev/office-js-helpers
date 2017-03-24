@@ -1,3 +1,5 @@
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+
 import { Authenticator } from '../authentication/authenticator';
 import { IEndpointConfiguration } from '../authentication/endpoint.manager';
 import { IToken } from '../authentication/token.manager';
@@ -27,7 +29,7 @@ export class UI {
             throw new Error('Cannot create Microsoft Login button as the element could not be found');
         }
 
-        let {button, style} = UI.createMicrosoftLoginButton(element);
+        let { button, style } = UI.createMicrosoftLoginButton(element);
         button.appendChild(style);
 
         let promise = new Promise<IToken>((resolve, reject) => {

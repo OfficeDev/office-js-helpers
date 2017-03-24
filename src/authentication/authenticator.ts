@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
 import { TokenStorage, IToken, ICode, IError } from './token.manager';

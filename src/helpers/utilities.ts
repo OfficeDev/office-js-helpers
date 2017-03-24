@@ -1,4 +1,4 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 /**
  * Constant strings for the host types
