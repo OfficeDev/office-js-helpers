@@ -1,6 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import extend = require('lodash/extend');
 import debounce = require('lodash/debounce');
 import { Dictionary } from './dictionary';
 import * as md5 from 'crypto-js/md5';
@@ -124,9 +123,8 @@ export class Storage<T> extends Dictionary<T> {
      * Refreshes the storage with the current localStorage values.
      */
     load() {
-        let items = extend({}, this.items, this._current);
+        let items = { ...this.items, ...this._current };
         this.items = items;
-        this.notify().subscribe()
     }
 
     /**
@@ -195,12 +193,9 @@ export class Storage<T> extends Dictionary<T> {
      * Synchronizes the current state to the storage.
      */
     private _sync(item: string, value: T) {
-        let items = extend<{ [index: string]: T }>({}, this._current);
+        let items = { ...this._current, ...this.items };
         if (value == null) {
             delete items[item];
-        }
-        else {
-            items[item] = value;
         }
         this._storage.setItem(this.container, JSON.stringify(items));
         this.items = items;

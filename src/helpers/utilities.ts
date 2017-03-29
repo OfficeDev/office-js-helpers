@@ -1,4 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+import { CustomError } from '../errors/custom.error';
 
 /**
  * Constant strings for the host types
@@ -117,8 +118,12 @@ export class Utilities {
 
     /**
      * Utility to print prettified errors.
+     * If multiple parameters are sent then it just logs them instead.
      */
-    static log(exception: Error | string) {
+    static log(exception: Error | CustomError | string, ...args) {
+        if (!(args == null)) {
+            return console.log(exception, ...args);
+        }
         if (exception == null) {
             console.error(exception);
         }
@@ -126,17 +131,27 @@ export class Utilities {
             console.error(exception);
         }
         else {
-            console.group(exception.message || exception.name || 'Unhandled Exception');
-            console.error(exception);
-            if ((exception.stack == null)) {
-                console.groupCollapsed('Stack Trace');
-                console.error(exception.stack);
-                console.groupEnd();
-            }
-            if ((window as any).OfficeExtenstion && exception instanceof OfficeExtension.Error) {
-                console.groupCollapsed('Debug Info');
-                console.error(exception.debugInfo);
-                console.groupEnd();
+            console.group(`${exception.name}: ${exception.message}`);
+            {
+                let innerException = exception;
+                if (exception instanceof CustomError) {
+                    innerException = exception.innerError;
+                }
+                if ((window as any).OfficeExtenstion && innerException instanceof OfficeExtension.Error) {
+                    console.groupCollapsed('Debug Info');
+                    console.error(innerException.debugInfo);
+                    console.groupEnd();
+                }
+                {
+                    console.groupCollapsed('Stack Trace');
+                    console.error(exception.stack);
+                    console.groupEnd();
+                }
+                {
+                    console.groupCollapsed('Inner Error');
+                    console.error(innerException);
+                    console.groupEnd();
+                }
             }
             console.groupEnd();
         }

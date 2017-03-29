@@ -1,6 +1,5 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import extend = require('lodash/extend');
 import { Storage } from '../helpers/storage';
 
 export const DefaultEndpoints = {
@@ -70,9 +69,10 @@ export interface IEndpointConfiguration {
     responseType?: string;
 
     /**
-     * Additional '&' separated query parameters.
+     * Additional object for query parameters.
+     * Will be appending them after encoding the values.
      */
-    extraQueryParameters?: string;
+    extraQueryParameters?: { [index: string]: string };
 }
 
 /**
@@ -122,7 +122,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = extend({}, overrides, defaults);
+        let config = { ...defaults, ...overrides };
         return this.add(DefaultEndpoints.Google, config);
     };
 
@@ -141,12 +141,14 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             authorizeUrl: '/authorize',
             responseType: 'token',
             scope: 'https://graph.microsoft.com/user.read',
-            extraParameters: '&response_mode=fragment',
+            extraQueryParameters: {
+                response_mode: 'fragment'
+            },
             nonce: true,
             state: true
         };
 
-        let config = extend({}, overrides, defaults);
+        let config = { ...defaults, ...overrides };
         this.add(DefaultEndpoints.Microsoft, config);
     };
 
@@ -170,7 +172,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = extend({}, overrides, defaults);
+        let config = { ...defaults, ...overrides };
         this.add(DefaultEndpoints.Facebook, config);
     };
 
@@ -194,7 +196,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             state: true
         };
 
-        let config = extend({}, overrides, defaults);
+        let config = { ...defaults, ...overrides };
         this.add(DefaultEndpoints.AzureAD, config);
     };
 
@@ -214,29 +216,31 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
         let nonce = endpointConfig.nonce && EndpointStorage.generateCryptoSafeRandom();
 
         let urlSegments = [
-            'response_type=' + endpointConfig.responseType,
-            'client_id=' + encodeURIComponent(endpointConfig.clientId),
-            'redirect_uri=' + encodeURIComponent(endpointConfig.redirectUrl)
+            `response_type=${endpointConfig.responseType}`,
+            `client_id=${encodeURIComponent(endpointConfig.clientId)}`,
+            `redirect_uri=${encodeURIComponent(endpointConfig.redirectUrl)}`
         ];
 
         if (scope) {
-            urlSegments.push('scope=' + scope);
+            urlSegments.push(`scope=${scope}`);
         }
         if (resource) {
-            urlSegments.push('resource=' + resource);
+            urlSegments.push(`resource=${resource}`);
         }
         if (state) {
-            urlSegments.push('state=' + state);
+            urlSegments.push(`state=${state}`);
         }
         if (nonce) {
-            urlSegments.push('nonce=' + nonce);
+            urlSegments.push(`nonce=${nonce}`);
         }
         if (endpointConfig.extraQueryParameters) {
-            urlSegments.push(endpointConfig.extraQueryParameters);
+            for (let param of Object.keys(endpointConfig.extraQueryParameters)) {
+                urlSegments.push(`${param}=${encodeURIComponent(endpointConfig.extraQueryParameters[param])}`);
+            }
         }
 
         return {
-            url: endpointConfig.baseUrl + endpointConfig.authorizeUrl + '?' + urlSegments.join('&'),
+            url: `${endpointConfig.baseUrl}${endpointConfig.authorizeUrl}?${urlSegments.join('&')}`,
             state: state
         };
     }
@@ -250,7 +254,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
             window.crypto.getRandomValues(random);
         }
         else {
-            throw new Error('The platform doesn\'t support generation of Cryptographically Safe Randoms. Please disable the state flag and try again');
+            throw new Error('The platform doesn\'t support generation of cryptographically safe randoms. Please disable the state flag and try again.');
         }
         return random[0];
     }

@@ -1,7 +1,6 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-export * from './errors/dialog'
-export * from './errors/auth'
+export * from './errors/custom.error'
 export * from './helpers/dialog'
 export * from './helpers/utilities';
 export * from './helpers/dictionary';

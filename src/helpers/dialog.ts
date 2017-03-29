@@ -1,13 +1,29 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 import { Utilities } from './utilities';
-import { DialogError } from '../errors/dialog';
+import { CustomError } from '../errors/custom.error';
 declare var microsoftTeams: any;
 
 interface DialogResult {
     parse: boolean,
     value: any
 }
+
+/**
+ * Custom error type to handle API specific errors.
+ */
+export class DialogError extends CustomError {
+    /**
+     * @constructor
+     *
+     * @param message Error message to be propagated.
+     * @param state OAuth state if available.
+    */
+    constructor(message: string, public innerError?: Error) {
+        super('DialogError', message, innerError);
+    }
+}
+
 
 /**
  * An optimized size object computed based on Screen Height & Screen Width

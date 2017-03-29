@@ -1,5 +1,21 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE in the project root for license information. */
-import { APIError } from '../errors/api';
+/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+
+import { CustomError } from '../errors/custom.error';
+
+/**
+ * Custom error type to handle API specific errors.
+ */
+export class APIError extends CustomError {
+    /**
+     * @constructor
+     *
+     * @param message Error message to be propagated.
+     * @param state OAuth state if available.
+    */
+    constructor(message: string, public innerError?: Error) {
+        super('APIError', message, innerError);
+    }
+}
 
 /**
  * Helper exposing useful Utilities for Excel-Addins.
