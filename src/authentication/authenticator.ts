@@ -135,6 +135,10 @@ export class Authenticator {
             matchParts;
 
         while ((matchParts = regex.exec(segment)) !== null) {
+            /* Fixes bugs when the state parameters contains a / before them */
+            if (matchParts[1] === '/state') {
+                matchParts[1] = matchParts[1].replace('/', '');
+            }
             params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
         }
 
