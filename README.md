@@ -102,6 +102,8 @@ This to inform the Authenticator to automatically close the authentication dialo
 
 > Note: This code needs to be run in the page that is redirected to from the provider. By default we assume the root url of your website. The code ensures that if an access_token, code or error was received inside of the dialog, then it will parse it and close the dialog automatically. Also as an additional step it ensures that the `state` sent to the provider is the same as what was returned, to prevent [Cross Site Request Forgery (CSRF)](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html).
 
+> Note: If using in an **AngularJS/Angular/React project** - please take a look https://github.com/OfficeDev/office-js-helpers/issues/19 for information around boostrapping your application correctly.
+
 #### Initialize
 Create a new instance of `Authenticator` and register the endpoints. An endpoint corresponds to a service that allows the user to authenticate with.
 
