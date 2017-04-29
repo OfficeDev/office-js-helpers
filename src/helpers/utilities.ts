@@ -32,43 +32,100 @@ export const PlatformType = {
 * Office.js will soon be delivering a new API to provide the host and platform
 * information.
 */
-function getHostInfo() {
-    let host = 'WEB';
-    let platform: string = null;
-    let extras = null;
+function getHostInfo(): {
+    host: 'WEB' | 'ACCESS' | 'EXCEL' | 'ONENOTE' | 'OUTLOOK' | 'POWERPOINT' | 'PROJECT' | 'WORD',
+    platform: 'IOS' | 'MAC' | 'OFFICE_ONLINE' | 'PC'
+} {
+    // A forthcoming API (partially rolled-out) will expose the host and platform info natively
+    // when queried from within an add-in.
+    // If the platform already exposes that info, then just return it
+    // (but only after massaging it to fit the return types expected by this function)
 
-    try {
-        if (window.sessionStorage == null) {
-            throw new Error(`Session Storage isn't supported`);
-        }
+    const hasContext = window['Office'] && window['Office'].context;
+    const context = hasContext ? window['Office'].context : {};
 
-        let hostInfoValue = window.sessionStorage['hostInfoValue'];
-        [host, platform, extras] = hostInfoValue.split('$');
-
-        // Older hosts used "|", so check for that as well:
-        if (extras == null) {
-            [host, platform] = hostInfoValue.split('|');
-        }
-
-        host = host.toUpperCase() || 'WEB';
-        platform = platform.toUpperCase() || null;
-    }
-    catch (error) {
+    if (context.host && context.platform) {
+        return {
+            host: convertHostValue(context.host),
+            platform: convertPlatformValue(context.platform)
+        };
     }
 
-    return { host, platform };
+    return useFallbackLogic();
+
+    function useFallbackLogic() {
+        let host = 'WEB';
+        let platform: string = null;
+        let extras = null;
+
+        try {
+            if (window.sessionStorage == null) {
+                throw new Error(`Session Storage isn't supported`);
+            }
+
+            let hostInfoValue = window.sessionStorage['hostInfoValue'];
+            [host, platform, extras] = hostInfoValue.split('$');
+
+            // Older hosts used "|", so check for that as well:
+            if (extras == null) {
+                [host, platform] = hostInfoValue.split('|');
+            }
+
+            host = host.toUpperCase() || 'WEB';
+            platform = platform.toUpperCase() || null;
+        }
+        catch (error) {
+        }
+
+        return { host: host as any, platform: platform as any };
+    }
+
+    function convertHostValue(host: string) {
+        const officeJsToHelperEnumMapping = {
+            'Word': HostType.WORD,
+            'Excel': HostType.EXCEL,
+            'PowerPoint': HostType.POWERPOINT,
+            'Outlook': HostType.OUTLOOK,
+            'OneNote': HostType.ONENOTE,
+            'Project': HostType.PROJECT,
+            'Access': HostType.ACCESS
+        };
+
+        const convertedValue = officeJsToHelperEnumMapping[host];
+        if (convertedValue) {
+            return convertedValue;
+        }
+
+        throw new Error(`Unrecognized host type value "${host}" returned by Office.js`);
+    }
+
+    function convertPlatformValue(platform: string) {
+        const officeJsToHelperEnumMapping = {
+            'PC': PlatformType.PC,
+            'OfficeOnline': PlatformType.OFFICE_ONLINE,
+            'Mac': PlatformType.MAC,
+            'iOS': PlatformType.IOS
+        };
+
+        const convertedValue = officeJsToHelperEnumMapping[platform];
+        if (convertedValue) {
+            return convertedValue;
+        }
+
+        throw new Error(`Unrecognized platform type value "${platform}" returned by Office.js`);
+    }
 };
 
 /**
- * Helper exposing useful Utilities for Office-Addins.
+ * Helper exposing useful Utilities for Office-Add-ins.
  */
 export class Utilities {
     /*
      * Returns the current host which is either the name of the application where the
      * Office Add-in is running ("EXCEL", "WORD", etc.) or simply "WEB" for all other platforms.
      * The property is always returned in ALL_CAPS.
-     * Note that this property is guranteed to return the correct value ONLY after Office has
-     * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+     * Note that this property is guaranteed to return the correct value ONLY after Office has
+     * initialized (i.e., inside, or sequentially after, an Office.initialize = function() { ... }; statement).
      *
      * This code currently uses a workaround that relies on the internals of Office.js.
      * A more robust approach is forthcoming within the official  Office.js library.
@@ -137,7 +194,7 @@ export class Utilities {
                 if (exception instanceof CustomError) {
                     innerException = exception.innerError;
                 }
-                if ((window as any).OfficeExtenstion && innerException instanceof OfficeExtension.Error) {
+                if ((window as any).OfficeExtension && innerException instanceof OfficeExtension.Error) {
                     console.groupCollapsed('Debug Info');
                     console.error(innerException.debugInfo);
                     console.groupEnd();
