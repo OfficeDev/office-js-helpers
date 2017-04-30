@@ -37,10 +37,9 @@ export class ExcelUtilities {
             throw new APIError('Sheet name cannot be greater than 31 characters.');
         }
 
-        options = options || {};
         const context: Excel.RequestContext = <any>workbook.context;
 
-        if (options.clearOnly) {
+        if (options && options.clearOnly) {
             return createOrClear();
         } else {
             return recreateFromScratch();
