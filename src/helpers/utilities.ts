@@ -52,69 +52,69 @@ function getHostInfo(): {
     }
 
     return useFallbackLogic();
-
-    function useFallbackLogic() {
-        let host = 'WEB';
-        let platform: string = null;
-        let extras = null;
-
-        try {
-            if (window.sessionStorage == null) {
-                throw new Error(`Session Storage isn't supported`);
-            }
-
-            let hostInfoValue = window.sessionStorage['hostInfoValue'];
-            [host, platform, extras] = hostInfoValue.split('$');
-
-            // Older hosts used "|", so check for that as well:
-            if (extras == null) {
-                [host, platform] = hostInfoValue.split('|');
-            }
-
-            host = host.toUpperCase() || 'WEB';
-            platform = platform.toUpperCase() || null;
-        }
-        catch (error) {
-        }
-
-        return { host: host as any, platform: platform as any };
-    }
-
-    function convertHostValue(host: string) {
-        const officeJsToHelperEnumMapping = {
-            'Word': HostType.WORD,
-            'Excel': HostType.EXCEL,
-            'PowerPoint': HostType.POWERPOINT,
-            'Outlook': HostType.OUTLOOK,
-            'OneNote': HostType.ONENOTE,
-            'Project': HostType.PROJECT,
-            'Access': HostType.ACCESS
-        };
-
-        const convertedValue = officeJsToHelperEnumMapping[host];
-        if (convertedValue) {
-            return convertedValue;
-        }
-
-        throw new Error(`Unrecognized host type value "${host}" returned by Office.js`);
-    }
-
-    function convertPlatformValue(platform: string) {
-        const officeJsToHelperEnumMapping = {
-            'PC': PlatformType.PC,
-            'OfficeOnline': PlatformType.OFFICE_ONLINE,
-            'Mac': PlatformType.MAC,
-            'iOS': PlatformType.IOS
-        };
-
-        const convertedValue = officeJsToHelperEnumMapping[platform];
-        if (convertedValue) {
-            return convertedValue;
-        }
-
-        throw new Error(`Unrecognized platform type value "${platform}" returned by Office.js`);
-    }
 };
+
+function useFallbackLogic() {
+    let host = 'WEB';
+    let platform: string = null;
+    let extras = null;
+
+    try {
+        if (window.sessionStorage == null) {
+            throw new Error(`Session Storage isn't supported`);
+        }
+
+        let hostInfoValue = window.sessionStorage['hostInfoValue'];
+        [host, platform, extras] = hostInfoValue.split('$');
+
+        // Older hosts used "|", so check for that as well:
+        if (extras == null) {
+            [host, platform] = hostInfoValue.split('|');
+        }
+
+        host = host.toUpperCase() || 'WEB';
+        platform = platform.toUpperCase() || null;
+    }
+    catch (error) {
+    }
+
+    return { host: host as any, platform: platform as any };
+}
+
+function convertHostValue(host: string) {
+    const officeJsToHelperEnumMapping = {
+        'Word': HostType.WORD,
+        'Excel': HostType.EXCEL,
+        'PowerPoint': HostType.POWERPOINT,
+        'Outlook': HostType.OUTLOOK,
+        'OneNote': HostType.ONENOTE,
+        'Project': HostType.PROJECT,
+        'Access': HostType.ACCESS
+    };
+
+    const convertedValue = officeJsToHelperEnumMapping[host];
+    if (convertedValue) {
+        return convertedValue;
+    }
+
+    throw new Error(`Unrecognized host type value "${host}" returned by Office.js`);
+}
+
+function convertPlatformValue(platform: string) {
+    const officeJsToHelperEnumMapping = {
+        'PC': PlatformType.PC,
+        'OfficeOnline': PlatformType.OFFICE_ONLINE,
+        'Mac': PlatformType.MAC,
+        'iOS': PlatformType.IOS
+    };
+
+    const convertedValue = officeJsToHelperEnumMapping[platform];
+    if (convertedValue) {
+        return convertedValue;
+    }
+
+    throw new Error(`Unrecognized platform type value "${platform}" returned by Office.js`);
+}
 
 /**
  * Helper exposing useful Utilities for Office-Add-ins.
@@ -177,9 +177,9 @@ export class Utilities {
      * Utility to print prettified errors.
      * If multiple parameters are sent then it just logs them instead.
      */
-    static log(exception: Error | CustomError | string, ...args) {
-        if (!(args == null)) {
-            return console.log(exception, ...args);
+    static log(exception: Error | CustomError | string, extras: any, ...args) {
+        if (!(extras == null)) {
+            return console.log(exception, extras, ...args);
         }
         if (exception == null) {
             console.error(exception);
