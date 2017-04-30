@@ -1,31 +1,30 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { CustomError } from '../errors/custom.error';
+import { APIError } from '../errors/custom.error';
 
 /**
- * Custom error type to handle API specific errors.
- */
-export class APIError extends CustomError {
-    /**
-     * @constructor
-     *
-     * @param message Error message to be propagated.
-     * @param state OAuth state if available.
-    */
-    constructor(message: string, public innerError?: Error) {
-        super('APIError', message, innerError);
-    }
-}
-
-/**
- * Helper exposing useful Utilities for Excel-Addins.
+ * Helper exposing useful Utilities for Excel Add-ins.
  */
 export class ExcelUtilities {
     /**
-     * Utility to delete a worksheet if it already exists.
-     * @returns true if the sheet had existed before being deleted.
+     * Utility to create (or re-create) a worksheet, even if it already exists.
+     * @returns the new worksheet
      */
-    static async forceCreateSheet(workbook: Excel.Workbook, sheetName: string): Promise<Excel.Worksheet> {
+    static async forceCreateSheet(
+        workbook: Excel.Workbook,
+        sheetName: string,
+        options?: {
+            /**
+             * clearOnly: If the sheet already exists, keep it as is, and only clear its grid.
+             * This results in a faster operation, and avoid a screen-update flash
+             * (and the re-setting of the current selection).
+             * Note that clearing the grid does not remove floating objects like charts,
+             * so it's more of a "soft" operation, rather than a complete
+             * forceful re-creation of a sheet.
+             */
+            clearOnly?: true
+        }
+    ): Promise<Excel.Worksheet> {
         if (workbook == null && typeof workbook !== typeof Excel.Workbook) {
             throw new APIError('Invalid workbook parameter.');
         }
@@ -38,37 +37,78 @@ export class ExcelUtilities {
             throw new APIError('Sheet name cannot be greater than 31 characters.');
         }
 
-        const { context } = workbook;
-        const newSheet = workbook.worksheets.add();
+        const context: Excel.RequestContext = <any>workbook.context;
 
-        if (Office.context.requirements.isSetSupported('ExcelApi', 1.4)) {
-            (context as any).workbook.worksheets.getItemOrNullObject(sheetName).delete();
+        if (options && options.clearOnly) {
+            return createOrClear();
+        } else {
+            return recreateFromScratch();
         }
-        else {
-            /**
-             * Flush anything already in the queue, so that the error,
-             * so as to scope the error handling logic below.
-             */
-            await context.sync();
 
-            try {
-                const oldSheet = workbook.worksheets.getItem(sheetName);
-                oldSheet.delete();
+
+        // Helpers
+
+        async function createOrClear(): Promise<Excel.Worksheet> {
+            if (Office.context.requirements.isSetSupported('ExcelApi', 1.4)) {
+                const existingSheet = context.workbook.worksheets.getItemOrNullObject(sheetName);
                 await context.sync();
-            }
-            catch (error) {
-                if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
-                    /**
-                     * This is an expected case where the sheet didnt exist. Hence no-op.
-                     */
+
+                if (existingSheet.isNullObject) {
+                    return context.workbook.worksheets.add(sheetName);
+                } else {
+                    existingSheet.getRange().clear();
+                    return existingSheet;
                 }
-                else {
-                    throw new APIError('Unexpected error while trying to delete sheet.', error);
+            }
+            else {
+                // Flush anything already in the queue, so as to scope the error handling logic below.
+                await context.sync();
+
+                try {
+                    const oldSheet = workbook.worksheets.getItem(sheetName);
+                    oldSheet.getRange().clear();
+                    await context.sync();
+                    return oldSheet;
+                }
+                catch (error) {
+                    if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
+                        // This is an expected case where the sheet didn't exist. Create it now.
+                        return workbook.worksheets.add(sheetName);
+                    }
+                    else {
+                        throw new APIError('Unexpected error while trying to delete sheet.', error);
+                    }
                 }
             }
         }
 
-        newSheet.name = sheetName;
-        return newSheet;
+        async function recreateFromScratch(): Promise<Excel.Worksheet> {
+            const newSheet = workbook.worksheets.add();
+
+            if (Office.context.requirements.isSetSupported('ExcelApi', 1.4)) {
+                context.workbook.worksheets.getItemOrNullObject(sheetName).delete();
+            }
+            else {
+                // Flush anything already in the queue, so as to scope the error handling logic below.
+                await context.sync();
+
+                try {
+                    const oldSheet = workbook.worksheets.getItem(sheetName);
+                    oldSheet.delete();
+                    await context.sync();
+                }
+                catch (error) {
+                    if (error instanceof OfficeExtension.Error && error.code === Excel.ErrorCodes.itemNotFound) {
+                        // This is an expected case where the sheet didn't exist. Hence no-op.
+                    }
+                    else {
+                        throw new APIError('Unexpected error while trying to delete sheet.', error);
+                    }
+                }
+            }
+
+            newSheet.name = sheetName;
+            return newSheet;
+        }
     }
 }

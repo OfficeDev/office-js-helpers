@@ -1,15 +1,9 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 /**
- * Custom error type to handle Dialog specific errors.
+ * Custom error type
  */
 export abstract class CustomError extends Error {
-    /**
-     * @constructor
-     *
-     * @param message Error message to be propagated.
-     * @param state OAuth state if available.
-    */
     constructor(public name: string, public message: string, public innerError?: Error) {
         super(message);
         if ((Error as any).captureStackTrace) {
@@ -22,5 +16,21 @@ export abstract class CustomError extends Error {
                 this.stack = `${this.name} at ${last_part}`;
             }
         }
+    }
+}
+
+
+/**
+ * Custom error type to handle API specific errors.
+ */
+export class APIError extends CustomError {
+    /**
+     * @constructor
+     *
+     * @param message: Error message to be propagated.
+     * @param innerError: Inner error if any
+    */
+    constructor(message: string, public innerError?: Error) {
+        super('APIError', message, innerError);
     }
 }
