@@ -35,7 +35,7 @@
   "devDependencies": {
     "@types/jquery": "2.0.41",
     "@types/lodash": "4.14.57",
-    "@types/office-js": "0.0.39",
+    "@types/office-js": "^0.0.42",
     "browserify": "14.1.0",
     "npm-run-all": "4.0.2",
     "dts-builder": "1.1.0",
