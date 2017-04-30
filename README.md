@@ -26,7 +26,7 @@ To install the stable version:
 
 #### Production
 
-You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers@0.6.0/dist/office.helpers.min.js), download them, or point your package manager to them.
+You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers@0.6.2/dist/office.helpers.min.js), download them, or point your package manager to them.
 
 You can also get the latest version from the [releases](https://github.com/OfficeDev/office-js-helpers/releases) tab
 
@@ -43,7 +43,7 @@ Reference the library inside of your `.html` page using:
 <script src="https://unpkg.com/core-js/client/core.min.js"></script>
 
 <!-- Office JavaScript API Helpers (via CDN) -->
-<script src="https://unpkg.com/@microsoft/office-js-helpers@0.6.0/dist/office.helpers.min.js"></script>
+<script src="https://unpkg.com/@microsoft/office-js-helpers@0.6.2/dist/office.helpers.min.js"></script>
 
 <!-- Office JavaScript API Helpers (via npm) -->
 <script src="node_modules/@microsoft/office-js-helpers/dist/office.helpers.min.js"></script>
