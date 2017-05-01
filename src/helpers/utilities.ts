@@ -177,7 +177,7 @@ export class Utilities {
      * Utility to print prettified errors.
      * If multiple parameters are sent then it just logs them instead.
      */
-    static log(exception: Error | CustomError | string, extras: any, ...args) {
+    static log(exception: Error | CustomError | string, extras?: any, ...args) {
         if (!(extras == null)) {
             return console.log(exception, extras, ...args);
         }

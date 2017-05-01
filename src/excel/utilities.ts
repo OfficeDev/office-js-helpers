@@ -19,7 +19,7 @@ export class ExcelUtilities {
     static async forceCreateSheet(
         workbook: Excel.Workbook,
         sheetName: string,
-        clearOnly: boolean
+        clearOnly?: boolean
     ): Promise<Excel.Worksheet> {
         if (workbook == null && typeof workbook !== typeof Excel.Workbook) {
             throw new APIError('Invalid workbook parameter.');
