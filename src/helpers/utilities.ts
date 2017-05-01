@@ -51,36 +51,45 @@ function getHostInfo(): {
         };
     }
 
-    return useFallbackLogic();
+    return useHostInfoFallbackLogic() as any;
 };
 
-function useFallbackLogic() {
-    let host = 'WEB';
-    let platform: string = null;
-    let extras = null;
-
+function useHostInfoFallbackLogic() {
     try {
         if (window.sessionStorage == null) {
             throw new Error(`Session Storage isn't supported`);
         }
 
-        let hostInfoValue = window.sessionStorage['hostInfoValue'];
-        [host, platform, extras] = hostInfoValue.split('$');
+        let hostInfoValue = window.sessionStorage['hostInfoValue'] as string;
+        let [hostRaw, platformRaw, extras] = hostInfoValue.split('$');
 
         // Older hosts used "|", so check for that as well:
         if (extras == null) {
-            [host, platform] = hostInfoValue.split('|');
+            [hostRaw, platformRaw] = hostInfoValue.split('|');
         }
 
-        host = host.toUpperCase() || 'WEB';
-        platform = platform.toUpperCase() || null;
+        let host = hostRaw.toUpperCase() || 'WEB';
+        let platform: string = null;
+
+        if (Utilities.host !== HostType.WEB) {
+            let platforms = {
+                'IOS': PlatformType.IOS,
+                'MAC': PlatformType.MAC,
+                'WEB': PlatformType.OFFICE_ONLINE,
+                'WIN32': PlatformType.PC
+            };
+
+            platform = platforms[platformRaw.toUpperCase()] || null;
+        }
+
+        return { host, platform };
     }
     catch (error) {
+        return { host: 'WEB', platform: null };
     }
-
-    return { host: host as any, platform: platform as any };
 }
 
+/** Convert the Office.context.host value to one of the Office JS Helpers constants. */
 function convertHostValue(host: string) {
     const officeJsToHelperEnumMapping = {
         'Word': HostType.WORD,
@@ -92,14 +101,10 @@ function convertHostValue(host: string) {
         'Access': HostType.ACCESS
     };
 
-    const convertedValue = officeJsToHelperEnumMapping[host];
-    if (convertedValue) {
-        return convertedValue;
-    }
-
-    throw new Error(`Unrecognized host type value "${host}" returned by Office.js`);
+    return officeJsToHelperEnumMapping[host] || null;
 }
 
+/** Convert the Office.context.platform value to one of the Office JS Helpers constants. */
 function convertPlatformValue(platform: string) {
     const officeJsToHelperEnumMapping = {
         'PC': PlatformType.PC,
@@ -108,12 +113,7 @@ function convertPlatformValue(platform: string) {
         'iOS': PlatformType.IOS
     };
 
-    const convertedValue = officeJsToHelperEnumMapping[platform];
-    if (convertedValue) {
-        return convertedValue;
-    }
-
-    throw new Error(`Unrecognized platform type value "${platform}" returned by Office.js`);
+    return officeJsToHelperEnumMapping[platform] || null;
 }
 
 /**
@@ -133,16 +133,15 @@ export class Utilities {
      * instead of the current workaround.
      */
     static get host(): string {
-        let hostInfo = getHostInfo();
-        return HostType[hostInfo.host];
+        return getHostInfo().host;
     }
 
     /*
     * Returns the host application's platform ("IOS", "MAC", "OFFICE_ONLINE", or "PC").
     * This is only valid for Office Add-ins, and hence returns null if the HostType is WEB.
     * The platform is in ALL-CAPS.
-    * Note that this property is guranteed to return the correct value ONLY after Office has
-    * initialized (i.e., inside, or seqentially after, an Office.initialize = function() { ... }; statement).
+    * Note that this property is guaranteed to return the correct value ONLY after Office has
+    * initialized (i.e., inside, or sequentially after, an Office.initialize = function() { ... }; statement).
     *
     * This code currently uses a workaround that relies on the internals of Office.js.
     * A more robust approach is forthcoming within the official  Office.js library.
@@ -150,20 +149,7 @@ export class Utilities {
     * instead of the current workaround.
     */
     static get platform(): string {
-        let hostInfo = getHostInfo();
-
-        if (Utilities.host === HostType.WEB) {
-            return null;
-        }
-
-        let platforms = {
-            'IOS': PlatformType.IOS,
-            'MAC': PlatformType.MAC,
-            'WEB': PlatformType.OFFICE_ONLINE,
-            'WIN32': PlatformType.PC
-        };
-
-        return platforms[hostInfo.platform] || null;
+        return getHostInfo().platform;
     }
 
     /**

@@ -26,7 +26,7 @@ To install the stable version:
 
 #### Production
 
-You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers@0.6.3/dist/office.helpers.min.js), download them, or point your package manager to them.
+You can access [these files on unpkg](https://unpkg.com/@microsoft/office-js-helpers@0.6.5/dist/office.helpers.min.js), download them, or point your package manager to them.
 
 You can also get the latest version from the [releases](https://github.com/OfficeDev/office-js-helpers/releases) tab
 
@@ -78,7 +78,7 @@ The Authentication helper is built for standards compliant OAuth Implicit Flow. 
 
 > Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School or Personal accounts.
 
-> Note on MSAL. This helper isn't a replacement for MSAL. When MSAL for JavaScript is released publicily, the helper will use MSAL.
+> Note on MSAL. This helper isn't a replacement for MSAL. When MSAL for JavaScript is released publicly, the helper will use MSAL.
 
 #### For Office Add-ins
 You need to meet the following requirements before you are able to successfully to use the Authenticator inside of Office Add-ins.
@@ -102,7 +102,7 @@ This to inform the Authenticator to automatically close the authentication dialo
 
 > Note: This code needs to be run in the page that is redirected to from the provider. By default we assume the root url of your website. The code ensures that if an access_token, code or error was received inside of the dialog, then it will parse it and close the dialog automatically. Also as an additional step it ensures that the `state` sent to the provider is the same as what was returned, to prevent [Cross Site Request Forgery (CSRF)](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html).
 
-> Note: If using in an **AngularJS/Angular/React project** - please take a look https://github.com/OfficeDev/office-js-helpers/issues/19 for information around boostrapping your application correctly.
+> Note: If using in an **AngularJS/Angular/React project** - please take a look https://github.com/OfficeDev/office-js-helpers/issues/19 for information around bootstrapping your application correctly.
 
 #### Initialize
 Create a new instance of `Authenticator` and register the endpoints. An endpoint corresponds to a service that allows the user to authenticate with.
@@ -122,7 +122,7 @@ authenticator.endpoints.registerGoogleAuth('client id here');
 // register Facebook endpoint using
 authenticator.endpoints.registerFacebookAuth('client id here');
 
-// register any 3rd Pary OAuth Implicit Provider using
+// register any 3rd-Party OAuth Implicit Provider using
 authenticator.endpoints.add('Name of provider', { /* Endpoint Configuration */ })
 
 // register Microsoft endpoint by overriding default values
