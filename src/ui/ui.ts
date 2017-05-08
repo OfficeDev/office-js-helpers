@@ -98,7 +98,7 @@ export class UI {
 
         document.body.insertAdjacentHTML('afterbegin', messageBannerHtml);
 
-        const notificationDiv = document.getElementById(id)
+        const notificationDiv = document.getElementById(id);
         const messageTextArea = document.createElement('div');
         notificationDiv.insertAdjacentElement('beforeend', messageTextArea);
 
@@ -123,7 +123,7 @@ export class UI {
             label.onclick = () => {
                 (document.querySelector(`#${id} pre`) as HTMLPreElement).parentElement.style.display = 'block';
                 labelDiv.style.display = 'none';
-            }
+            };
             label.textContent = params.additionalDetails.label;
             labelDiv.insertAdjacentElement('beforeend', label);
 
@@ -269,7 +269,7 @@ function parseNotificationParams(params: IArguments): {
                 details: null,
                 label: 'Additional details...'
             }
-        }
+        };
         switch (params.length) {
             case 1: {
                 if (isError(params[0])) {
@@ -410,6 +410,9 @@ function getErrorDetails(error: Error, defaultLabel: string): {
     };
 
     let innerException = error;
+    if (error instanceof CustomError) {
+        innerException = error.innerError;
+    }
 
     if ((window as any).OfficeExtension && innerException instanceof OfficeExtension.Error) {
         additionalDetails = {
