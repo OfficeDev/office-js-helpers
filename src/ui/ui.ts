@@ -59,10 +59,10 @@ export class UI {
                         padding: 10px 15px;
                         box-sizing: border-box;
                     }
-                    #${id} > div > pre {
+                    #${id} pre {
                         display: none;
                         white-space: pre-wrap;
-                        padding: 0px;
+                        word-wrap: break-word;
                         margin: 0px;
                         font-size: smaller;
                     }
@@ -111,13 +111,18 @@ export class UI {
             messageTextArea.insertAdjacentElement('beforeend', labelDiv);
             const label = document.createElement('a');
             label.setAttribute('href', 'javascript:void(0)');
-            label.onclick = () => (document.querySelector(`#${id} pre`) as HTMLPreElement).style.display = 'block';
+            label.onclick = () => {
+                (document.querySelector(`#${id} pre`) as HTMLPreElement).style.display = 'block';
+                labelDiv.style.display = 'none';
+            }
             label.textContent = params.additionalDetails.label;
             labelDiv.insertAdjacentElement('beforeend', label);
 
+            const preDiv = document.createElement('div');
+            messageTextArea.insertAdjacentElement('beforeend', preDiv);
             const detailsDiv = document.createElement('pre');
             detailsDiv.textContent = params.additionalDetails.details;
-            messageTextArea.insertAdjacentElement('beforeend', detailsDiv);
+            preDiv.insertAdjacentElement('beforeend', detailsDiv);
         }
 
         (document.querySelector(`#${id} > button`) as HTMLButtonElement)
@@ -260,7 +265,7 @@ function parseNotificationParams(params: IArguments): {
                 if (isError(params[0])) {
                     return {
                         ...defaults,
-                        title: (params[0] as Error).name,
+                        title: 'Error',
                         type: 'error',
                         ...getErrorDetails(params[0], defaults.additionalDetails.label)
                     };
@@ -378,13 +383,9 @@ function getErrorDetails(error: Error, defaultLabel: string): {
 
     let innerException = error;
 
-    if (error instanceof CustomError) {
-        innerException = error.innerError;
-    }
-
     if ((window as any).OfficeExtension && innerException instanceof OfficeExtension.Error) {
         additionalDetails = {
-            details: JSON.stringify((error as OfficeExtension.Error).debugInfo),
+            details: JSON.stringify((error as OfficeExtension.Error).debugInfo, null, 4),
             label: defaultLabel
         };
     }
