@@ -4,6 +4,8 @@ import { Authenticator } from '../authentication/authenticator';
 import { IEndpointConfiguration } from '../authentication/endpoint.manager';
 import { IToken } from '../authentication/token.manager';
 import { isString, isArray, isError, isObject } from 'lodash';
+import { CustomError } from '../errors/custom.error';
+import { Utilities, PlatformType } from '../helpers/utilities';
 
 const authenticator = new Authenticator();
 
@@ -38,6 +40,13 @@ export class UI {
         };
         const messageBarTypeClass = messageBarClasses[params.type] || '';
 
+        let paddingForPersonalityMenu = '0';
+        if (Utilities.platform === PlatformType.PC) {
+            paddingForPersonalityMenu = '20px';
+        } else if (Utilities.platform === PlatformType.MAC) {
+            paddingForPersonalityMenu = '40px';
+        }
+
         const id = `message-${generateUUID()}`;
         const messageBannerHtml = `
             <div id="${id}" class="office-js-helpers-notification ms-font-m ms-MessageBar ${messageBarTypeClass}">
@@ -48,9 +57,11 @@ export class UI {
                         top: 0;
                         left: 0;
                         right: 0;
+                        padding: 0 0 10px 0;
                     }
                     #${id} > div > div {
-                        padding: 10px;
+                        padding: 10px 15px;
+                        box-sizing: border-box;
                     }
                     #${id} > button {
                         height: 52px;
@@ -60,6 +71,7 @@ export class UI {
                         background: transparent;
                         border: 0;
                         margin-left: 10px;
+                        margin-right: ${paddingForPersonalityMenu}
                     }
                 </style>
                 <button>
@@ -234,7 +246,7 @@ function parseNotificationParams(params: IArguments): {
                     return {
                         ...defaults,
                         title: (params[0] as Error).name,
-                        messages: [(params[0] as Error).message],
+                        messages: getErrorDetails(params[0] as Error),
                         type: 'error'
                     };
                 }
@@ -280,7 +292,7 @@ function parseNotificationParams(params: IArguments): {
                     return {
                         ...defaults,
                         title: params[0],
-                        messages: [(params[1] as Error).toString()],
+                        messages: getErrorDetails(params[0] as Error),
                         type: 'error'
                     };
                 }
@@ -329,4 +341,20 @@ function parseNotificationParams(params: IArguments): {
     } catch (e) {
         throw new Error('Invalid parameters passed to "notify" function');
     }
+}
+
+function getErrorDetails(error: Error): string[] {
+    const messages = [ error.toString() ];
+    let innerException = error;
+
+    if (error instanceof CustomError) {
+        innerException = error.innerError;
+    }
+
+    if ((window as any).OfficeExtension && innerException instanceof OfficeExtension.Error) {
+        messages.push('Additional details:');
+        messages.push(JSON.stringify((error as OfficeExtension.Error).debugInfo));
+    }
+
+    return messages;
 }
