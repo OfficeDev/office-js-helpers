@@ -11,6 +11,66 @@ export class UI {
 
     }
 
+    static notify(title: string, ...messages: string[]) {
+        const id = `message-${generateUUID()}`;
+        const messageBannerHtml = `
+            <div id="${id}" class="office-js-helpers-notification ms-font-m ms-bgColor-neutralLighter ms-fontColor-black">
+                <style>
+                    #${id} {
+                        position: absolute;
+                        z-index: 2147483647;
+                        top: 0;
+                        left: 0;
+                        right: 0;
+                    }
+                    #${id} > div > div {
+                        padding: 10px;
+                    }
+                    #${id} > button {
+                        height: 52px;
+                        width: 40px;
+                        cursor: pointer;
+                        float: right;
+                        background: transparent;
+                        border: 0;
+                        margin-left: 10px;
+                    }
+                </style>
+                <button>
+                    <i class="ms-Icon ms-Icon--Clear"></i>
+                </button>
+            </div>`;
+
+        const existingNotifications = document.getElementsByClassName('office-js-helpers-notification');
+        while (existingNotifications[0]) {
+            existingNotifications[0].parentNode.removeChild(existingNotifications[0]);
+        }
+
+        document.body.insertAdjacentHTML('afterbegin', messageBannerHtml);
+
+        const notificationDiv = document.getElementById(id)
+        const messageTextArea = document.createElement('div');
+        notificationDiv.insertAdjacentElement('beforeend', messageTextArea);
+
+        if (title) {
+            const titleDiv = document.createElement('div');
+            titleDiv.textContent = title;
+            titleDiv.classList.add('ms-fontWeight-semibold');
+            messageTextArea.insertAdjacentElement('beforeend', titleDiv);
+        }
+
+        messages.forEach(text => {
+            const div = document.createElement('div');
+            div.textContent = text;
+            messageTextArea.insertAdjacentElement('beforeend', div);
+        });
+
+        (document.querySelector(`#${id} > button`) as HTMLButtonElement)
+            .onclick = () => {
+                notificationDiv.parentNode.removeChild(notificationDiv);
+            };
+    }
+
     static microsoftLogin(
         container: HTMLButtonElement | JQuery,
         clientId: string,
@@ -106,4 +166,18 @@ export class UI {
 
         return { button, style };
     }
+}
+
+
+function generateUUID() {
+    // Public Domain/MIT from http://stackoverflow.com/a/8809472/678505
+    let d = new Date().getTime();
+    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
+        d += performance.now(); //use high-precision timer if available
+    }
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = (d + Math.random() * 16) % 16 | 0;
+        d = Math.floor(d / 16);
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+    });
 }
