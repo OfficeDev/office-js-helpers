@@ -20,8 +20,13 @@ export class UI {
     static notify(title: string, message: string | string[], type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
     static notify(params: {
         title?: string;
-        message: string | string[]
-        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning'
+        message: string | string[];
+        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning';
+        details?: string;
+        detailsLabels?: {
+            moreDetails: 'More details...',
+            lessDetails: 'Hide details'
+        }
     });
     static notify() {
         const params = parseNotificationParams(arguments);
@@ -206,13 +211,28 @@ function generateUUID() {
 function parseNotificationParams(params: IArguments): {
     title: string;
     messages: string[];
-    type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning'
+    type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning',
+    details: string;
+    detailsLabels: {
+        moreDetails: string;
+        lessDetails: string;
+    }
 } {
     try {
+        const defaults = {
+            title: null,
+            type: 'default' as ('default' | 'success' | 'error' | 'warning' | 'severe-warning'),
+            details: null,
+            detailsLabels: {
+                moreDetails: 'More details...',
+                lessDetails: 'Hide details'
+            }
+        }
         switch (params.length) {
             case 1: {
                 if (isError(params[0])) {
                     return {
+                        ...defaults,
                         title: (params[0] as Error).name,
                         messages: [(params[0] as Error).message],
                         type: 'error'
@@ -220,16 +240,14 @@ function parseNotificationParams(params: IArguments): {
                 }
                 if (isString(params[0])) {
                     return {
-                        title: null,
-                        messages: [params[0]],
-                        type: 'default'
+                        ...defaults,
+                        messages: [params[0]]
                     };
                 }
                 if (isArray(params[0])) {
                     return {
-                        title: null,
-                        messages: params[0],
-                        type: 'default'
+                        ...defaults,
+                        messages: params[0]
                     };
                 }
                 if (isObject(params[0])) {
@@ -243,9 +261,11 @@ function parseNotificationParams(params: IArguments): {
                     }
 
                     return {
-                        title: params[0].title || null,
+                        title: params[0].title || defaults.title,
                         messages: messages,
-                        type: params[0].type || 'default'
+                        type: params[0].type || defaults.type,
+                        details: params[0].details || defaults.details,
+                        detailsLabels: params[0].detailsLabels || defaults.detailsLabels,
                     };
                 }
                 throw new Error();
@@ -258,6 +278,7 @@ function parseNotificationParams(params: IArguments): {
 
                 if (isError(params[1])) {
                     return {
+                        ...defaults,
                         title: params[0],
                         messages: [(params[1] as Error).toString()],
                         type: 'error'
@@ -265,16 +286,16 @@ function parseNotificationParams(params: IArguments): {
                 }
                 if (isString(params[1])) {
                     return {
+                        ...defaults,
                         title: params[0],
-                        messages: [params[1]],
-                        type: 'default'
+                        messages: [params[1]]
                     };
                 }
                 if (isArray(params[1])) {
                     return {
+                        ...defaults,
                         title: params[0],
-                        messages: params[1],
-                        type: 'default'
+                        messages: params[1]
                     };
                 }
                 throw new Error();
@@ -295,6 +316,7 @@ function parseNotificationParams(params: IArguments): {
                 }
 
                 return {
+                    ...defaults,
                     title: params[0],
                     messages: messages,
                     type: params[2]
