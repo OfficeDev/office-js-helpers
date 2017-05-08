@@ -12,10 +12,19 @@ const authenticator = new Authenticator();
 export class UI {
     constructor() { }
 
+    /** Shows a basic notification at the top of the page */
     static notify(message: string | string[]);
+
+    /** Shows a basic error notification at the top of the page */
     static notify(error: Error);
+
+    /** Shows a basic notification with a custom title at the top of the page */
     static notify(title: string, message: string | string[]);
+
+    /** Shows a basic error notification with a custom title at the top of the page */
     static notify(title: string, error: Error);
+
+    /** Shows a basic error notification, with custom parameters, at the top of the page */
     static notify(error: Error, params: {
         title?: string;
         /** custom message in place of the error text */
@@ -24,7 +33,11 @@ export class UI {
             label?: string;
         }
     });
+
+    /** Shows a basic notification at the top of the page, with a background color set based on the type parameter */
     static notify(title: string, message: string | string[], type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
+
+    /** Shows a basic notification at the top of the page, with custom parameters */
     static notify(params: {
         title?: string;
         message: string | string[];
@@ -34,6 +47,7 @@ export class UI {
             label?: string;
         }
     });
+
     static notify() {
         const params = parseNotificationParams(arguments);
         const messageBarClasses = {
