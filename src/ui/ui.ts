@@ -16,6 +16,14 @@ export class UI {
     static notify(error: Error);
     static notify(title: string, message: string | string[]);
     static notify(title: string, error: Error);
+    static notify(error: Error, params: {
+        title?: string;
+        /** custom message in place of the error text */
+        message?: string | string[];
+        additionalDetails?: {
+            label?: string;
+        }
+    });
     static notify(title: string, message: string | string[], type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
     static notify(params: {
         title?: string;
@@ -53,6 +61,7 @@ export class UI {
                         top: 0;
                         left: 0;
                         right: 0;
+                        width: 100%;
                         padding: 0 0 10px 0;
                     }
                     #${id} > div > div {
@@ -106,19 +115,20 @@ export class UI {
             messageTextArea.insertAdjacentElement('beforeend', div);
         });
 
-        if (params.additionalDetails.details) {
+        if (params.additionalDetails && params.additionalDetails.details) {
             const labelDiv = document.createElement('div');
             messageTextArea.insertAdjacentElement('beforeend', labelDiv);
             const label = document.createElement('a');
             label.setAttribute('href', 'javascript:void(0)');
             label.onclick = () => {
-                (document.querySelector(`#${id} pre`) as HTMLPreElement).style.display = 'block';
+                (document.querySelector(`#${id} pre`) as HTMLPreElement).parentElement.style.display = 'block';
                 labelDiv.style.display = 'none';
             }
             label.textContent = params.additionalDetails.label;
             labelDiv.insertAdjacentElement('beforeend', label);
 
             const preDiv = document.createElement('div');
+            preDiv.style.display = 'none';
             messageTextArea.insertAdjacentElement('beforeend', preDiv);
             const detailsDiv = document.createElement('pre');
             detailsDiv.textContent = params.additionalDetails.details;
@@ -309,31 +319,48 @@ function parseNotificationParams(params: IArguments): {
             }
 
             case 2: {
-                if (!isString(params[0])) {
-                    throw new Error();
-                }
+                if (isString(params[0])) {
+                    if (isError(params[1])) {
+                        return {
+                            ...defaults,
+                            title: params[0],
+                            ...getErrorDetails(params[1], defaults.additionalDetails.label)
+                        };
+                    }
+                    if (isString(params[1])) {
+                        return {
+                            ...defaults,
+                            title: params[0],
+                            messages: [params[1]]
+                        };
+                    }
+                    if (isArray(params[1])) {
+                        return {
+                            ...defaults,
+                            title: params[0],
+                            messages: params[1]
+                        };
+                    }
+                } else if (isError(params[0]) && isObject(params[1])) {
+                    const additionalDetailsLabel =
+                        (params[1].additionalDetails && params[1].additionalDetails.label) ?
+                            params[1].additionalDetails.label : defaults.additionalDetails.label;
 
-                if (isError(params[1])) {
-                    return {
+                    const result = {
                         ...defaults,
-                        title: params[0],
-                        type: 'error',
-                        ...getErrorDetails(params[1], defaults.additionalDetails.label)
+                        ...getErrorDetails(params[0], additionalDetailsLabel)
                     };
-                }
-                if (isString(params[1])) {
-                    return {
-                        ...defaults,
-                        title: params[0],
-                        messages: [params[1]]
-                    };
-                }
-                if (isArray(params[1])) {
-                    return {
-                        ...defaults,
-                        title: params[0],
-                        messages: params[1]
-                    };
+
+                    result.title = params[1].title || result.title;
+                    if (isString(params[1].message)) {
+                        result.messages = [params[1].message];
+                    } else if (isArray(params[1].message)) {
+                        result.messages = params[1].message;
+                    } else {
+                        throw new Error();
+                    }
+
+                    return result;
                 }
                 throw new Error();
             }
@@ -369,6 +396,7 @@ function parseNotificationParams(params: IArguments): {
 }
 
 function getErrorDetails(error: Error, defaultLabel: string): {
+    type: 'error'
     messages: string[],
     additionalDetails: {
         details: string;
@@ -390,5 +418,9 @@ function getErrorDetails(error: Error, defaultLabel: string): {
         };
     }
 
-    return { messages, additionalDetails };
+    return {
+        type: 'error',
+        messages,
+        additionalDetails
+    };
 }
