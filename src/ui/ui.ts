@@ -10,10 +10,7 @@ import { Utilities, PlatformType } from '../helpers/utilities';
 const authenticator = new Authenticator();
 
 export class UI {
-    constructor() {
-
-    }
-
+    constructor() { }
 
     static notify(message: string | string[]);
     static notify(error: Error);
@@ -23,11 +20,10 @@ export class UI {
     static notify(params: {
         title?: string;
         message: string | string[];
-        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning';
-        details?: string;
-        detailsLabels?: {
-            moreDetails: 'More details...',
-            lessDetails: 'Hide details'
+        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning',
+        additionalDetails?: {
+            details: string;
+            label?: string;
         }
     });
     static notify() {
@@ -62,6 +58,13 @@ export class UI {
                     #${id} > div > div {
                         padding: 10px 15px;
                         box-sizing: border-box;
+                    }
+                    #${id} > div > pre {
+                        display: none;
+                        white-space: pre-wrap;
+                        padding: 0px;
+                        margin: 0px;
+                        font-size: smaller;
                     }
                     #${id} > button {
                         height: 52px;
@@ -102,6 +105,20 @@ export class UI {
             div.textContent = text;
             messageTextArea.insertAdjacentElement('beforeend', div);
         });
+
+        if (params.additionalDetails.details) {
+            const labelDiv = document.createElement('div');
+            messageTextArea.insertAdjacentElement('beforeend', labelDiv);
+            const label = document.createElement('a');
+            label.setAttribute('href', 'javascript:void(0)');
+            label.onclick = () => (document.querySelector(`#${id} pre`) as HTMLPreElement).style.display = 'block';
+            label.textContent = params.additionalDetails.label;
+            labelDiv.insertAdjacentElement('beforeend', label);
+
+            const detailsDiv = document.createElement('pre');
+            detailsDiv.textContent = params.additionalDetails.details;
+            messageTextArea.insertAdjacentElement('beforeend', detailsDiv);
+        }
 
         (document.querySelector(`#${id} > button`) as HTMLButtonElement)
             .onclick = () => {
@@ -224,20 +241,18 @@ function parseNotificationParams(params: IArguments): {
     title: string;
     messages: string[];
     type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning',
-    details: string;
-    detailsLabels: {
-        moreDetails: string;
-        lessDetails: string;
+    additionalDetails: {
+        details: string;
+        label: string;
     }
 } {
     try {
         const defaults = {
             title: null,
             type: 'default' as ('default' | 'success' | 'error' | 'warning' | 'severe-warning'),
-            details: null,
-            detailsLabels: {
-                moreDetails: 'More details...',
-                lessDetails: 'Hide details'
+            additionalDetails: {
+                details: null,
+                label: 'Additional details...'
             }
         }
         switch (params.length) {
@@ -246,8 +261,8 @@ function parseNotificationParams(params: IArguments): {
                     return {
                         ...defaults,
                         title: (params[0] as Error).name,
-                        messages: getErrorDetails(params[0] as Error),
-                        type: 'error'
+                        type: 'error',
+                        ...getErrorDetails(params[0], defaults.additionalDetails.label)
                     };
                 }
                 if (isString(params[0])) {
@@ -272,12 +287,17 @@ function parseNotificationParams(params: IArguments): {
                         throw new Error();
                     }
 
+                    const additionalDetails: {
+                        details: string;
+                        label: string;
+                    } = params[0].additionalDetails || {};
+                    additionalDetails.label = additionalDetails.label || defaults.additionalDetails.label;
+
                     return {
                         title: params[0].title || defaults.title,
                         messages: messages,
                         type: params[0].type || defaults.type,
-                        details: params[0].details || defaults.details,
-                        detailsLabels: params[0].detailsLabels || defaults.detailsLabels,
+                        additionalDetails: additionalDetails
                     };
                 }
                 throw new Error();
@@ -292,8 +312,8 @@ function parseNotificationParams(params: IArguments): {
                     return {
                         ...defaults,
                         title: params[0],
-                        messages: getErrorDetails(params[0] as Error),
-                        type: 'error'
+                        type: 'error',
+                        ...getErrorDetails(params[1], defaults.additionalDetails.label)
                     };
                 }
                 if (isString(params[1])) {
@@ -343,8 +363,19 @@ function parseNotificationParams(params: IArguments): {
     }
 }
 
-function getErrorDetails(error: Error): string[] {
-    const messages = [ error.toString() ];
+function getErrorDetails(error: Error, defaultLabel: string): {
+    messages: string[],
+    additionalDetails: {
+        details: string;
+        label: string;
+    }
+} {
+    const messages = [error.toString()];
+    let additionalDetails: {
+        details: string;
+        label: string;
+    };
+
     let innerException = error;
 
     if (error instanceof CustomError) {
@@ -352,9 +383,11 @@ function getErrorDetails(error: Error): string[] {
     }
 
     if ((window as any).OfficeExtension && innerException instanceof OfficeExtension.Error) {
-        messages.push('Additional details:');
-        messages.push(JSON.stringify((error as OfficeExtension.Error).debugInfo));
+        additionalDetails = {
+            details: JSON.stringify((error as OfficeExtension.Error).debugInfo),
+            label: defaultLabel
+        };
     }
 
-    return messages;
+    return { messages, additionalDetails };
 }
