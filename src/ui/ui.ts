@@ -3,6 +3,7 @@
 import { Authenticator } from '../authentication/authenticator';
 import { IEndpointConfiguration } from '../authentication/endpoint.manager';
 import { IToken } from '../authentication/token.manager';
+import { isString, isArray, isError, isObject } from 'lodash';
 
 const authenticator = new Authenticator();
 
@@ -11,10 +12,30 @@ export class UI {
 
     }
 
-    static notify(title: string, ...messages: string[]) {
+
+    static notify(message: string | string[]);
+    static notify(error: Error);
+    static notify(title: string, message: string | string[]);
+    static notify(title: string, error: Error);
+    static notify(title: string, message: string | string[], type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
+    static notify(params: {
+        title?: string;
+        message: string | string[]
+        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning'
+    });
+    static notify() {
+        const params = parseNotificationParams(arguments);
+        const messageBarClasses = {
+            'success': 'ms-MessageBar--success',
+            'error': 'ms-MessageBar--error',
+            'warning': 'ms-MessageBar--warning',
+            'severe-warning': 'ms-MessageBar--severeWarning'
+        };
+        const messageBarTypeClass = messageBarClasses[params.type] || '';
+
         const id = `message-${generateUUID()}`;
         const messageBannerHtml = `
-            <div id="${id}" class="office-js-helpers-notification ms-font-m ms-bgColor-neutralLighter ms-fontColor-black">
+            <div id="${id}" class="office-js-helpers-notification ms-font-m ms-MessageBar ${messageBarTypeClass}">
                 <style>
                     #${id} {
                         position: absolute;
@@ -52,14 +73,14 @@ export class UI {
         const messageTextArea = document.createElement('div');
         notificationDiv.insertAdjacentElement('beforeend', messageTextArea);
 
-        if (title) {
+        if (params.title) {
             const titleDiv = document.createElement('div');
-            titleDiv.textContent = title;
+            titleDiv.textContent = params.title;
             titleDiv.classList.add('ms-fontWeight-semibold');
             messageTextArea.insertAdjacentElement('beforeend', titleDiv);
         }
 
-        messages.forEach(text => {
+        params.messages.forEach(text => {
             const div = document.createElement('div');
             div.textContent = text;
             messageTextArea.insertAdjacentElement('beforeend', div);
@@ -180,4 +201,110 @@ function generateUUID() {
         d = Math.floor(d / 16);
         return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
+}
+
+function parseNotificationParams(params: IArguments): {
+    title: string;
+    messages: string[];
+    type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning'
+} {
+    try {
+        switch (params.length) {
+            case 1: {
+                if (isError(params[0])) {
+                    return {
+                        title: (params[0] as Error).name,
+                        messages: [(params[0] as Error).message],
+                        type: 'error'
+                    };
+                }
+                if (isString(params[0])) {
+                    return {
+                        title: null,
+                        messages: [params[0]],
+                        type: 'default'
+                    };
+                }
+                if (isArray(params[0])) {
+                    return {
+                        title: null,
+                        messages: params[0],
+                        type: 'default'
+                    };
+                }
+                if (isObject(params[0])) {
+                    let messages: string[];
+                    if (isString(params[0].message)) {
+                        messages = [params[0].message];
+                    } else if (isArray(params[0].message)) {
+                        messages = params[0].message;
+                    } else {
+                        throw new Error();
+                    }
+
+                    return {
+                        title: params[0].title || null,
+                        messages: messages,
+                        type: params[0].type || 'default'
+                    };
+                }
+                throw new Error();
+            }
+
+            case 2: {
+                if (!isString(params[0])) {
+                    throw new Error();
+                }
+
+                if (isError(params[1])) {
+                    return {
+                        title: params[0],
+                        messages: [(params[1] as Error).toString()],
+                        type: 'error'
+                    };
+                }
+                if (isString(params[1])) {
+                    return {
+                        title: params[0],
+                        messages: [params[1]],
+                        type: 'default'
+                    };
+                }
+                if (isArray(params[1])) {
+                    return {
+                        title: params[0],
+                        messages: params[1],
+                        type: 'default'
+                    };
+                }
+                throw new Error();
+            }
+
+            case 3: {
+                if (!(isString(params[0]) && isString(params[2]))) {
+                    throw new Error();
+                }
+
+                let messages: string[];
+                if (isString(params[1])) {
+                    messages = [params[1]];
+                } else if (isArray(params[1])) {
+                    messages = params[1];
+                } else {
+                    throw new Error();
+                }
+
+                return {
+                    title: params[0],
+                    messages: messages,
+                    type: params[2]
+                };
+            }
+
+            default:
+                throw new Error();
+        }
+    } catch (e) {
+        throw new Error('Invalid parameters passed to "notify" function');
+    }
 }
