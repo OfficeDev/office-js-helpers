@@ -1,7 +1,11 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs",
+<<<<<<< HEAD
   "version": "0.7.1",
+=======
+  "version": "0.6.5",
+>>>>>>> 15405aaaece7bf6f1dcc92558bbf9aecd08a4d51
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
