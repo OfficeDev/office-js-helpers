@@ -67,11 +67,10 @@ export class UI {
             paddingForPersonalityMenu = '40px';
         }
 
-        const id = `message-${generateUUID()}`;
         const messageBannerHtml = `
-            <div id="${id}" class="office-js-helpers-notification ms-font-m ms-MessageBar ${messageBarTypeClass}">
+            <div class="office-js-helpers-notification ms-font-m ms-MessageBar ${messageBarTypeClass}">
                 <style>
-                    #${id} {
+                    .office-js-helpers-notification {
                         position: absolute;
                         z-index: 2147483647;
                         top: 0;
@@ -80,17 +79,17 @@ export class UI {
                         width: 100%;
                         padding: 0 0 10px 0;
                     }
-                    #${id} > div > div {
+                    .office-js-helpers-notification > div > div {
                         padding: 10px 15px;
                         box-sizing: border-box;
                     }
-                    #${id} pre {
+                    .office-js-helpers-notification pre {
                         white-space: pre-wrap;
                         word-wrap: break-word;
                         margin: 0px;
                         font-size: smaller;
                     }
-                    #${id} > button {
+                    .office-js-helpers-notification > button {
                         height: 52px;
                         width: 40px;
                         cursor: pointer;
@@ -113,7 +112,7 @@ export class UI {
 
         document.body.insertAdjacentHTML('afterbegin', messageBannerHtml);
 
-        const notificationDiv = document.getElementById(id);
+        const notificationDiv = document.getElementsByClassName('office-js-helpers-notification')[0];
         const messageTextArea = document.createElement('div');
         notificationDiv.insertAdjacentElement('beforeend', messageTextArea);
 
@@ -136,7 +135,8 @@ export class UI {
             const label = document.createElement('a');
             label.setAttribute('href', 'javascript:void(0)');
             label.onclick = () => {
-                (document.querySelector(`#${id} pre`) as HTMLPreElement).parentElement.style.display = 'block';
+                (document.querySelector('.office-js-helpers-notification pre') as HTMLPreElement)
+                    .parentElement.style.display = 'block';
                 labelDiv.style.display = 'none';
             };
             label.textContent = params.moreDetailsLabel;
@@ -150,24 +150,11 @@ export class UI {
             preDiv.insertAdjacentElement('beforeend', detailsDiv);
         }
 
-        (document.querySelector(`#${id} > button`) as HTMLButtonElement)
+        (document.querySelector('.office-js-helpers-notification > button') as HTMLButtonElement)
             .onclick = () => {
                 notificationDiv.parentNode.removeChild(notificationDiv);
             };
     }
-}
-
-function generateUUID() {
-    // Public Domain/MIT from http://stackoverflow.com/a/8809472/678505
-    let d = new Date().getTime();
-    if (typeof performance !== 'undefined' && typeof performance.now === 'function') {
-        d += performance.now(); //use high-precision timer if available
-    }
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
-        const r = (d + Math.random() * 16) % 16 | 0;
-        d = Math.floor(d / 16);
-        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
-    });
 }
 
 function parseNotificationParams(params: IArguments): {
