@@ -1,17 +1,10 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { Authenticator } from '../authentication/authenticator';
-import { IEndpointConfiguration } from '../authentication/endpoint.manager';
-import { IToken } from '../authentication/token.manager';
 import { isString, isError, isObject } from 'lodash';
 import { CustomError } from '../errors/custom.error';
 import { Utilities, PlatformType } from '../helpers/utilities';
 
-const authenticator = new Authenticator();
-
 export class UI {
-    constructor() { }
-
     /** Shows a basic notification at the top of the page
      * @param message - Message, either single-string or multiline (punctuated by '\n')
      */
@@ -163,7 +156,6 @@ export class UI {
             };
     }
 }
-
 
 function generateUUID() {
     // Public Domain/MIT from http://stackoverflow.com/a/8809472/678505
