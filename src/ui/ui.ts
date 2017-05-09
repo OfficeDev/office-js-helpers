@@ -3,7 +3,7 @@
 import { Authenticator } from '../authentication/authenticator';
 import { IEndpointConfiguration } from '../authentication/endpoint.manager';
 import { IToken } from '../authentication/token.manager';
-import { isString, isArray, isError, isObject } from 'lodash';
+import { isString, isError, isObject } from 'lodash';
 import { CustomError } from '../errors/custom.error';
 import { Utilities, PlatformType } from '../helpers/utilities';
 
@@ -12,40 +12,49 @@ const authenticator = new Authenticator();
 export class UI {
     constructor() { }
 
-    /** Shows a basic notification at the top of the page */
-    static notify(message: string | string[]);
+    /** Shows a basic notification at the top of the page
+     * @param message - Message, either single-string or multiline (punctuated by '\n')
+     */
+    static notify(message: string);
 
-    /** Shows a basic error notification at the top of the page */
+    /** Shows a basic error notification at the top of the page
+     * @param error - Error object
+     */
     static notify(error: Error);
 
-    /** Shows a basic notification with a custom title at the top of the page */
-    static notify(title: string, message: string | string[]);
+    /** Shows a basic notification with a custom title at the top of the page
+     * @param title - Title, bolded
+     * @param message - Message, either single-string or multiline (punctuated by '\n')
+    */
+    static notify(title: string, message: string);
 
-    /** Shows a basic error notification with a custom title at the top of the page */
+    /** Shows a basic error notification with a custom title at the top of the page
+     * @param title - Title, bolded
+     * @param error - Error object
+     */
     static notify(title: string, error: Error);
 
     /** Shows a basic error notification, with custom parameters, at the top of the page */
     static notify(error: Error, params: {
         title?: string;
         /** custom message in place of the error text */
-        message?: string | string[];
-        additionalDetails?: {
-            label?: string;
-        }
+        message?: string;
+        moreDetailsLabel?: string;
     });
 
-    /** Shows a basic notification at the top of the page, with a background color set based on the type parameter */
-    static notify(title: string, message: string | string[], type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
+    /** Shows a basic notification at the top of the page, with a background color set based on the type parameter
+     * @param title - Title, bolded
+     * @param message - Message, either single-string or multiline (punctuated by '\n')
+     * @param type - Type, determines the background color of the notification. Acceptable types are:
+     *               'default' | 'success' | 'error' | 'warning' | 'severe-warning'
+     */
+    static notify(title: string, message: string, type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
 
     /** Shows a basic notification at the top of the page, with custom parameters */
     static notify(params: {
         title?: string;
-        message: string | string[];
-        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning',
-        additionalDetails?: {
-            details: string;
-            label?: string;
-        }
+        message: string;
+        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning'
     });
 
     static notify() {
@@ -83,7 +92,6 @@ export class UI {
                         box-sizing: border-box;
                     }
                     #${id} pre {
-                        display: none;
                         white-space: pre-wrap;
                         word-wrap: break-word;
                         margin: 0px;
@@ -123,13 +131,13 @@ export class UI {
             messageTextArea.insertAdjacentElement('beforeend', titleDiv);
         }
 
-        params.messages.forEach(text => {
+        params.message.split('\n').forEach(text => {
             const div = document.createElement('div');
             div.textContent = text;
             messageTextArea.insertAdjacentElement('beforeend', div);
         });
 
-        if (params.additionalDetails && params.additionalDetails.details) {
+        if (params.moreDetails) {
             const labelDiv = document.createElement('div');
             messageTextArea.insertAdjacentElement('beforeend', labelDiv);
             const label = document.createElement('a');
@@ -138,14 +146,14 @@ export class UI {
                 (document.querySelector(`#${id} pre`) as HTMLPreElement).parentElement.style.display = 'block';
                 labelDiv.style.display = 'none';
             };
-            label.textContent = params.additionalDetails.label;
+            label.textContent = params.moreDetailsLabel;
             labelDiv.insertAdjacentElement('beforeend', label);
 
             const preDiv = document.createElement('div');
             preDiv.style.display = 'none';
             messageTextArea.insertAdjacentElement('beforeend', preDiv);
             const detailsDiv = document.createElement('pre');
-            detailsDiv.textContent = params.additionalDetails.details;
+            detailsDiv.textContent = params.moreDetails;
             preDiv.insertAdjacentElement('beforeend', detailsDiv);
         }
 
@@ -268,21 +276,17 @@ function generateUUID() {
 
 function parseNotificationParams(params: IArguments): {
     title: string;
-    messages: string[];
-    type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning',
-    additionalDetails: {
-        details: string;
-        label: string;
-    }
+    message: string;
+    type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning';
+    moreDetails: string | null;
+    moreDetailsLabel: string;
 } {
     try {
         const defaults = {
             title: null,
             type: 'default' as ('default' | 'success' | 'error' | 'warning' | 'severe-warning'),
-            additionalDetails: {
-                details: null,
-                label: 'Additional details...'
-            }
+            moreDetails: null,
+            moreDetailsLabel: 'Additional details...'
         };
         switch (params.length) {
             case 1: {
@@ -291,42 +295,31 @@ function parseNotificationParams(params: IArguments): {
                         ...defaults,
                         title: 'Error',
                         type: 'error',
-                        ...getErrorDetails(params[0], defaults.additionalDetails.label)
+                        ...getErrorDetails(params[0])
                     };
                 }
                 if (isString(params[0])) {
                     return {
                         ...defaults,
-                        messages: [params[0]]
-                    };
-                }
-                if (isArray(params[0])) {
-                    return {
-                        ...defaults,
-                        messages: params[0]
+                        message: params[0]
                     };
                 }
                 if (isObject(params[0])) {
-                    let messages: string[];
-                    if (isString(params[0].message)) {
-                        messages = [params[0].message];
-                    } else if (isArray(params[0].message)) {
-                        messages = params[0].message;
-                    } else {
+                    const customParams: {
+                        title?: string;
+                        message: string;
+                        type?: 'default' | 'success' | 'error' | 'warning' | 'severe-warning'
+                    } = params[0];
+
+                    if (!isString(customParams.message)) {
                         throw new Error();
                     }
 
-                    const additionalDetails: {
-                        details: string;
-                        label: string;
-                    } = params[0].additionalDetails || {};
-                    additionalDetails.label = additionalDetails.label || defaults.additionalDetails.label;
-
                     return {
-                        title: params[0].title || defaults.title,
-                        messages: messages,
-                        type: params[0].type || defaults.type,
-                        additionalDetails: additionalDetails
+                        ...defaults,
+                        title: customParams.title || defaults.title,
+                        message: customParams.message,
+                        type: customParams.type || defaults.type,
                     };
                 }
                 throw new Error();
@@ -338,41 +331,32 @@ function parseNotificationParams(params: IArguments): {
                         return {
                             ...defaults,
                             title: params[0],
-                            ...getErrorDetails(params[1], defaults.additionalDetails.label)
+                            ...getErrorDetails(params[1])
                         };
                     }
                     if (isString(params[1])) {
                         return {
                             ...defaults,
                             title: params[0],
-                            messages: [params[1]]
-                        };
-                    }
-                    if (isArray(params[1])) {
-                        return {
-                            ...defaults,
-                            title: params[0],
-                            messages: params[1]
+                            message: params[1]
                         };
                     }
                 } else if (isError(params[0]) && isObject(params[1])) {
-                    const additionalDetailsLabel =
-                        (params[1].additionalDetails && params[1].additionalDetails.label) ?
-                            params[1].additionalDetails.label : defaults.additionalDetails.label;
+                    const customParams: {
+                        title?: string;
+                        /** custom message in place of the error text */
+                        message?: string;
+                        moreDetailsLabel?: string;
+                    } = params[1];
 
                     const result = {
                         ...defaults,
-                        ...getErrorDetails(params[0], additionalDetailsLabel)
+                        ...getErrorDetails(params[0]),
+                        moreDetailsLabel: customParams.moreDetailsLabel || defaults.moreDetailsLabel
                     };
 
-                    result.title = params[1].title || result.title;
-                    if (isString(params[1].message)) {
-                        result.messages = [params[1].message];
-                    } else if (isArray(params[1].message)) {
-                        result.messages = params[1].message;
-                    } else {
-                        throw new Error();
-                    }
+                    result.title = customParams.title || result.title;
+                    result.message = customParams.message || result.message;
 
                     return result;
                 }
@@ -384,19 +368,14 @@ function parseNotificationParams(params: IArguments): {
                     throw new Error();
                 }
 
-                let messages: string[];
-                if (isString(params[1])) {
-                    messages = [params[1]];
-                } else if (isArray(params[1])) {
-                    messages = params[1];
-                } else {
+                if (!isString(params[1])) {
                     throw new Error();
                 }
 
                 return {
                     ...defaults,
                     title: params[0],
-                    messages: messages,
+                    message: params[1],
                     type: params[2]
                 };
             }
@@ -409,19 +388,12 @@ function parseNotificationParams(params: IArguments): {
     }
 }
 
-function getErrorDetails(error: Error, defaultLabel: string): {
+function getErrorDetails(error: Error): {
     type: 'error'
-    messages: string[],
-    additionalDetails: {
-        details: string;
-        label: string;
-    }
+    message: string,
+    moreDetails: string;
 } {
-    const messages = [error.toString()];
-    let additionalDetails: {
-        details: string;
-        label: string;
-    };
+    let moreDetails: string;
 
     let innerException = error;
     if (error instanceof CustomError) {
@@ -429,15 +401,12 @@ function getErrorDetails(error: Error, defaultLabel: string): {
     }
 
     if ((window as any).OfficeExtension && innerException instanceof OfficeExtension.Error) {
-        additionalDetails = {
-            details: JSON.stringify((error as OfficeExtension.Error).debugInfo, null, 4),
-            label: defaultLabel
-        };
+        moreDetails = JSON.stringify((error as OfficeExtension.Error).debugInfo, null, 4);
     }
 
     return {
         type: 'error',
-        messages,
-        additionalDetails
+        message: error.toString(),
+        moreDetails
     };
 }
