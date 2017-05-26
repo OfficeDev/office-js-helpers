@@ -33,11 +33,20 @@ export class ExcelUtilities {
             throw new APIError('Sheet name cannot be greater than 31 characters.');
         }
 
+        let sheet: Excel.Worksheet;
         if (clearOnly) {
-            return createOrClear(workbook.context as any, workbook, sheetName);
+            sheet = await createOrClear(workbook.context as any, workbook, sheetName);
         } else {
-            return recreateFromScratch(workbook.context as any, workbook, sheetName);
+            sheet = await recreateFromScratch(workbook.context as any, workbook, sheetName);
         }
+
+        // To work around an issue with Office Online (tracked by the API team), it is
+        // currently necessary to do a `context.sync()` before any call to `sheet.activate()`.
+        // So to be safe, in case the caller of this helper method decides to immediately
+        // turn around and call `sheet.activate()`, call `sync` before returning the sheet.
+        await workbook.context.sync();
+
+        return sheet;
     }
 }
 
