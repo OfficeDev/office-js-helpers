@@ -135,7 +135,7 @@ export class Dialog<T> {
                 url: this.url,
                 width: this.size.width,
                 height: this.size.height,
-                failureCallback: exception => reject(new DialogError('Error while launching dialog', exception)),
+                failureCallback: exception => reject(new DialogError('Error while launching dialog', exception as any)),
                 successCallback: message => resolve(message)
             });
         });
