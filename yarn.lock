@@ -10,6 +10,10 @@
   version "4.14.57"
   resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.57.tgz#f0095fb15ec1004455613f3ad73766583e62f830"
 
+"@types/microsoftteams@1.0.0":
+  version "1.0.0"
+  resolved "https://registry.yarnpkg.com/@types/microsoftteams/-/microsoftteams-1.0.0.tgz#0ad803da6112813bddb674ec1114f7d7b5bc0b04"
+
 "@types/office-js@^0.0.42":
   version "0.0.42"
   resolved "https://registry.yarnpkg.com/@types/office-js/-/office-js-0.0.42.tgz#3b79623f14d8bf8710cabd00136ab166d0c57fc7"

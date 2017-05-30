@@ -2,7 +2,6 @@
 
 import { Utilities } from './utilities';
 import { CustomError } from '../errors/custom.error';
-declare var microsoftTeams: any;
 
 interface DialogResult {
     parse: boolean,
