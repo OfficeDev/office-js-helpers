@@ -71,7 +71,7 @@ export class UI {
             <div class="office-js-helpers-notification ms-font-m ms-MessageBar ${messageBarTypeClass}">
                 <style>
                     .office-js-helpers-notification {
-                        position: absolute;
+                        position: fixed;
                         z-index: 2147483647;
                         top: 0;
                         left: 0;
