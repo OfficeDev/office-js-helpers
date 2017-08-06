@@ -1,6 +1,8 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { isString, isError, isObject } from 'lodash';
+import isString from 'lodash/isstring';
+import isError from 'lodash/iserror';
+import isObject from 'lodash/isobject';
 import { CustomError } from '../errors/custom.error';
 import { Utilities, PlatformType } from '../helpers/utilities';
 
