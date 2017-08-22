@@ -1,19 +1,13 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs",
-  "version": "0.7.4",
+  "version": "0.8.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
   "scripts": {
-    "clean": "rimraf dist dts",
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
-    "tsc": "tsc -p tsconfig.json && rimraf ./dist/**/*.spec.*",
-    "umdify": "node build/browserify.js",
-    "minify": "node build/minify.js",
-    "gendts": "node build/generate-dts.js",
-    "generate": "npm-run-all -s umdify minify -p gendts",
     "build": "npm-run-all -s clean tsc generate",
     "version": "npm run build",
     "beta": "npm version prerelease && npm publish --tag beta"
@@ -27,23 +21,19 @@
     "dts/"
   ],
   "dependencies": {
-    "core-js": "2.4.1",
+    "core-js": "2.5.0",
     "crypto-js": "3.1.9-1",
     "lodash": "4.17.4",
     "rxjs": "^5.0.0"
   },
   "devDependencies": {
-    "@types/jquery": "2.0.41",
-    "@types/lodash": "4.14.57",
+    "@types/jquery": "3.2.12",
+    "@types/lodash": "4.14.74",
     "@types/microsoftteams": "1.0.0",
-    "@types/office-js": "^0.0.42",
-    "browserify": "14.1.0",
-    "dts-builder": "1.1.0",
-    "npm-run-all": "4.0.2",
+    "@types/office-js": "^0.0.47",
     "rimraf": "2.6.1",
-    "tslint": "4.5.1",
-    "typescript": "2.2.1",
-    "uglify-js": "2.8.15"
+    "tslint": "5.6.0",
+    "typescript": "2.4.2"
   },
   "keywords": [
     "Office Add-ins",
