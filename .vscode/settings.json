@@ -1,0 +1,15 @@
+{
+  "files.autoSave": "afterDelay",
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "editor.autoClosingBrackets": true,
+  "editor.autoIndent": true,
+  "editor.trimAutoWhitespace": true,
+  "editor.renderWhitespace": "all",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnType": true,
+  "html.format.wrapAttributes": "force-aligned"
+}
