@@ -36,6 +36,7 @@ const config = {
         test: /(\.ts)$/,
         loader: 'awesome-typescript-loader',
         options: {
+          configFileName: 'tsconfig.webpack.json'
         }
       }
     ]

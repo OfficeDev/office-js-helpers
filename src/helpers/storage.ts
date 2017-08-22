@@ -1,6 +1,6 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import debounce = require('lodash/debounce');
+import { default as debounce } from 'lodash/debounce';
 import { Dictionary } from './dictionary';
 import * as md5 from 'crypto-js/md5';
 import { Observable } from 'rxjs/Observable';
