@@ -5,6 +5,8 @@ import { Dictionary } from './dictionary';
 import * as md5 from 'crypto-js/md5';
 import { Observable } from 'rxjs/Observable';
 
+const NOTIFICATION_DEBOUNCE = 300;
+
 export enum StorageType {
   LocalStorage,
   SessionStorage
@@ -37,6 +39,7 @@ export interface Subscription {
  */
 export class Storage<T> extends Dictionary<T> {
   private _storage: typeof localStorage | typeof sessionStorage = null;
+  private _observable: Observable<void> = null;
 
   private get _current() {
     return JSON.parse(this._storage.getItem(this.container));
@@ -131,13 +134,17 @@ export class Storage<T> extends Dictionary<T> {
    * Notify that the storage has changed only if the 'notify'
    * property has been subscribed to.
    */
-  notify = () =>
-    new Observable<void>((observer) => {
+  notify = (): Listener => {
+    if (!(this._observable == null)) {
+      return this._observable;
+    }
+
+    this._observable = new Observable((observer) => {
       /* Determine the initial count and hash for this loop */
       let lastCount = this.count;
       let lastHash = md5(JSON.stringify(this.items)).toString();
 
-      /* Begin the polling at 300ms */
+      /* Begin the polling at NOTIFICATION_DEBOUNCE duration */
       let pollInterval = setInterval(() => {
         try {
           this.load();
@@ -160,7 +167,7 @@ export class Storage<T> extends Dictionary<T> {
         catch (e) {
           observer.error(e);
         }
-      }, 300);
+      }, NOTIFICATION_DEBOUNCE);
 
       /* Debounced listener to localStorage events given that they fire any change */
       let debouncedUpdate = debounce((event: StorageEvent) => {
@@ -176,7 +183,7 @@ export class Storage<T> extends Dictionary<T> {
         catch (e) {
           observer.error(e);
         }
-      }, 300);
+      }, NOTIFICATION_DEBOUNCE);
 
       window.addEventListener('storage', debouncedUpdate, false);
 
@@ -186,8 +193,12 @@ export class Storage<T> extends Dictionary<T> {
           clearInterval(pollInterval);
         }
         window.removeEventListener('storage', debouncedUpdate, false);
+        this._observable = null;
       };
-    }) as Listener
+    });
+
+    return this._observable;
+  }
 
   /**
    * Synchronizes the current state to the storage.
