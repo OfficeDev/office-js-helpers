@@ -8,7 +8,11 @@
   },
   "scripts": {
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
-    "build": "npm-run-all -s clean tsc generate",
+    "clean": "rimraf dist dts",
+    "build:ts": "tsc -p tsconfig.json",
+    "build:dev": "webpack --colors --progress --display-modules",
+    "build:prod": "webpack -p --colors --progress",
+    "build": "npm run clean && npm run build:ts && npm run build:dev",
     "version": "npm run build",
     "beta": "npm version prerelease && npm publish --tag beta"
   },
@@ -27,13 +31,20 @@
     "rxjs": "^5.0.0"
   },
   "devDependencies": {
-    "@types/jquery": "3.2.12",
+    "@types/node": "8.0.24",
     "@types/lodash": "4.14.74",
     "@types/microsoftteams": "1.0.0",
     "@types/office-js": "^0.0.47",
+    "@types/webpack": "3.0.9",
     "rimraf": "2.6.1",
     "tslint": "5.6.0",
-    "typescript": "2.4.2"
+    "typescript": "2.4.2",
+    "babel-core": "6.26.0",
+    "babel-preset-env": "1.6.0",
+    "html-loader": "0.5.1",
+    "webpack": "3.5.5",
+    "webpack-closure-compiler": "2.1.5",
+    "awesome-typescript-loader": "3.2.3"
   },
   "keywords": [
     "Office Add-ins",
