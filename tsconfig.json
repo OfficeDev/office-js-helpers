@@ -8,6 +8,7 @@
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
+    "noResolve": false,
     "removeComments": false,
     "allowUnusedLabels": false,
     "noImplicitReturns": true,
@@ -16,12 +17,14 @@
     "sourceMap": true,
     "declaration": true,
     "allowSyntheticDefaultImports": true,
+    "jsx": "react",
     "lib": [
       "dom",
       "es2016"
     ],
     "typeRoots": [
-      "node_modules/@types"
+      "node_modules/@types",
+      "./global.d.ts"
     ]
   },
   "exclude": [
