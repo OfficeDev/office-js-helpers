@@ -30,7 +30,9 @@ const config = {
       {
         test: /(\.html)$/,
         loader: 'html-loader',
-        exclude: /node_modules/
+        options: {
+          exportAsEs6Default: true
+        }
       },
       {
         test: /(\.ts)$/,

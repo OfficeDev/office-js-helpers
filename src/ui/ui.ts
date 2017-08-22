@@ -3,6 +3,7 @@
 import { isString, isError, isObject } from 'lodash-es';
 import { CustomError } from '../errors/custom.error';
 import { Utilities, PlatformType } from '../helpers/utilities';
+import html from './message-banner.html';
 
 export class UI {
   /** Shows a basic notification at the top of the page
@@ -67,43 +68,7 @@ export class UI {
       paddingForPersonalityMenu = '40px';
     }
 
-    const messageBannerHtml = `
-            <div class="office-js-helpers-notification ms-font-m ms-MessageBar ${messageBarTypeClass}">
-                <style>
-                    .office-js-helpers-notification {
-                        position: fixed;
-                        z-index: 2147483647;
-                        top: 0;
-                        left: 0;
-                        right: 0;
-                        width: 100%;
-                        padding: 0 0 10px 0;
-                    }
-                    .office-js-helpers-notification > div > div {
-                        padding: 10px 15px;
-                        box-sizing: border-box;
-                    }
-                    .office-js-helpers-notification pre {
-                        white-space: pre-wrap;
-                        word-wrap: break-word;
-                        margin: 0px;
-                        font-size: smaller;
-                    }
-                    .office-js-helpers-notification > button {
-                        height: 52px;
-                        width: 40px;
-                        cursor: pointer;
-                        float: right;
-                        background: transparent;
-                        border: 0;
-                        margin-left: 10px;
-                        margin-right: ${paddingForPersonalityMenu}
-                    }
-                </style>
-                <button>
-                    <i class="ms-Icon ms-Icon--Clear"></i>
-                </button>
-            </div>`;
+    const messageBannerHtml = html.replace('@@CLASS', messageBarTypeClass).replace('\'@@PADDING\'', paddingForPersonalityMenu);
 
     const existingNotifications = document.getElementsByClassName('office-js-helpers-notification');
     while (existingNotifications[0]) {
