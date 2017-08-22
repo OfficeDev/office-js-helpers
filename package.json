@@ -10,9 +10,9 @@
     "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "clean": "rimraf dist dts",
     "build:ts": "tsc -p tsconfig.json",
-    "build:dev": "webpack --colors --progress --display-modules",
-    "build:prod": "webpack -p --colors --progress",
-    "build": "npm run clean && npm run build:ts && npm run build:dev",
+    "build:lib": "webpack --colors --progress --display-modules",
+    "build:min": "uglifyjs ./dist/office.helpers.js --compress --mangle --output ./dist/office.helpers.min.js",
+    "build": "npm run clean && npm run build:ts && npm run build:lib && npm run build:min",
     "version": "npm run build",
     "beta": "npm version prerelease && npm publish --tag beta"
   },
@@ -31,21 +31,23 @@
     "rxjs": "^5.0.0"
   },
   "devDependencies": {
-    "@types/node": "8.0.24",
     "@types/lodash-es": "4.14.6",
     "@types/microsoftteams": "1.0.0",
+    "@types/node": "8.0.24",
     "@types/office-js": "^0.0.47",
     "@types/webpack": "3.0.9",
+    "awesome-typescript-loader": "3.2.3",
+    "babel-core": "6.26.0",
+    "babel-plugin-lodash": "3.2.11",
+    "babel-preset-env": "1.6.0",
+    "dts-bundle": "0.7.3",
+    "html-loader": "0.5.1",
     "rimraf": "2.6.1",
     "tslint": "5.6.0",
     "typescript": "2.4.2",
-    "babel-core": "6.26.0",
-    "babel-preset-env": "1.6.0",
-    "babel-plugin-lodash": "3.2.11",
-    "html-loader": "0.5.1",
+    "uglify-js": "3.0.28",
     "webpack": "3.5.5",
-    "webpack-closure-compiler": "2.1.5",
-    "awesome-typescript-loader": "3.2.3"
+    "webpack-closure-compiler": "2.1.5"
   },
   "keywords": [
     "Office Add-ins",
