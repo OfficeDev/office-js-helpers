@@ -1,26 +1,32 @@
 const webpack = require('webpack');
-const UglifyJsPlugin = webpack.optimize.UglifyJsPlugin;
 const path = require('path');
-const isProdMode = process.env.NODE_ENV === 'production';
 const libraryName = 'OfficeHelpers';
-const fileName = 'office.helpers';
+const fileName = 'office.helpers.js';
 
+function DtsBundlePlugin() { };
 
-let outputFile = fileName, plugins = [];
+DtsBundlePlugin.prototype.apply = compiler => {
+  compiler.plugin('done', () => {
+    const dts = require('dts-bundle');
 
-if (isProdMode) {
-  plugins.push(new UglifyJsPlugin({ minimize: true }));
-  outputFile += '.min.js';
-} else {
-  outputFile += '.js';
-}
+    dts.bundle({
+      name: libraryName,
+      main: 'dts/index.d.ts',
+      baseDir: 'dts',
+      out: '../dist/office.helpers.d.ts',
+      removeSource: true,
+      externals: true,
+      outputAsModuleFolder: true
+    });
+  });
+};
 
 const config = {
   entry: __dirname + '/src/index.ts',
   devtool: 'source-map',
   output: {
     path: __dirname + '/dist',
-    filename: outputFile,
+    filename: fileName,
     library: libraryName,
     libraryTarget: 'umd',
     umdNamedDefine: true
@@ -50,7 +56,9 @@ const config = {
     ],
     extensions: ['.json', '.js', '.ts', '.html']
   },
-  plugins: plugins
+  plugins: [
+    new DtsBundlePlugin()
+  ]
 };
 
 module.exports = config;
