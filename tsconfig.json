@@ -1,6 +1,9 @@
 {
   "compilerOptions": {
-    "target": "es5",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "declarationDir": "./dts",
+    "target": "es6",
     "module": "commonjs",
     "moduleResolution": "node",
     "emitDecoratorMetadata": true,
@@ -11,13 +14,18 @@
     "noUnusedParameters": true,
     "noUnusedLocals": true,
     "sourceMap": true,
-    "rootDir": "./src",
-    "outDir": "./dist",
-    "declarationDir": "./dts",
     "declaration": true,
+    "allowSyntheticDefaultImports": true,
     "lib": [
       "dom",
-      "es2015"
+      "es2016"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
     ]
-  }
+  },
+  "exclude": [
+    "node_modules",
+    "./webpack.config.ts"
+  ]
 }
