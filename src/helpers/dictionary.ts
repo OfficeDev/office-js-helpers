@@ -41,7 +41,7 @@ export class Dictionary<T> {
       throw new Error(`Key: ${key} already exists.`);
     }
     return this.insert(key, value);
-  };
+  }
 
   /**
    * Inserts an item into the dictionary.
@@ -73,7 +73,7 @@ export class Dictionary<T> {
     let value = this.items[key];
     delete this.items[key];
     return value;
-  };
+  }
 
   /**
    * Clears the dictionary.
@@ -132,5 +132,5 @@ export class Dictionary<T> {
    */
   get count(): number {
     return this.keys().length;
-  };
+  }
 }

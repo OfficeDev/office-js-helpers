@@ -52,7 +52,7 @@ function getHostInfo(): {
   }
 
   return useHostInfoFallbackLogic() as any;
-};
+}
 
 function useHostInfoFallbackLogic() {
   try {
