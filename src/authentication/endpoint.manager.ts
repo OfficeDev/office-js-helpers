@@ -6,7 +6,8 @@ export const DefaultEndpoints = {
   Google: 'Google',
   Microsoft: 'Microsoft',
   Facebook: 'Facebook',
-  AzureAD: 'AzureAD'
+  AzureAD: 'AzureAD',
+  Dropbox: 'Dropbox'
 };
 
 export interface IEndpointConfiguration {
@@ -124,7 +125,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
 
     let config = { ...defaults, ...overrides };
     return this.add(DefaultEndpoints.Google, config);
-  };
+  }
 
   /**
    * Register Microsoft Implicit OAuth.
@@ -150,7 +151,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
 
     let config = { ...defaults, ...overrides };
     this.add(DefaultEndpoints.Microsoft, config);
-  };
+  }
 
   /**
    * Register Facebook Implicit OAuth.
@@ -174,7 +175,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
 
     let config = { ...defaults, ...overrides };
     this.add(DefaultEndpoints.Facebook, config);
-  };
+  }
 
   /**
    * Register AzureAD Implicit OAuth.
@@ -198,7 +199,28 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
 
     let config = { ...defaults, ...overrides };
     this.add(DefaultEndpoints.AzureAD, config);
-  };
+  }
+
+  /**
+   * Register Dropbox Implicit OAuth.
+   * If overrides is left empty, the default scope is limited to basic profile information.
+   *
+   * @param {string} clientId ClientID for the Dropbox App.
+   * @param {object} config Valid Endpoint configuration to override the defaults.
+   * @return {object} Returns the added endpoint.
+   */
+  registerDropboxAuth(clientId: string, overrides?: IEndpointConfiguration) {
+    let defaults = <IEndpointConfiguration>{
+      clientId: clientId,
+      baseUrl: `https://www.dropbox.com/1`,
+      authorizeUrl: '/oauth2/authorize',
+      responseType: 'token',
+      state: true
+    };
+
+    let config = { ...defaults, ...overrides };
+    this.add(DefaultEndpoints.Dropbox, config);
+  }
 
   /**
    * Helper to generate the OAuth login url.
