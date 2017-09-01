@@ -25,7 +25,7 @@
     "dts/"
   ],
   "dependencies": {
-    "core-js": "2.5.0",
+    "core-js": "2.5.1",
     "crypto-js": "3.1.9-1",
     "lodash-es": "4.17.4",
     "rxjs": "^5.0.0"
@@ -33,9 +33,9 @@
   "devDependencies": {
     "@types/lodash-es": "4.14.6",
     "@types/microsoftteams": "1.0.0",
-    "@types/node": "8.0.24",
+    "@types/node": "8.0.26",
     "@types/office-js": "^0.0.47",
-    "@types/webpack": "3.0.9",
+    "@types/webpack": "3.0.10",
     "awesome-typescript-loader": "3.2.3",
     "babel-core": "6.26.0",
     "babel-plugin-lodash": "3.2.11",
@@ -43,8 +43,8 @@
     "dts-bundle": "0.7.3",
     "html-loader": "0.5.1",
     "rimraf": "2.6.1",
-    "tslint": "5.6.0",
-    "typescript": "2.4.2",
+    "tslint": "5.7.0",
+    "typescript": "2.5.2",
     "uglify-js": "3.0.28",
     "webpack": "3.5.5",
     "webpack-closure-compiler": "2.1.5"
