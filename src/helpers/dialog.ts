@@ -194,7 +194,7 @@ export class Dialog<T> {
 
   private _maxSize(value: number, max: number) {
     return value < (max - 30) ? value : max - 30;
-  };
+  }
 
   private _percentage(value: number, max: number) {
     return (value * 100 / max);
