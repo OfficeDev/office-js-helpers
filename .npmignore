@@ -1,4 +1,5 @@
 !dist/**
+!dts/**
 src/**
 tests/**
 build/**
