@@ -1,5 +1,11 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 import { CustomError } from '../errors/custom.error';
+import { result } from 'lodash-es';
+
+interface IContext {
+  host: string;
+  platform: string;
+}
 
 /**
  * Constant strings for the host types
@@ -40,21 +46,14 @@ function getHostInfo(): {
   // when queried from within an add-in.
   // If the platform already exposes that info, then just return it
   // (but only after massaging it to fit the return types expected by this function)
-
-  const hasContext = window['Office'] && window['Office'].context;
-  const context = hasContext ? window['Office'].context : {};
-
-  if (context.host && context.platform) {
-    return {
-      host: convertHostValue(context.host),
-      platform: convertPlatformValue(context.platform)
-    };
-  }
-
-  return useHostInfoFallbackLogic() as any;
+  const context: IContext = result(window, 'Office.context', useHostInfoFallbackLogic());
+  return {
+    host: convertHostValue(context.host),
+    platform: convertPlatformValue(context.platform)
+  };
 }
 
-function useHostInfoFallbackLogic() {
+function useHostInfoFallbackLogic(): IContext {
   try {
     if (window.sessionStorage == null) {
       throw new Error(`Session Storage isn't supported`);
@@ -120,6 +119,29 @@ function convertPlatformValue(platform: string) {
  * Helper exposing useful Utilities for Office-Add-ins.
  */
 export class Utilities {
+  /**
+   * A promise based helper for Office initialize.
+   * If Office.js was found, the 'initialize' event is waited for and
+   * the promise is resolved with the right reason.
+   *
+   * Else the application starts as a web application.
+   */
+  static initialize() {
+    return new Promise<string>((resolve, reject) => {
+      try {
+        Office.initialize = reason => resolve(reason as any);
+      }
+      catch (exception) {
+        if (window['Office']) {
+          reject(exception);
+        }
+        else {
+          resolve('Office was not found. Running as web application.');
+        }
+      }
+    });
+  }
+
   /*
    * Returns the current host which is either the name of the application where the
    * Office Add-in is running ("EXCEL", "WORD", etc.) or simply "WEB" for all other platforms.
