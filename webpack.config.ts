@@ -13,7 +13,7 @@ class DtsBundlePlugin {
         main: 'dts/index.d.ts',
         baseDir: 'dts',
         out: '../dist/office.helpers.d.ts',
-        removeSource: true,
+        removeSource: false,
         externals: true,
         outputAsModuleFolder: true
       });
@@ -39,6 +39,11 @@ module.exports = {
         options: {
           exportAsEs6Default: true
         }
+      },
+      {
+        enforce: 'pre',
+        test: /\.ts?$/,
+        loader: 'tslint-loader'
       },
       {
         test: /(\.ts)$/,

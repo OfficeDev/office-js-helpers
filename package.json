@@ -1,23 +1,24 @@
 {
   "name": "@microsoft/office-js-helpers",
   "description": "A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs",
-  "version": "0.8.0-beta.1",
+  "version": "0.8.0-beta.3",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/OfficeDev/office-js-helpers.git"
   },
   "scripts": {
-    "lint": "tslint -c ./tslint.json ./src/**/*.ts",
     "clean": "rimraf dist dts",
-    "build:ts": "tsc -p tsconfig.json",
+    "prebuild": "yarn clean",
     "build:lib": "webpack --colors --progress --display-modules",
     "build:min": "uglifyjs ./dist/office.helpers.js --compress --mangle --output ./dist/office.helpers.min.js",
-    "build": "npm run clean && npm run build:ts && npm run build:lib && npm run build:min",
-    "version": "npm run build",
-    "beta": "npm version prerelease && npm publish --tag beta"
+    "build": "yarn build:lib && yarn build:min",
+    "prestart": "yarn clean",
+    "start": "yarn build:lib --watch",
+    "version": "yarn build",
+    "beta": "yarn version prerelease && yarn publish --tag beta"
   },
-  "main": "./dist/index.js",
-  "jsnext:main": "./dist/index.js",
+  "main": "./dist/office.helpers.js",
+  "jsnext:main": "./dist/office.helpers.js",
   "typings": "./dist/office.helpers.d.ts",
   "license": "MIT",
   "files": [
@@ -28,13 +29,13 @@
     "core-js": "2.5.1",
     "crypto-js": "3.1.9-1",
     "lodash-es": "4.17.4",
-    "rxjs": "^5.0.0"
+    "rxjs": "^5.0.0",
+    "@types/office-js": "^0.0.48",
+    "@types/microsoftteams": "^1.0.0"
   },
   "devDependencies": {
     "@types/lodash-es": "4.14.6",
-    "@types/microsoftteams": "1.0.0",
     "@types/node": "8.0.26",
-    "@types/office-js": "^0.0.47",
     "@types/webpack": "3.0.10",
     "awesome-typescript-loader": "3.2.3",
     "babel-core": "6.26.0",
@@ -44,6 +45,7 @@
     "html-loader": "0.5.1",
     "rimraf": "2.6.1",
     "tslint": "5.7.0",
+    "tslint-loader": "3.5.3",
     "typescript": "2.5.2",
     "uglify-js": "3.0.28",
     "webpack": "3.5.5"
