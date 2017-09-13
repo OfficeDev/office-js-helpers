@@ -119,39 +119,51 @@ export class Dictionary<T> {
   }
 
   /**
-   * Get the dictionary.
+   * Get the map representation of the dictionary.
    *
-   * @return {object} Returns the dictionary if it contains data, null otherwise.
+   * @return {object} Returns the map representation of the dictionary.
    */
   lookup(): Map<string, T> {
-    if (this._items.size > 0) {
-      return new Map(this._items);
-    }
-    return null;
+    return new Map(this._items);
   }
 
   /**
-   * Serializes the Map to a string
+   * Serializes the map to a string
    * @param items Map that needs to be serialized
    */
-  serialize(items: Map<string, T>): string {
-    return JSON.stringify([...items]);
+  static serialize<T>(items: Map<string, T>): string {
+    try {
+      return JSON.stringify([...items]);
+    }
+    catch (error) {
+      throw new Error('Unable to serialize map. Invalid structure.');
+    }
   }
 
   /**
-   * Deserializes the string into a Map
+   * Deserializes the string into a map
    * @param items String of items that correspond to a valid map
    */
-  deserialize(items: string): Map<string, T> {
-    return new Map(JSON.parse(items));
+  static deserialize<T>(items: string): Map<string, T> {
+    try {
+      return new Dictionary<T>(JSON.parse(items)).lookup();
+    }
+    catch (error) {
+      throw new Error('Unable to deserialize map. Invalid structure.');
+    }
   }
 
   /**
    * Merges two or more maps into a single map
    */
-  union(map1: Map<string, T>, map2: Map<string, T>, ...args: Map<string, T>[]) {
-    const flattendMap = args.reduce((agg, item) => agg = [...agg, ...item], []);
-    return new Map<string, T>([...map1, ...map2, ...flattendMap]);
+  static union<T>(map1: Map<string, T>, map2: Map<string, T>, ...args: Map<string, T>[]) {
+    try {
+      const flattendMap = args.reduce((agg, item) => agg = [...agg, ...item], []);
+      return new Map<string, T>([...map1, ...map2, ...flattendMap]);
+    }
+    catch (error) {
+      throw new Error('Unable to merge map. Invalid structure.');
+    }
   }
 
   /**
