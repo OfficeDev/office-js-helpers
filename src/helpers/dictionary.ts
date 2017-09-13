@@ -131,6 +131,30 @@ export class Dictionary<T> {
   }
 
   /**
+   * Serializes the Map to a string
+   * @param items Map that needs to be serialized
+   */
+  serialize(items: Map<string, T>): string {
+    return JSON.stringify([...items]);
+  }
+
+  /**
+   * Deserializes the string into a Map
+   * @param items String of items that correspond to a valid map
+   */
+  deserialize(items: string): Map<string, T> {
+    return new Map(JSON.parse(items));
+  }
+
+  /**
+   * Merges two or more maps into a single map
+   */
+  union(map1: Map<string, T>, map2: Map<string, T>, ...args: Map<string, T>[]) {
+    const flattendMap = args.reduce((agg, item) => agg = [...agg, ...item], []);
+    return new Map<string, T>([...map1, ...map2, ...flattendMap]);
+  }
+
+  /**
    * Number of items in the dictionary.
    *
    * @return {number} Returns the number of items in the dictionary.

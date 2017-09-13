@@ -41,8 +41,9 @@ export class Storage<T> extends Dictionary<T> {
   private _storage: typeof localStorage | typeof sessionStorage = null;
   private _observable: Observable<void> = null;
 
-  private get _current() {
-    return JSON.parse(this._storage.getItem(this.container));
+  private get _current(): Map<string, T> {
+    const items = this._storage.getItem(this.container);
+    return this.deserialize(items);
   }
 
   /**
@@ -67,6 +68,9 @@ export class Storage<T> extends Dictionary<T> {
    */
   switchStorage(type: StorageType) {
     this._storage = type === StorageType.LocalStorage ? localStorage : sessionStorage;
+    if (this._storage == null) {
+      throw new Error('Browser local or session storage is disabled.');
+    }
     if (!this._storage.hasOwnProperty(this.container)) {
       this._storage[this.container] = null;
     }
@@ -126,8 +130,7 @@ export class Storage<T> extends Dictionary<T> {
    * Refreshes the storage with the current localStorage values.
    */
   load() {
-    let items = { ...this.items, ...this._current };
-    this.items = items;
+    this._items = this.union(this._items, this._current);
   }
 
   /**
@@ -142,7 +145,7 @@ export class Storage<T> extends Dictionary<T> {
     this._observable = new Observable((observer) => {
       /* Determine the initial count and hash for this loop */
       let lastCount = this.count;
-      let lastHash = md5(JSON.stringify(this.items)).toString();
+      let lastHash = md5(this.serialize(this._items)).toString();
 
       /* Begin the polling at NOTIFICATION_DEBOUNCE duration */
       let pollInterval = setInterval(() => {
@@ -155,7 +158,7 @@ export class Storage<T> extends Dictionary<T> {
             observer.next();
           }
           else {
-            const hash = md5(JSON.stringify(this.items)).toString();
+            const hash = md5(this.serialize(this._items)).toString();
 
             /* If the last hash isn't the same as the current hash */
             if (hash !== lastHash) {
@@ -204,11 +207,11 @@ export class Storage<T> extends Dictionary<T> {
    * Synchronizes the current state to the storage.
    */
   private _sync(item: string, value: T) {
-    let items = { ...this._current, ...this.items };
+    let items = this.union(this._current, this._items);
     if (value == null) {
-      delete items[item];
+      items.delete(item);
     }
-    this._storage.setItem(this.container, JSON.stringify(items));
-    this.items = items;
+    this._storage.setItem(this.container, this.serialize(items));
+    this._items = items;
   }
 }
