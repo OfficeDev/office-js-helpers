@@ -1,17 +1,24 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+import { each } from 'lodash-es';
 
 /**
  * Helper for creating and querying Dictionaries.
- * A rudimentary alternative to ES6 Maps.
+ * A wrapper around ES6 Maps.
  */
 export class Dictionary<T> {
+  protected _items: Map<string, T>;
+
   /**
    * @constructor
    * @param {object} items Initial seed of items.
   */
-  constructor(protected items?: { [index: string]: T }) {
-    if (!(this.items === new Object(this.items)) || Array.isArray(this.items)) {
-      this.items = {};
+  constructor(items?: { [index: string]: T } | [string, T][]) {
+    if (Array.isArray(items)) {
+      this._items = new Map(items);
+    }
+    else {
+      this._items = new Map();
+      each(items, (value, key) => this._items.set(key, value));
     }
   }
 
@@ -22,10 +29,7 @@ export class Dictionary<T> {
    * @return {object} Returns an item if found, else returns null.
    */
   get(key: string): T {
-    if (!this.contains(key)) {
-      return null;
-    }
-    return this.items[key];
+    return this._items.get(key);
   }
 
   /**
@@ -37,10 +41,11 @@ export class Dictionary<T> {
    * @return {object} Returns the added item.
    */
   add(key: string, value: T): T {
-    if (this.contains(key)) {
+    if (this._items.has(key)) {
       throw new Error(`Key: ${key} already exists.`);
     }
-    return this.insert(key, value);
+    this._items.set(key, value);
+    return value;
   }
 
   /**
@@ -55,7 +60,7 @@ export class Dictionary<T> {
     if (key == null) {
       throw new Error('Key cannot be null or undefined');
     }
-    this.items[key] = value;
+    this._items.set(key, value);
     return value;
   }
 
@@ -67,11 +72,11 @@ export class Dictionary<T> {
    * @return {object} Returns the deleted item.
    */
   remove(key: string): T {
-    if (!this.contains(key)) {
+    if (!this._items.has(key)) {
       throw new Error(`Key: ${key} not found.`);
     }
-    let value = this.items[key];
-    delete this.items[key];
+    let value = this._items.get(key);
+    this._items.delete(key);
     return value;
   }
 
@@ -79,7 +84,7 @@ export class Dictionary<T> {
    * Clears the dictionary.
    */
   clear() {
-    this.items = {};
+    this._items.clear();
   }
 
   /**
@@ -92,7 +97,7 @@ export class Dictionary<T> {
     if (key == null) {
       throw new Error('Key cannot be null or undefined');
     }
-    return this.items.hasOwnProperty(key);
+    return this._items.has(key);
   }
 
   /**
@@ -100,11 +105,8 @@ export class Dictionary<T> {
    *
    * @return {array} Returns all the keys.
    */
-  keys(): string[] {
-    if (this.items == null) {
-      return [];
-    }
-    return Object.keys(this.items);
+  keys(): IterableIterator<string> {
+    return this._items.keys();
   }
 
   /**
@@ -112,8 +114,8 @@ export class Dictionary<T> {
    *
    * @return {array} Returns all the values.
    */
-  values(): T[] {
-    return this.keys().map(key => this.items[key]);
+  values(): IterableIterator<T> {
+    return this._items.values();
   }
 
   /**
@@ -121,8 +123,11 @@ export class Dictionary<T> {
    *
    * @return {object} Returns the dictionary if it contains data, null otherwise.
    */
-  lookup(): { [key: string]: T } {
-    return this.keys().length ? JSON.parse(JSON.stringify(this.items)) : null;
+  lookup(): Map<string, T> {
+    if (this._items.size > 0) {
+      return new Map(this._items);
+    }
+    return null;
   }
 
   /**
@@ -131,6 +136,6 @@ export class Dictionary<T> {
    * @return {number} Returns the number of items in the dictionary.
    */
   get count(): number {
-    return this.keys().length;
+    return this._items.size;
   }
 }
