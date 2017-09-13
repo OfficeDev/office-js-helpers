@@ -43,7 +43,7 @@ export class Storage<T> extends Dictionary<T> {
 
   private get _current(): Map<string, T> {
     const items = this._storage.getItem(this.container);
-    return this.deserialize(items);
+    return Dictionary.deserialize(items);
   }
 
   /**
@@ -130,7 +130,7 @@ export class Storage<T> extends Dictionary<T> {
    * Refreshes the storage with the current localStorage values.
    */
   load() {
-    this._items = this.union(this._items, this._current);
+    this._items = Dictionary.union(this._items, this._current);
   }
 
   /**
@@ -143,28 +143,19 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     this._observable = new Observable((observer) => {
-      /* Determine the initial count and hash for this loop */
-      let lastCount = this.count;
-      let lastHash = md5(this.serialize(this._items)).toString();
+      /* Determine the initial hash for this loop */
+      let lastHash = md5(Dictionary.serialize(this._items)).toString();
 
       /* Begin the polling at NOTIFICATION_DEBOUNCE duration */
       let pollInterval = setInterval(() => {
         try {
           this.load();
 
-          /* If the last count isn't the same as the current count */
-          if (this.count !== lastCount) {
-            lastCount = this.count;
+          /* If the last hash isn't the same as the current hash */
+          const hash = md5(Dictionary.serialize(this._items)).toString();
+          if (hash !== lastHash) {
+            lastHash = hash;
             observer.next();
-          }
-          else {
-            const hash = md5(this.serialize(this._items)).toString();
-
-            /* If the last hash isn't the same as the current hash */
-            if (hash !== lastHash) {
-              lastHash = hash;
-              observer.next();
-            }
           }
         }
         catch (e) {
@@ -207,11 +198,11 @@ export class Storage<T> extends Dictionary<T> {
    * Synchronizes the current state to the storage.
    */
   private _sync(item: string, value: T) {
-    let items = this.union(this._current, this._items);
+    let items = Dictionary.union(this._current, this._items);
     if (value == null) {
       items.delete(item);
     }
-    this._storage.setItem(this.container, this.serialize(items));
+    this._storage.setItem(this.container, Dictionary.serialize(items));
     this._items = items;
   }
 }
