@@ -3,25 +3,25 @@ const path = require('path');
 const libraryName = 'OfficeHelpers';
 const fileName = 'office.helpers.js';
 
-function DtsBundlePlugin() { };
+class DtsBundlePlugin {
+  apply(compiler) {
+    compiler.plugin('done', () => {
+      const dts = require('dts-bundle');
 
-DtsBundlePlugin.prototype.apply = compiler => {
-  compiler.plugin('done', () => {
-    const dts = require('dts-bundle');
-
-    dts.bundle({
-      name: libraryName,
-      main: 'dts/index.d.ts',
-      baseDir: 'dts',
-      out: '../dist/office.helpers.d.ts',
-      removeSource: true,
-      externals: true,
-      outputAsModuleFolder: true
+      dts.bundle({
+        name: libraryName,
+        main: 'dts/index.d.ts',
+        baseDir: 'dts',
+        out: '../dist/office.helpers.d.ts',
+        removeSource: true,
+        externals: true,
+        outputAsModuleFolder: true
+      });
     });
-  });
-};
+  }
+}
 
-const config = {
+module.exports = {
   entry: __dirname + '/src/index.ts',
   devtool: 'source-map',
   output: {
@@ -57,8 +57,7 @@ const config = {
     extensions: ['.json', '.js', '.ts', '.html']
   },
   plugins: [
+    new webpack.NamedModulesPlugin(),
     new DtsBundlePlugin()
   ]
 };
-
-module.exports = config;
