@@ -9,7 +9,7 @@
         "targets": {
           "browsers": [
             "last 2 versions",
-            "safari >= 9"
+            "safari >= 9.1"
           ]
         },
         "modules": false
