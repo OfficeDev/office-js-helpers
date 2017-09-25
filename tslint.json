@@ -1,68 +1,84 @@
 {
-    "rules": {
-        "no-reference": true,
-        "only-arrow-functions": [
-            true,
-            "allow-declarations"
-        ],
-        "no-namespace": [
-            true,
-            "allow-declarations"
-        ],
-        "class-name": true,
-        "curly": true,
-        "eofline": true,
-        "forin": true,
-        "indent": [
-            true,
-            "spaces"
-        ],
-        "label-position": true,
-        "no-arg": true,
-        "no-var-keyword": true,
-        "no-console": [
-            true,
-            "debug",
-            "info",
-            "time",
-            "timeEnd",
-            "trace"
-        ],
-        "no-construct": true,
-        "no-debugger": true,
-        "no-duplicate-variable": true,
-        "no-empty": false,
-        "no-eval": true,
-        "no-switch-case-fall-through": true,
-        "no-trailing-whitespace": true,
-        "no-unused-expression": true,
-        "one-line": [
-            true,
-            "check-open-brace",
-            "check-whitespace"
-        ],
-        "quotemark": [
-            true,
-            "single"
-        ],
-        "radix": true,
-        "semicolon": [
-            true,
-            "always",
-            "ignore-interfaces"
-        ],
-        "triple-equals": [
-            true,
-            "allow-null-check"
-        ],
-        "variable-name": false,
-        "whitespace": [
-            true,
-            "check-branch",
-            "check-decl",
-            "check-operator",
-            "check-separator",
-            "check-type"
-        ]
-    }
+  "rules": {
+    "arrow-parens": true,
+    "arrow-return-shorthand": true,
+    "class-name": true,
+    "curly": true,
+    "eofline": true,
+    "forin": true,
+    "import-spacing": true,
+    "indent": [
+      true,
+      "spaces",
+      2
+    ],
+    "jsdoc-format": true,
+    "label-position": true,
+    "max-line-length": [
+      true,
+      120
+    ],
+    "no-arg": true,
+    "no-console": [
+      true,
+      "info",
+      "time",
+      "timeEnd"
+    ],
+    "no-construct": true,
+    "no-debugger": true,
+    "no-duplicate-variable": true,
+    "no-empty": false,
+    "no-eval": true,
+    "no-irregular-whitespace": true,
+    "no-magic-numbers": true,
+    "no-namespace": [
+      true,
+      "allow-declarations"
+    ],
+    "no-reference": true,
+    "no-switch-case-fall-through": true,
+    "no-trailing-whitespace": true,
+    "no-unused-expression": true,
+    "no-var-keyword": true,
+    "one-line": [
+      true,
+      "check-open-brace",
+      "check-whitespace"
+    ],
+    "one-variable-per-declaration": true,
+    "only-arrow-functions": [
+      true,
+      "allow-declarations"
+    ],
+    "prefer-switch": true,
+    "quotemark": [
+      true,
+      "single"
+    ],
+    "radix": true,
+    "semicolon": [
+      true,
+      "always",
+      "ignore-interfaces"
+    ],
+    "triple-equals": [
+      true,
+      "allow-null-check"
+    ],
+    "variable-name": [
+      true,
+      "ban-keywords",
+      "check-format",
+      "allow-leading-underscore"
+    ],
+    "whitespace": [
+      true,
+      "check-branch",
+      "check-decl",
+      "check-operator",
+      "check-separator",
+      "check-type"
+    ]
+  }
 }
