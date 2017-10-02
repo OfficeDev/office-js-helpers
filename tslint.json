@@ -1,6 +1,5 @@
 {
   "rules": {
-    "arrow-parens": true,
     "arrow-return-shorthand": true,
     "class-name": true,
     "curly": true,
@@ -12,12 +11,7 @@
       "spaces",
       2
     ],
-    "jsdoc-format": true,
     "label-position": true,
-    "max-line-length": [
-      true,
-      120
-    ],
     "no-arg": true,
     "no-console": [
       true,
@@ -31,7 +25,6 @@
     "no-empty": false,
     "no-eval": true,
     "no-irregular-whitespace": true,
-    "no-magic-numbers": true,
     "no-namespace": [
       true,
       "allow-declarations"
@@ -65,12 +58,6 @@
     "triple-equals": [
       true,
       "allow-null-check"
-    ],
-    "variable-name": [
-      true,
-      "ban-keywords",
-      "check-format",
-      "allow-leading-underscore"
     ],
     "whitespace": [
       true,
