@@ -133,7 +133,7 @@ export class Dictionary<T> {
    */
   static serialize<T>(items: Map<string, T>): string {
     try {
-      return JSON.stringify([...items]);
+      return JSON.stringify(Array.from(items));
     }
     catch (error) {
       throw new Error('Unable to serialize map. Invalid structure.');
@@ -158,8 +158,8 @@ export class Dictionary<T> {
    */
   static union<T>(map1: Map<string, T>, map2: Map<string, T>, ...args: Map<string, T>[]) {
     try {
-      const flattendMap = args.reduce((agg, item) => agg = [...agg, ...item], []);
-      return new Map<string, T>([...map1, ...map2, ...flattendMap]);
+      const flattendMap = args.reduce((agg, item) => agg = [...agg, ...Array.from(item)], []);
+      return new Map<string, T>([...Array.from(map1), ...Array.from(map2), ...flattendMap]);
     }
     catch (error) {
       throw new Error('Unable to merge map. Invalid structure.');
