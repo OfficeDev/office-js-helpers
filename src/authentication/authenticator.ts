@@ -130,9 +130,9 @@ export class Authenticator {
       return null;
     }
 
-    let params: any = {},
-      regex = /([^&=]+)=([^&]*)/g,
-      matchParts;
+    let params: any = {};
+    let regex = /([^&=]+)=([^&]*)/g;
+    let matchParts;
 
     while ((matchParts = regex.exec(segment)) !== null) {
       /* Fixes bugs when the state parameters contains a / before them */
