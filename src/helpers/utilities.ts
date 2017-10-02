@@ -100,7 +100,7 @@ function convertHostValue(host: string) {
     'Access': HostType.ACCESS
   };
 
-  return officeJsToHelperEnumMapping[host] || null;
+  return officeJsToHelperEnumMapping[host] || host;
 }
 
 /** Convert the Office.context.platform value to one of the Office JS Helpers constants. */
@@ -112,7 +112,7 @@ function convertPlatformValue(platform: string) {
     'iOS': PlatformType.IOS
   };
 
-  return officeJsToHelperEnumMapping[platform] || null;
+  return officeJsToHelperEnumMapping[platform] || platform;
 }
 
 /**
