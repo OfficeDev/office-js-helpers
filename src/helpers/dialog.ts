@@ -73,9 +73,14 @@ export class Dialog<T> {
   private _result: Promise<T>;
   get result(): Promise<T> {
     if (this._result == null) {
-      this._result = this.useTeamsDialog ? this._teamsDialog() : this._addinDialog();
+      if (this.useTeamsDialog) {
+        this._result = this._teamsDialog();
+      } else if (Utilities.isAddin) {
+        this._result = this._addinDialog();
+      } else {
+        this._result = this._webDialog();
+      }
     }
-
     return this._result;
   }
 
@@ -141,6 +146,24 @@ export class Dialog<T> {
     });
   }
 
+  private _webDialog(): Promise<T> {
+    return new Promise((resolve, reject) => {
+      try {
+        let windowFeatures = `width=${this.size.width},height=${this.size.height},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
+        window.open(this.url, this.url, windowFeatures);
+        const handler = event => {
+          if (event.origin === location.origin) {
+            window.removeEventListener('message', handler);
+            resolve(event.data);
+          }
+        };
+        window.addEventListener('message', handler);
+      } catch (exception) {
+        return reject(new DialogError('Unexpected error occured while creating popup', exception));
+      }
+    });
+  }
+
   /**
    * Close any open dialog by providing an optional message.
    * If more than one dialogs are attempted to be opened
@@ -170,6 +193,9 @@ export class Dialog<T> {
       }
       else if (Utilities.isAddin) {
         Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
+      }
+      else {
+        window.postMessage(location.href, location.origin);
       }
     }
     catch (error) {
