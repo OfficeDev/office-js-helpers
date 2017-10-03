@@ -70,6 +70,9 @@ export class Dialog<T> {
     this.size = this._optimizeSize(width, height);
   }
 
+  private readonly _windowFeatures = ',menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no';
+  private readonly _legacyFeatures = `;center:on;resizable:yes;scroll:yes`;
+
   private _result: Promise<T>;
   get result(): Promise<T> {
     if (this._result == null) {
@@ -77,6 +80,8 @@ export class Dialog<T> {
         this._result = this._teamsDialog();
       } else if (Utilities.isAddin) {
         this._result = this._addinDialog();
+      } else if (Dialog.useIE11Fallback) {
+        this._result = this._legacyDialog();
       } else {
         this._result = this._webDialog();
       }
@@ -86,7 +91,7 @@ export class Dialog<T> {
 
   size: IDialogSize;
 
-  private _addinDialog(): Promise<T> {
+  private _addinDialog<T>(): Promise<T> {
     return new Promise((resolve, reject) => {
       Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
         if (result.status === Office.AsyncResultStatus.Failed) {
@@ -95,33 +100,14 @@ export class Dialog<T> {
         else {
           let dialog = result.value as Office.DialogHandler;
           dialog.addEventHandler(Office.EventType.DialogMessageReceived, args => {
-            try {
-              let result = this._safeParse(args.message) as DialogResult;
-              if (result.parse) {
-                resolve(this._safeParse(result.value));
-              }
-              else {
-                resolve(result.value);
-              }
-            }
-            catch (exception) {
-              reject(new DialogError('An unexpected error in the dialog has occured.', exception));
-            }
-            finally {
-              dialog.close();
-            }
+            let result = this._safeParse(args.message) as T;
+            resolve(result);
+            dialog.close();
           });
 
           dialog.addEventHandler(Office.EventType.DialogEventReceived, args => {
-            try {
-              reject(new DialogError(args.message, args.error));
-            }
-            catch (exception) {
-              reject(new DialogError('An unexpected error in the dialog has occured.', exception));
-            }
-            finally {
-              dialog.close();
-            }
+            reject(new DialogError(args.message, args.error));
+            dialog.close();
           });
         }
       });
@@ -130,18 +116,13 @@ export class Dialog<T> {
 
   private _teamsDialog(): Promise<T> {
     return new Promise((resolve, reject) => {
-      try {
-        microsoftTeams.initialize();
-      }
-      catch (e) {
-
-      }
+      microsoftTeams.initialize();
       microsoftTeams.authentication.authenticate({
         url: this.url,
         width: this.size.width,
         height: this.size.height,
         failureCallback: exception => reject(new DialogError('Error while launching dialog', exception as any)),
-        successCallback: message => resolve(message as any)
+        successCallback: message => resolve(this._safeParse(message))
       });
     });
   }
@@ -149,12 +130,12 @@ export class Dialog<T> {
   private _webDialog(): Promise<T> {
     return new Promise((resolve, reject) => {
       try {
-        let windowFeatures = `width=${this.size.width},height=${this.size.height},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
-        window.open(this.url, this.url, windowFeatures);
+        const options = 'width=' + this.size.width + ',height=' + this.size.height + this._windowFeatures;
+        window.open(this.url, this.url, options);
         const handler = event => {
           if (event.origin === location.origin) {
-            window.removeEventListener('message', handler);
-            resolve(event.data);
+            window.removeEventListener('message', handler, false);
+            resolve(this._safeParse(event.data));
           }
         };
         window.addEventListener('message', handler);
@@ -162,6 +143,24 @@ export class Dialog<T> {
         return reject(new DialogError('Unexpected error occured while creating popup', exception));
       }
     });
+  }
+
+  private _legacyDialog(): Promise<T> {
+    return new Promise((resolve, reject) => {
+      try {
+        const options = 'dialogwidth:' + this.size.width + ';dialogheight:' + this.size.height + this._legacyFeatures;
+        const data = (window as any).showModalDialog(this.url, '', options);
+        resolve(this._safeParse(data));
+      } catch (exception) {
+        return reject(new DialogError('Unexpected error occured while creating popup', exception));
+      }
+    });
+  }
+
+  static get useIE11Fallback() {
+    if ((window as any).showModalDialog) {
+      return (window as any).showModalDialog;
+    }
   }
 
   /**
@@ -173,29 +172,30 @@ export class Dialog<T> {
     let parse = false;
     let value = message;
 
-    if ((!(value == null)) && typeof value === 'object') {
+    if (typeof message === 'function') {
+      throw new DialogError('Invalid message. Cannot pass functions as arguments');
+    }
+    else if ((!(value == null)) && typeof value === 'object') {
       parse = true;
       value = JSON.stringify(value);
-    }
-    else if (typeof message === 'function') {
-      throw new DialogError('Invalid message. Cannot pass functions as arguments');
     }
 
     try {
       if (useTeamsDialog) {
-        try {
-          microsoftTeams.initialize();
-        }
-        catch (e) {
-
-        }
+        microsoftTeams.initialize();
         microsoftTeams.authentication.notifySuccess(JSON.stringify(<DialogResult>{ parse, value }));
       }
       else if (Utilities.isAddin) {
         Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
       }
       else {
-        window.postMessage(location.href, location.origin);
+        if (Dialog.useIE11Fallback) {
+          (window as any).returnValue = location.origin;
+        }
+        if (window.opener) {
+          window.opener.postMessage(JSON.stringify(<DialogResult>{ parse, value }), location.origin);
+        }
+        window.close();
       }
     }
     catch (error) {
@@ -228,10 +228,13 @@ export class Dialog<T> {
 
   private _safeParse(data: string) {
     try {
-      let result = JSON.parse(data);
-      return result;
+      let result = JSON.parse(data) as DialogResult;
+      if (result.parse === true) {
+        return this._safeParse(result.value);
+      }
+      return result.value;
     }
-    catch (e) {
+    catch (_e) {
       return data;
     }
   }
