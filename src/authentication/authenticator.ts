@@ -71,11 +71,8 @@ export class Authenticator {
     if (useMicrosoftTeams) {
       return this._openAuthDialog(provider, true);
     }
-    else if (Utilities.isAddin) {
-      return this._openAuthDialog(provider, false);
-    }
     else {
-      return this._openInWindowPopup(provider);
+      return this._openAuthDialog(provider, false);
     }
   }
 
@@ -163,43 +160,6 @@ export class Authenticator {
 
     /** Try and extract the result and pass it along */
     return this._handleTokenResult(redirectUrl, endpoint, state);
-  }
-
-  private _openInWindowPopup(provider: string): Promise<IToken> {
-    /** Get the endpoint configuration for the given provider and verify that it exists. */
-    let endpoint = this.endpoints.get(provider);
-    if (endpoint == null) {
-      return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
-    }
-
-    let { state, url } = EndpointStorage.getLoginParams(endpoint);
-    let windowFeatures = `width=${1024},height=${768},menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no`;
-    let popupWindow: Window = window.open(url, endpoint.provider.toUpperCase(), windowFeatures);
-
-    return new Promise<IToken>((resolve, reject) => {
-      try {
-        const POLL_INTERVAL = 400;
-        let interval = setInterval(() => {
-          try {
-            if (popupWindow.document.URL.indexOf(endpoint.redirectUrl) !== -1) {
-              clearInterval(interval);
-              popupWindow.close();
-              return resolve(this._handleTokenResult(popupWindow.document.URL, endpoint, state));
-            }
-          }
-          catch (exception) {
-            if (!popupWindow) {
-              clearInterval(interval);
-              return reject(new AuthError('Popup window was closed'));
-            }
-          }
-        }, POLL_INTERVAL);
-      }
-      catch (exception) {
-        popupWindow.close();
-        return reject(new AuthError('Unexpected error occured while creating popup'));
-      }
-    });
   }
 
   /**
