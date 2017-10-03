@@ -2,7 +2,6 @@
 
 import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
 import { TokenStorage, IToken, ICode, IError } from './token.manager';
-import { Utilities } from '../helpers/utilities';
 import { Dialog } from '../helpers/dialog';
 import { CustomError } from '../errors/custom.error';
 
@@ -77,26 +76,34 @@ export class Authenticator {
   }
 
   /**
+   * Helper to perform Authenticator.isAuthDialog(). See the origin function for documentation.
+   * @param useMicrosoftTeams Is running in the context of Microsoft Teams
+   */
+  isAuthDialog(useMicrosoftTeams: boolean = false) {
+    return Authenticator.isAuthDialog(useMicrosoftTeams);
+  }
+
+  /**
    * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
    * If true then it calls messageParent by extracting the token information, thereby closing the dialog.
    * Otherwise, the caller should proceed with normal initialization of their application.
+   *
+   * This logic assumes that the redirect url is your application and hence when your code runs again in
+   * the dialog, this logic takes over and closes it for you.
    *
    * @return {boolean}
    * Returns false if the code is running inside of a dialog without the required information
    * or is not running inside of a dialog at all.
    */
   static isAuthDialog(useMicrosoftTeams: boolean = false): boolean {
-    if (useMicrosoftTeams === false && !Utilities.isAddin) {
+    // If the url doesn't contain and access_token, code or error then return false.
+    // This is in scenarios where we don't want to automatically control what happens to the dialog.
+    if (!/(access_token|code|error|state)/gi.test(location.href)) {
       return false;
     }
-    else {
-      if (!/(access_token|code|error)/gi.test(location.href)) {
-        return false;
-      }
 
-      Dialog.close(location.href, useMicrosoftTeams);
-      return true;
-    }
+    Dialog.close(location.href, useMicrosoftTeams);
+    return true;
   }
 
   /**
