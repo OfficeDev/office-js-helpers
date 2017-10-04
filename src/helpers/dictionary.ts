@@ -1,5 +1,5 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
-import { each } from 'lodash-es';
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+import { isObject } from 'lodash-es';
 
 /**
  * Helper for creating and querying Dictionaries.
@@ -16,9 +16,11 @@ export class Dictionary<T> {
     if (Array.isArray(items)) {
       this._items = new Map(items);
     }
-    else {
+    else if (isObject(items)) {
       this._items = new Map();
-      each(items, (value, key) => this._items.set(key, value));
+      for (const key of Object.keys(items)) {
+        this._items.set(key, items[key]);
+      }
     }
   }
 

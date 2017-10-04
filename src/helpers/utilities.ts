@@ -1,6 +1,5 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 import { CustomError } from '../errors/custom.error';
-import { result } from 'lodash-es';
 
 interface IContext {
   host: string;
@@ -46,7 +45,7 @@ function getHostInfo(): {
   // when queried from within an add-in.
   // If the platform already exposes that info, then just return it
   // (but only after massaging it to fit the return types expected by this function)
-  const context: IContext = result(window, 'Office.context', useHostInfoFallbackLogic());
+  const context: IContext = ((window as any).Office && (window as any).Office.context) || useHostInfoFallbackLogic();
   return {
     host: convertHostValue(context.host),
     platform: convertPlatformValue(context.platform)
