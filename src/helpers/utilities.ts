@@ -182,6 +182,30 @@ export class Utilities {
   }
 
   /**
+   * Utility to check if the browser is IE11.
+   */
+  static get isIE11() {
+    return !((window as any).showModalDialog == null);
+  }
+
+  /**
+   * Utility to generate crypto safe random numbers
+   */
+  static generateCryptoSafeRandom() {
+    let random = new Uint32Array(1);
+    if ('msCrypto' in window) {
+      (<any>window).msCrypto.getRandomValues(random);
+    }
+    else if ('crypto' in window) {
+      window.crypto.getRandomValues(random);
+    }
+    else {
+      throw new Error('The platform doesn\'t support generation of cryptographically safe randoms. Please disable the state flag and try again.');
+    }
+    return random[0];
+  }
+
+  /**
    * Utility to print prettified errors.
    * If multiple parameters are sent then it just logs them instead.
    */

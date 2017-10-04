@@ -1,5 +1,5 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
-
+import { Utilities } from '../helpers/utilities';
 import { Storage } from '../helpers/storage';
 
 export const DefaultEndpoints = {
@@ -234,8 +234,8 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
   } {
     let scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
     let resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
-    let state = endpointConfig.state && EndpointStorage.generateCryptoSafeRandom();
-    let nonce = endpointConfig.nonce && EndpointStorage.generateCryptoSafeRandom();
+    let state = endpointConfig.state && Utilities.generateCryptoSafeRandom();
+    let nonce = endpointConfig.nonce && Utilities.generateCryptoSafeRandom();
 
     let urlSegments = [
       `response_type=${endpointConfig.responseType}`,
@@ -265,19 +265,5 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
       url: `${endpointConfig.baseUrl}${endpointConfig.authorizeUrl}?${urlSegments.join('&')}`,
       state: state
     };
-  }
-
-  static generateCryptoSafeRandom() {
-    let random = new Uint32Array(1);
-    if ('msCrypto' in window) {
-      (<any>window).msCrypto.getRandomValues(random);
-    }
-    else if ('crypto' in window) {
-      window.crypto.getRandomValues(random);
-    }
-    else {
-      throw new Error('The platform doesn\'t support generation of cryptographically safe randoms. Please disable the state flag and try again.');
-    }
-    return random[0];
   }
 }
