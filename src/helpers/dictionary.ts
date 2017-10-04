@@ -11,7 +11,7 @@ export class Dictionary<T> {
   /**
    * @constructor
    * @param {object} items Initial seed of items.
-  */
+   */
   constructor(items?: { [index: string]: T } | [string, T][]) {
     if (Array.isArray(items)) {
       this._items = new Map(items);

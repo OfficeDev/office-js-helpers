@@ -1,4 +1,4 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import { Storage } from '../helpers/storage';
 
@@ -31,7 +31,7 @@ export interface IError {
 export class TokenStorage extends Storage<IToken> {
   /**
    * @constructor
-  */
+   */
   constructor() {
     super('OAuth2Tokens');
   }
