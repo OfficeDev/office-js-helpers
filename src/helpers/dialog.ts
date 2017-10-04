@@ -71,18 +71,18 @@ export class Dialog<T> {
   }
 
   private readonly _windowFeatures = ',menubar=no,toolbar=no,location=no,resizable=yes,scrollbars=yes,status=no';
-  private readonly _legacyFeatures = `;center:on;resizable:yes;scroll:yes`;
+  private static readonly key = 'VGVtcG9yYXJ5S2V5Rm9yT0pIQXV0aA==';
 
   private _result: Promise<T>;
   get result(): Promise<T> {
     if (this._result == null) {
       if (this.useTeamsDialog) {
         this._result = this._teamsDialog();
-      } else if (Utilities.isAddin) {
+      }
+      else if (Utilities.isAddin) {
         this._result = this._addinDialog();
-      } else if (Dialog.useIE11Fallback) {
-        this._result = this._legacyDialog();
-      } else {
+      }
+      else {
         this._result = this._webDialog();
       }
     }
@@ -132,35 +132,39 @@ export class Dialog<T> {
       try {
         const options = 'width=' + this.size.width + ',height=' + this.size.height + this._windowFeatures;
         window.open(this.url, this.url, options);
-        const handler = event => {
-          if (event.origin === location.origin) {
-            window.removeEventListener('message', handler, false);
-            resolve(this._safeParse(event.data));
-          }
-        };
-        window.addEventListener('message', handler);
-      } catch (exception) {
+        if (Utilities.isIEOrEdge) {
+          localStorage.removeItem(Dialog.key);
+          const POLL_INTERVAL = 400;
+          let interval = setInterval(() => {
+            try {
+              const data = localStorage.getItem(Dialog.key);
+              if (!(data == null)) {
+                clearInterval(interval);
+                localStorage.removeItem(Dialog.key);
+                return resolve(this._safeParse(data));
+              }
+            }
+            catch (exception) {
+              clearInterval(interval);
+              localStorage.removeItem(Dialog.key);
+              return reject(new DialogError('Unexpected error occured while creating popup', exception));
+            }
+          }, POLL_INTERVAL);
+        }
+        else {
+          const handler = event => {
+            if (event.origin === location.origin) {
+              window.removeEventListener('message', handler, false);
+              resolve(this._safeParse(event.data));
+            }
+          };
+          window.addEventListener('message', handler);
+        }
+      }
+      catch (exception) {
         return reject(new DialogError('Unexpected error occured while creating popup', exception));
       }
     });
-  }
-
-  private _legacyDialog(): Promise<T> {
-    return new Promise((resolve, reject) => {
-      try {
-        const options = 'dialogwidth:' + this.size.width + ';dialogheight:' + this.size.height + this._legacyFeatures;
-        const data = (window as any).showModalDialog(this.url, '', options);
-        resolve(this._safeParse(data));
-      } catch (exception) {
-        return reject(new DialogError('Unexpected error occured while creating popup', exception));
-      }
-    });
-  }
-
-  static get useIE11Fallback() {
-    if ((window as any).showModalDialog) {
-      return (window as any).showModalDialog;
-    }
   }
 
   /**
@@ -189,10 +193,10 @@ export class Dialog<T> {
         Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
       }
       else {
-        if (Dialog.useIE11Fallback) {
-          (window as any).returnValue = location.origin;
+        if (Utilities.isIEOrEdge) {
+          localStorage.setItem(Dialog.key, JSON.stringify(<DialogResult>{ parse, value }));
         }
-        if (window.opener) {
+        else if (window.opener) {
           window.opener.postMessage(JSON.stringify(<DialogResult>{ parse, value }), location.origin);
         }
         window.close();
