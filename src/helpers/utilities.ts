@@ -182,10 +182,10 @@ export class Utilities {
   }
 
   /**
-   * Utility to check if the browser is IE11.
+   * Utility to check if the browser is IE11 or Edge.
    */
-  static get isIE11() {
-    return !((window as any).showModalDialog == null);
+  static get isIEOrEdge() {
+    return /Edge\/|Trident\//gi.test(window.navigator.userAgent);
   }
 
   /**
