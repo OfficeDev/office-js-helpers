@@ -1,6 +1,16 @@
 {
+  "extends": [
+    "tslint-eslint-rules"
+  ],
   "rules": {
     "arrow-return-shorthand": true,
+    "brace-style": [
+      true,
+      "stroustrup",
+      {
+        "allowSingleLine": true
+      }
+    ],
     "class-name": true,
     "curly": true,
     "eofline": true,

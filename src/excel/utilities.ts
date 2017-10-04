@@ -36,7 +36,8 @@ export class ExcelUtilities {
     let sheet: Excel.Worksheet;
     if (clearOnly) {
       sheet = await createOrClear(workbook.context as any, workbook, sheetName);
-    } else {
+    }
+    else {
       sheet = await recreateFromScratch(workbook.context as any, workbook, sheetName);
     }
 
@@ -64,7 +65,8 @@ async function createOrClear(
 
     if (existingSheet.isNullObject) {
       return context.workbook.worksheets.add(sheetName);
-    } else {
+    }
+    else {
       existingSheet.getRange().clear();
       return existingSheet;
     }

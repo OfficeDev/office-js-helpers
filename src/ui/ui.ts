@@ -64,7 +64,8 @@ export class UI {
     let paddingForPersonalityMenu = '0';
     if (Utilities.platform === PlatformType.PC) {
       paddingForPersonalityMenu = '20px';
-    } else if (Utilities.platform === PlatformType.MAC) {
+    }
+    else if (Utilities.platform === PlatformType.MAC) {
       paddingForPersonalityMenu = '40px';
     }
 
@@ -189,7 +190,8 @@ function parseNotificationParams(params: IArguments): {
               message: params[1]
             };
           }
-        } else if (isError(params[0]) && isObject(params[1])) {
+        }
+        else if (isError(params[0]) && isObject(params[1])) {
           const customParams: {
             title?: string;
             /** custom message in place of the error text */
@@ -231,7 +233,8 @@ function parseNotificationParams(params: IArguments): {
       default:
         throw new Error();
     }
-  } catch (e) {
+  }
+  catch (e) {
     throw new Error('Invalid parameters passed to "notify" function');
   }
 }
