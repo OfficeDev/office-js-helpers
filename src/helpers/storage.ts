@@ -18,17 +18,12 @@ export interface Listener {
 }
 
 export interface Subscription {
-  /**
-   * A flag to indicate whether this Subscription has already been unsubscribed.
-   * @type {boolean}
-   */
+  // A flag to indicate whether this Subscription has already been unsubscribed.
   closed: boolean;
-  /**
-   * Disposes the resources held by the subscription. May, for instance, cancel
-   * an ongoing Observable execution or cancel any other type of work that
-   * started when the Subscription was created.
-   * @return {void}
-   */
+  
+  // Disposes the resources held by the subscription. May, for instance, cancel
+  // an ongoing Observable execution or cancel any other type of work that
+  // started when the Subscription was created.
   unsubscribe(): void;
 }
 
@@ -143,15 +138,15 @@ export class Storage<T> extends Dictionary<T> {
     }
 
     this._observable = new Observable((observer) => {
-      /* Determine the initial hash for this loop */
+      // Determine the initial hash for this loop
       let lastHash = md5(Dictionary.serialize(this._items)).toString();
 
-      /* Begin the polling at NOTIFICATION_DEBOUNCE duration */
+      // Begin the polling at NOTIFICATION_DEBOUNCE duration
       let pollInterval = setInterval(() => {
         try {
           this.load();
 
-          /* If the last hash isn't the same as the current hash */
+          // If the last hash isn't the same as the current hash
           const hash = md5(Dictionary.serialize(this._items)).toString();
           if (hash !== lastHash) {
             lastHash = hash;
@@ -163,12 +158,12 @@ export class Storage<T> extends Dictionary<T> {
         }
       }, NOTIFICATION_DEBOUNCE);
 
-      /* Debounced listener to localStorage events given that they fire any change */
+      // Debounced listener to localStorage events given that they fire any change
       let debouncedUpdate = debounce((event: StorageEvent) => {
         try {
           clearInterval(pollInterval);
 
-          /* If the change is on the current container */
+          // If the change is on the current container
           if (event.key === this.container) {
             this.load();
             observer.next();
@@ -181,7 +176,7 @@ export class Storage<T> extends Dictionary<T> {
 
       window.addEventListener('storage', debouncedUpdate, false);
 
-      /* Teardown */
+      // Teardown
       return () => {
         if (pollInterval) {
           clearInterval(pollInterval);

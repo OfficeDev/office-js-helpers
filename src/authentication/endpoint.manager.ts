@@ -1,4 +1,4 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 import { Utilities } from '../helpers/utilities';
 import { Storage } from '../helpers/storage';
 
@@ -11,68 +11,44 @@ export const DefaultEndpoints = {
 };
 
 export interface IEndpointConfiguration {
-  /**
-   * Unique name for the Endpoint
-   */
+  // Unique name for the Endpoint
   provider?: string;
 
-  /**
-   * Registered OAuth ClientID
-   */
+  // Registered OAuth ClientID
   clientId?: string;
 
-  /**
-   * Base URL of the endpoint
-   */
+  // Base URL of the endpoint
   baseUrl?: string;
 
-  /**
-   * URL segment for OAuth authorize endpoint.
-   * The final authorize url is constructed as (baseUrl + '/' + authorizeUrl).
-   */
+  // URL segment for OAuth authorize endpoint.
+  // The final authorize url is constructed as (baseUrl + '/' + authorizeUrl).
   authorizeUrl?: string;
 
-  /**
-   * Registered OAuth redirect url.
-   * Defaults to window.location.origin
-   */
+  // Registered OAuth redirect url.
+  // Defaults to window.location.origin
   redirectUrl?: string;
 
-  /**
-   * Optional token url to exchange a code with.
-   * Not recommended if OAuth provider supports implicit flow.
-   */
+  // Optional token url to exchange a code with.
+  // Not recommended if OAuth provider supports implicit flow.
   tokenUrl?: string;
 
-  /**
-   * Registered OAuth scope.
-   */
+  // Registered OAuth scope.
   scope?: string;
 
-  /**
-   * Resource paramater for the OAuth provider.
-   */
+  // Resource paramater for the OAuth provider.
   resource?: string;
 
-  /**
-   * Automatically generate a state? defaults to false.
-   */
+  // Automatically generate a state? defaults to false.
   state?: boolean;
 
-  /**
-   * Automatically generate a nonce? defaults to false.
-   */
+  // Automatically generate a nonce? defaults to false.
   nonce?: boolean;
 
-  /**
-   * OAuth responseType.
-   */
+  // OAuth responseType.
   responseType?: string;
 
-  /**
-   * Additional object for query parameters.
-   * Will be appending them after encoding the values.
-   */
+  // Additional object for query parameters.
+  // Will be appending them after encoding the values.
   extraQueryParameters?: { [index: string]: string };
 }
 

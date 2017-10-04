@@ -1,4 +1,4 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import { Utilities } from './utilities';
 import { CustomError } from '../errors/custom.error';
@@ -28,24 +28,16 @@ export class DialogError extends CustomError {
  * An optimized size object computed based on Screen Height & Screen Width
  */
 export interface IDialogSize {
-  /**
-   * Width in pixels
-   */
+  // Width in pixels
   width: number;
 
-  /**
-   * Width in percentage
-   */
+  // Width in percentage
   width$: number;
 
-  /**
-   * Height in pixels
-   */
+  // Height in pixels
   height: number;
 
-  /**
-   * Height in percentage
-   */
+  // Height in percentage
   height$: number;
 }
 

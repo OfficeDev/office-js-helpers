@@ -1,4 +1,4 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import { CustomError } from './custom.error';
 

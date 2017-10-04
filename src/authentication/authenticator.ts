@@ -1,4 +1,4 @@
-/* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
+// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
 import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
 import { TokenStorage, IToken, ICode, IError } from './token.manager';
@@ -67,20 +67,7 @@ export class Authenticator {
       return Promise.resolve(token);
     }
 
-    if (useMicrosoftTeams) {
-      return this._openAuthDialog(provider, true);
-    }
-    else {
-      return this._openAuthDialog(provider, false);
-    }
-  }
-
-  /**
-   * Helper to perform Authenticator.isAuthDialog(). See the origin function for documentation.
-   * @param useMicrosoftTeams Is running in the context of Microsoft Teams
-   */
-  isAuthDialog(useMicrosoftTeams: boolean = false) {
-    return Authenticator.isAuthDialog(useMicrosoftTeams);
+    return this._openAuthDialog(provider, useMicrosoftTeams);
   }
 
   /**
@@ -150,22 +137,20 @@ export class Authenticator {
   }
 
   private async _openAuthDialog(provider: string, useMicrosoftTeams: boolean): Promise<IToken> {
-    /** Get the endpoint configuration for the given provider and verify that it exists. */
+    // Get the endpoint configuration for the given provider and verify that it exists.
     let endpoint = this.endpoints.get(provider);
     if (endpoint == null) {
       return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
     }
 
-    /** Set the authentication state to redirect and begin the auth flow */
+    // Set the authentication state to redirect and begin the auth flow.
     let { state, url } = EndpointStorage.getLoginParams(endpoint);
 
-    /**
-     * Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
-     * url where we expect the call to isAuthDialog to be available.
-     */
+    // Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
+    // url where we expect the call to isAuthDialog to be available.
     let redirectUrl = await new Dialog<string>(url, 1024, 768, useMicrosoftTeams).result;
 
-    /** Try and extract the result and pass it along */
+    // Try and extract the result and pass it along.
     return this._handleTokenResult(redirectUrl, endpoint, state);
   }
 
@@ -184,11 +169,7 @@ export class Authenticator {
   private _exchangeCodeForToken(endpoint: IEndpointConfiguration, data: any, headers?: any): Promise<IToken> {
     return new Promise((resolve, reject) => {
       if (endpoint.tokenUrl == null) {
-        console.warn(
-          `We couldn\'t exchange the received code for an access_token.
-                    The value returned is not an access_token.
-                    Please set the tokenUrl property or refer to our docs.`
-        );
+        console.warn('We couldn\'t exchange the received code for an access_token. The value returned is not an access_token. Please set the tokenUrl property or refer to our docs.');
         return resolve(data);
       }
 
@@ -206,9 +187,7 @@ export class Authenticator {
         xhr.setRequestHeader(header, headers[header]);
       }
 
-      xhr.onerror = () => {
-        return reject(new AuthError('Unable to send request due to a Network error'));
-      };
+      xhr.onerror = () => reject(new AuthError('Unable to send request due to a Network error'));
 
       xhr.onload = () => {
         try {
@@ -247,7 +226,7 @@ export class Authenticator {
       throw new AuthError('State couldn\'t be verified');
     }
     else if ('code' in result) {
-      return this._exchangeCodeForToken(endpoint, (<ICode>result));
+      return this._exchangeCodeForToken(endpoint, result as ICode);
     }
     else if ('access_token' in result) {
       return this.tokens.add(endpoint.provider, result as IToken);
