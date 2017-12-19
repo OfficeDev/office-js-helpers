@@ -87,7 +87,7 @@ export class Dialog<T> {
     return new Promise((resolve, reject) => {
       Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
         if (result.status === Office.AsyncResultStatus.Failed) {
-          throw new DialogError(result.error.message);
+          throw new DialogError(result.error.message, result.error);
         }
         else {
           let dialog = result.value as Office.DialogHandler;
@@ -125,23 +125,7 @@ export class Dialog<T> {
         const options = 'width=' + this.size.width + ',height=' + this.size.height + this._windowFeatures;
         window.open(this.url, this.url, options);
         if (Utilities.isIEOrEdge) {
-          localStorage.removeItem(Dialog.key);
-          const POLL_INTERVAL = 400;
-          let interval = setInterval(() => {
-            try {
-              const data = localStorage.getItem(Dialog.key);
-              if (!(data == null)) {
-                clearInterval(interval);
-                localStorage.removeItem(Dialog.key);
-                return resolve(this._safeParse(data));
-              }
-            }
-            catch (exception) {
-              clearInterval(interval);
-              localStorage.removeItem(Dialog.key);
-              return reject(new DialogError('Unexpected error occured while creating popup', exception));
-            }
-          }, POLL_INTERVAL);
+          this._pollLocalStorageForToken(resolve, reject);
         }
         else {
           const handler = event => {
@@ -157,6 +141,26 @@ export class Dialog<T> {
         return reject(new DialogError('Unexpected error occured while creating popup', exception));
       }
     });
+  }
+
+  private _pollLocalStorageForToken(resolve: (value: T) => void, reject: (reason: DialogError) => void) {
+    localStorage.removeItem(Dialog.key);
+    const POLL_INTERVAL = 400;
+    let interval = setInterval(() => {
+      try {
+        const data = localStorage.getItem(Dialog.key);
+        if (!(data == null)) {
+          clearInterval(interval);
+          localStorage.removeItem(Dialog.key);
+          return resolve(this._safeParse(data));
+        }
+      }
+      catch (exception) {
+        clearInterval(interval);
+        localStorage.removeItem(Dialog.key);
+        return reject(new DialogError('Unexpected error occured in the dialog', exception));
+      }
+    }, POLL_INTERVAL);
   }
 
   /**
@@ -199,19 +203,15 @@ export class Dialog<T> {
     }
   }
 
-  private _optimizeSize(width: number, height: number): IDialogSize {
-    let screenWidth = window.screen.width;
-    let screenHeight = window.screen.height;
+  private _optimizeSize(desiredWidth: number, desiredHeight: number): IDialogSize {
+    const { width: screenWidth, height: screenHeight } = window.screen;
 
-    let optimizedWidth = this._maxSize(width, screenWidth);
-    let optimizedHeight = this._maxSize(height, screenHeight);
+    const width = this._maxSize(desiredWidth, screenWidth);
+    const height = this._maxSize(desiredHeight, screenHeight);
+    const width$ = this._percentage(width, screenWidth);
+    const height$ = this._percentage(height, screenHeight);
 
-    return {
-      width$: this._percentage(optimizedWidth, screenWidth),
-      height$: this._percentage(optimizedHeight, screenHeight),
-      width: optimizedWidth,
-      height: optimizedHeight
-    };
+    return { width$, height$, width, height };
   }
 
   private _maxSize(value: number, max: number) {

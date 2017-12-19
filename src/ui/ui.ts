@@ -114,7 +114,7 @@ export class UI {
     }
 
     (document.querySelector('.office-js-helpers-notification > button') as HTMLButtonElement)
-      .onclick = () => notificationDiv.parentNode.removeChild(notificationDiv)
+      .onclick = () => notificationDiv.parentNode.removeChild(notificationDiv);
   }
 }
 
@@ -140,14 +140,16 @@ function _parseNotificationParams(params: any[]): IMessageBannerParams {
       type: 'error',
       details: details
     };
-  } else if (body instanceof String) {
+  }
+  else if (body instanceof String) {
     return {
       message: body as string,
       title,
       type: type || 'default',
       details: null
     };
-  } else {
+  }
+  else {
     return {
       type: 'default',
       details: JSON.stringify(body, null, DEFAULT_WHITESPACE)
