@@ -1,25 +1,8 @@
 const webpack = require('webpack');
 const path = require('path');
+const DtsBundlePlugin = require('./generate-dts');
 const libraryName = 'OfficeHelpers';
 const fileName = 'office.helpers.js';
-
-class DtsBundlePlugin {
-  apply(compiler) {
-    compiler.plugin('done', () => {
-      const dts = require('dts-bundle');
-
-      dts.bundle({
-        name: libraryName,
-        main: 'dts/index.d.ts',
-        baseDir: 'dts',
-        out: '../dist/office.helpers.d.ts',
-        removeSource: false,
-        externals: true,
-        outputAsModuleFolder: true
-      });
-    });
-  }
-}
 
 module.exports = {
   entry: __dirname + '/src/index.ts',
