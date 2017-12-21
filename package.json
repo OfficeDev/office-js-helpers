@@ -14,6 +14,7 @@
     "build": "yarn build:lib && yarn build:min",
     "prestart": "yarn clean",
     "start": "yarn build:lib --watch",
+    "test": "jest",
     "version": "yarn build",
     "beta": "npm version prerelease && npm publish --tag beta"
   },
@@ -33,20 +34,24 @@
     "rxjs": "^5.5.5"
   },
   "devDependencies": {
+    "@types/jest": "21.1.9",
     "@types/lodash-es": "^4.17.0",
     "@types/node": "^8.5.2",
     "@types/webpack": "^3.8.1",
     "awesome-typescript-loader": "^3.4.1",
     "babel-core": "^6.26.0",
+    "babel-jest": "^22.0.3",
     "babel-plugin-lodash": "^3.3.2",
     "babel-preset-env": "^1.6.1",
     "crypto-js": "^3.1.9-1",
     "dts-builder": "^1.1.3",
     "html-loader": "^0.5.1",
+    "jest": "^22.0.3",
     "rimraf": "^2.6.2",
     "tslint": "^5.8.0",
     "tslint-eslint-rules": "^4.1.1",
     "tslint-loader": "^3.5.3",
+    "ts-jest": "22.0.0",
     "typescript": "^2.6.2",
     "uglify-js": "^3.2.2",
     "webpack": "^3.10.0"
@@ -63,5 +68,28 @@
   "bugs": {
     "url": "https://github.com/OfficeDev/office-js-helpers/issues"
   },
-  "homepage": "https://github.com/OfficeDev/office-js-helpers#readme"
+  "homepage": "https://github.com/OfficeDev/office-js-helpers#readme",
+  "jest": {
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      "^.+\\.ts$": "ts-jest"
+    },
+    "mapCoverage": true,
+    "testPathIgnorePatterns": [
+      "/node_modules/",
+      "/dist/"
+    ],
+    "transformIgnorePatterns": [
+      "<rootDir>/node_modules/(?!lodash-es/)"
+    ],
+    "testRegex": "\\.spec.ts$",
+    "moduleDirectories": [
+      "node_modules",
+      "src"
+    ],
+    "moduleFileExtensions": [
+      "ts",
+      "js"
+    ]
+  }
 }

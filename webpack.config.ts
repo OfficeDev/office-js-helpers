@@ -29,7 +29,8 @@ module.exports = {
         loader: 'tslint-loader'
       },
       {
-        test: /(\.ts)$/,
+        test: /\.ts$/,
+        exclude: /\.spec\.ts$/,
         loader: 'awesome-typescript-loader',
         options: {
           configFileName: 'tsconfig.webpack.json'
