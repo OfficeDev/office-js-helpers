@@ -20,7 +20,6 @@ export interface Listener {
 export interface Subscription {
   // A flag to indicate whether this Subscription has already been unsubscribed.
   closed: boolean;
-  
   // Disposes the resources held by the subscription. May, for instance, cancel
   // an ongoing Observable execution or cancel any other type of work that
   // started when the Subscription was created.
