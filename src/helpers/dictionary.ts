@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
-import { isObject } from 'lodash-es';
+import { isObject, isNil } from 'lodash-es';
 
 /**
  * Helper for creating and querying Dictionaries.
@@ -12,8 +12,14 @@ export class Dictionary<T> {
    * @constructor
    * @param {object} items Initial seed of items.
    */
-  constructor(items?: { [index: string]: T } | [string, T][]) {
-    if (Array.isArray(items)) {
+  constructor(items?: { [index: string]: T } | [string, T][] | Map<string, T>) {
+    if (isNil(items)) {
+      this._items = new Map();
+    }
+    else if (items instanceof Map) {
+      this._items = new Map(items);
+    }
+    else if (Array.isArray(items)) {
       this._items = new Map(items);
     }
     else if (isObject(items)) {
@@ -21,6 +27,9 @@ export class Dictionary<T> {
       for (const key of Object.keys(items)) {
         this._items.set(key, items[key]);
       }
+    }
+    else {
+      throw new TypeError(`Invalid type of argument: ${typeof items}`);
     }
   }
 
