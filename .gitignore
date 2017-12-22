@@ -51,6 +51,7 @@ $RECYCLE.BIN/
 obj/**
 bin/**
 *.user
+.yarnclean
 temp
 test
 node_modules/**
