@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
-import { isObject, isNil } from 'lodash-es';
+import { isObject, isNil, isString } from 'lodash-es';
 
 /**
  * Helper for creating and querying Dictionaries.
@@ -12,9 +12,12 @@ export class Dictionary<T> {
    * @constructor
    * @param {object} items Initial seed of items.
    */
-  constructor(items?: { [index: string]: T } | [string, T][] | Map<string, T>) {
+  constructor(items?: { [index: string]: T } | Array<[string, T]> | Map<string, T>) {
     if (isNil(items)) {
       this._items = new Map();
+    }
+    else if (items instanceof Set) {
+      throw new TypeError(`Invalid type of argument: Set`);
     }
     else if (items instanceof Map) {
       this._items = new Map(items);
@@ -53,10 +56,9 @@ export class Dictionary<T> {
    */
   add(key: string, value: T): T {
     if (this._items.has(key)) {
-      throw new Error(`Key: ${key} already exists.`);
+      throw new ReferenceError(`Key: ${key} already exists.`);
     }
-    this._items.set(key, value);
-    return value;
+    return this.insert(key, value);
   }
 
   /**
@@ -68,9 +70,7 @@ export class Dictionary<T> {
    * @return {object} Returns the added item.
    */
   insert(key: string, value: T): T {
-    if (key == null) {
-      throw new Error('Key cannot be null or undefined');
-    }
+    this._validateKey(key);
     this._items.set(key, value);
     return value;
   }
@@ -83,8 +83,9 @@ export class Dictionary<T> {
    * @return {object} Returns the deleted item.
    */
   remove(key: string): T {
+    this._validateKey(key);
     if (!this._items.has(key)) {
-      throw new Error(`Key: ${key} not found.`);
+      throw new ReferenceError(`Key: ${key} not found.`);
     }
     let value = this._items.get(key);
     this._items.delete(key);
@@ -184,5 +185,14 @@ export class Dictionary<T> {
    */
   get count(): number {
     return this._items.size;
+  }
+
+  private _validateKey(key: string) {
+    if (!isString(key)) {
+      throw new TypeError('Key needs to be a string');
+    }
+    if (key == null) {
+      throw new TypeError('Key cannot be null or undefined');
+    }
   }
 }
