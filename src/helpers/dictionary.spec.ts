@@ -1,13 +1,16 @@
 import { Dictionary } from './dictionary';
 
-describe('test dictionary creation', () => {
-  test('creates a new empty dictionary', () => {
+describe('Dictionary creation', () => {
+  it('creates a new empty dictionary', () => {
+    // Setup
     const dictionary = new Dictionary();
+
+    // Assert
     expect(dictionary).toBeDefined();
-    expect(dictionary.count).toEqual(0);
+    expect(dictionary.count).toBe(0);
   });
 
-  test('creates a dictionary from a Map<string, T>', () => {
+  it('creates a dictionary from a Map<string, T>', () => {
     // Setup
     const dictionary = new Dictionary<any>(new Map<string, any>([
       ['item1', 1],
@@ -17,12 +20,12 @@ describe('test dictionary creation', () => {
 
     // Assert
     expect(dictionary).toBeDefined();
-    expect(dictionary.count).toEqual(3);
-    expect(dictionary.get('item1')).toEqual(1);
-    expect(dictionary.get('item2')).toEqual('the second item');
+    expect(dictionary.count).toBe(3);
+    expect(dictionary.get('item1')).toBe(1);
+    expect(dictionary.get('item2')).toBe('the second item');
   });
 
-  test('creates a dictionary from Array<[string, T]>', () => {
+  it('creates a dictionary from Array<[string, T]>', () => {
     // Setup
     const dictionary = new Dictionary<any>([
       ['item1', 1],
@@ -32,12 +35,12 @@ describe('test dictionary creation', () => {
 
     // Assert
     expect(dictionary).toBeDefined();
-    expect(dictionary.count).toEqual(3);
-    expect(dictionary.get('item1')).toEqual(1);
-    expect(dictionary.get('item2')).toEqual('the second item');
+    expect(dictionary.count).toBe(3);
+    expect(dictionary.get('item1')).toBe(1);
+    expect(dictionary.get('item2')).toBe('the second item');
   });
 
-  test('creates a dictionary from an Object', () => {
+  it('creates a dictionary from an Object', () => {
     // Setup
     const dictionary = new Dictionary<any>({
       item1: 1,
@@ -47,12 +50,12 @@ describe('test dictionary creation', () => {
 
     // Assert
     expect(dictionary).toBeDefined();
-    expect(dictionary.count).toEqual(3);
-    expect(dictionary.get('item1')).toEqual(1);
-    expect(dictionary.get('item2')).toEqual('the second item');
+    expect(dictionary.count).toBe(3);
+    expect(dictionary.get('item1')).toBe(1);
+    expect(dictionary.get('item2')).toBe('the second item');
   });
 
-  test('fails if Dictionary is instantiated with invalid values', () => {
+  it('fails if Dictionary is instantiated with invalid values', () => {
     // Assert
     expect(() => new Dictionary(2 as any)).toThrow(TypeError);
     expect(() => new Dictionary(new Set() as any)).toThrow(TypeError);
@@ -60,7 +63,7 @@ describe('test dictionary creation', () => {
   });
 });
 
-describe('test dictionary operations', () => {
+describe('Dictionary operations', () => {
   let dictionary: Dictionary<any>;
 
   beforeEach(() => {
@@ -72,55 +75,55 @@ describe('test dictionary operations', () => {
   });
 
   describe('Get', () => {
-    test('returns an object', () => {
+    it('returns an object', () => {
       // Assert
       expect(dictionary.get('item1')).toBe(1);
     });
 
-    test('returns undefined if the object doesn\'t exist', () => {
+    it('returns undefined if the object doesn\'t exist', () => {
       // Assert
       expect(dictionary.get('item4')).toBeUndefined();
     });
 
-    test('returns undefined if the key is invalid', () => {
+    it('returns undefined if the key is invalid', () => {
       // Assert
       expect(dictionary.get(undefined)).toBeUndefined();
     });
   });
 
   describe('Set', () => {
-    test('inserts the object', () => {
+    it('inserts the object', () => {
       // Setup
       const originalCount = dictionary.count;
       dictionary.set('item4', 4);
       const item = dictionary.get('item4');
 
       // Assert
-      expect(item).toEqual(4);
-      expect(dictionary.count).toEqual(originalCount + 1);
+      expect(item).toBe(4);
+      expect(dictionary.count).toBe(originalCount + 1);
     });
 
-    test('returns the inserted object', () => {
+    it('returns the inserted object', () => {
       // Setup
       const item = dictionary.set('item4', 4);
 
       // Assert
-      expect(item).toEqual(4);
+      expect(item).toBe(4);
     });
 
-    test('replaces if the key already exists', () => {
+    it('replaces if the key already exists', () => {
       // Setup
       dictionary.set('item4', 4);
       let item = dictionary.get('item4');
-      expect(item).toEqual(4);
+      expect(item).toBe(4);
 
       // Assert
       dictionary.set('item4', 'random');
       item = dictionary.get('item4');
-      expect(item).toEqual('random');
+      expect(item).toBe('random');
     });
 
-    test('throws if the key is invalid', () => {
+    it('throws if the key is invalid', () => {
       // Assert
       expect(() => dictionary.set(null, 'random')).toThrow(TypeError);
       expect(() => dictionary.set(2 as any, 'random')).toThrow(TypeError);
@@ -128,7 +131,7 @@ describe('test dictionary operations', () => {
   });
 
   describe('Delete', () => {
-    test('deletes the object', () => {
+    it('deletes the object', () => {
       // Setup
       const originalCount = dictionary.count;
       dictionary.delete('item3');
@@ -136,23 +139,23 @@ describe('test dictionary operations', () => {
 
       // Assert
       expect(item).toBeUndefined();
-      expect(dictionary.count).toEqual(originalCount - 1);
+      expect(dictionary.count).toBe(originalCount - 1);
     });
 
-    test('returns the deleted object', () => {
+    it('returns the deleted object', () => {
       // Setup
       const item = dictionary.delete('item1');
 
       // Assert
-      expect(item).toEqual(1);
+      expect(item).toBe(1);
     });
 
-    test('throws if the doesn\'t exist', () => {
+    it('throws if the doesn\'t exist', () => {
       // Assert
       expect(() => dictionary.delete('item4')).toThrow(ReferenceError);
     });
 
-    test('throws if the key is invalid', () => {
+    it('throws if the key is invalid', () => {
       // Assert
       expect(() => dictionary.delete(null)).toThrow(TypeError);
       expect(() => dictionary.delete(2 as any)).toThrow(TypeError);
@@ -160,19 +163,19 @@ describe('test dictionary operations', () => {
   });
 
   describe('Clear', () => {
-    test('empties the dictionary', () => {
+    it('empties the dictionary', () => {
       // Setup
       dictionary.clear();
       const item = dictionary.get('item4');
 
       // Assert
       expect(item).toBeUndefined();
-      expect(dictionary.count).toEqual(0);
+      expect(dictionary.count).toBe(0);
     });
   });
 
   describe('Keys', () => {
-    test('returns the keys in the dictionary', () => {
+    it('returns the keys in the dictionary', () => {
       // Setup
       const keys = dictionary.keys();
 
@@ -183,7 +186,7 @@ describe('test dictionary operations', () => {
   });
 
   describe('Values', () => {
-    test('returns the values in the dictionary', () => {
+    it('returns the values in the dictionary', () => {
       // Setup
       const values = dictionary.values();
 
@@ -194,7 +197,7 @@ describe('test dictionary operations', () => {
   });
 
   describe('Clone', () => {
-    test('returns a shallow copy of the dictonary', () => {
+    it('returns a shallow copy of the dictonary', () => {
       // Setup
       const dictionaryCopy = dictionary.clone();
 
@@ -202,34 +205,34 @@ describe('test dictionary operations', () => {
       expect(dictionaryCopy).toBeDefined();
     });
 
-    test('ensure the copy is shallow', () => {
+    it('ensure the copy is shallow', () => {
       // Setup
       const dictionaryCopy = dictionary.clone();
       dictionaryCopy.set('item1', 10);
 
       // Assert
-      expect(dictionaryCopy.get('item1')).toEqual(10);
-      expect(dictionary.get('item1')).toEqual(1);
+      expect(dictionaryCopy.get('item1')).toBe(10);
+      expect(dictionary.get('item1')).toBe(1);
     });
   });
 
   describe('Count', () => {
-    test('returns the count of the dictonary', () => {
+    it('returns the count of the dictonary', () => {
       // Setup
       const count = dictionary.count;
 
       // Assert
-      expect(count).toEqual(3);
+      expect(count).toBe(3);
     });
   });
 
   describe('Iterator', () => {
-    test('iterators over the key value pair of the dictionary', () => {
+    it('iterators over the key value pair of the dictionary', () => {
       // Setup
       for (const kvp of dictionary) {
         // Assert
-        expect(kvp.key).toEqual('item1');
-        expect(kvp.value).toEqual(1);
+        expect(kvp.key).toBe('item1');
+        expect(kvp.value).toBe(1);
         break;
       }
     });
