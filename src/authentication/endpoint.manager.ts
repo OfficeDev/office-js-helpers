@@ -77,7 +77,7 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
       config.redirectUrl = window.location.origin;
     }
     config.provider = provider;
-    return super.insert(provider, config);
+    return super.set(provider, config);
   }
 
   /**

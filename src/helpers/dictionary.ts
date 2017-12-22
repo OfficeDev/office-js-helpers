@@ -55,10 +55,10 @@ export class Dictionary<T> {
    * @return {object} Returns the added item.
    */
   add(key: string, value: T): T {
-    if (this._items.has(key)) {
+    if (this.has(key)) {
       throw new ReferenceError(`Key: ${key} already exists.`);
     }
-    return this.insert(key, value);
+    return this.set(key, value);
   }
 
   /**
@@ -69,7 +69,7 @@ export class Dictionary<T> {
    * @param {object} value The item to be added.
    * @return {object} Returns the added item.
    */
-  insert(key: string, value: T): T {
+  set(key: string, value: T): T {
     this._validateKey(key);
     this._items.set(key, value);
     return value;
@@ -82,9 +82,8 @@ export class Dictionary<T> {
    * @param {string} key The key of the item.
    * @return {object} Returns the deleted item.
    */
-  remove(key: string): T {
-    this._validateKey(key);
-    if (!this._items.has(key)) {
+  delete(key: string): T {
+    if (!this.has(key)) {
       throw new ReferenceError(`Key: ${key} not found.`);
     }
     let value = this._items.get(key);
@@ -105,10 +104,8 @@ export class Dictionary<T> {
    * @param {string} key The key of the item.
    * @return {boolean} Returns true if the key was found.
    */
-  contains(key: string): boolean {
-    if (key == null) {
-      throw new Error('Key cannot be null or undefined');
-    }
+  has(key: string): boolean {
+    this._validateKey(key);
     return this._items.has(key);
   }
 
@@ -131,51 +128,12 @@ export class Dictionary<T> {
   }
 
   /**
-   * Get the map representation of the dictionary.
+   * Get a shallow copy of the underlying map.
    *
-   * @return {object} Returns the map representation of the dictionary.
+   * @return {object} Returns the shallow copy of the map.
    */
-  lookup(): Map<string, T> {
+  clone(): Map<string, T> {
     return new Map(this._items);
-  }
-
-  /**
-   * Serializes the map to a string
-   * @param items Map that needs to be serialized
-   */
-  static serialize<T>(items: Map<string, T>): string {
-    try {
-      return JSON.stringify(Array.from(items));
-    }
-    catch (error) {
-      throw new Error('Unable to serialize map. Invalid structure.');
-    }
-  }
-
-  /**
-   * Deserializes the string into a map
-   * @param items String of items that correspond to a valid map
-   */
-  static deserialize<T>(items: string): Map<string, T> {
-    try {
-      return new Dictionary<T>(JSON.parse(items)).lookup();
-    }
-    catch (error) {
-      throw new Error('Unable to deserialize map. Invalid structure.');
-    }
-  }
-
-  /**
-   * Merges two or more maps into a single map
-   */
-  static union<T>(map1: Map<string, T>, map2: Map<string, T>, ...args: Map<string, T>[]) {
-    try {
-      const flattendMap = args.reduce((agg, item) => agg = [...agg, ...Array.from(item)], []);
-      return new Map<string, T>([...Array.from(map1), ...Array.from(map2), ...flattendMap]);
-    }
-    catch (error) {
-      throw new Error('Unable to merge map. Invalid structure.');
-    }
   }
 
   /**

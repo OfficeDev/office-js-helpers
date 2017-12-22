@@ -123,11 +123,11 @@ describe('test dictionary operations', () => {
     });
   });
 
-  describe('Insert', () => {
+  describe('Set', () => {
     test('inserts the object', () => {
       // Setup
       const originalCount = dictionary.count;
-      dictionary.insert('item4', 4);
+      dictionary.set('item4', 4);
       const item = dictionary.get('item4');
 
       // Assert
@@ -137,7 +137,7 @@ describe('test dictionary operations', () => {
 
     test('returns the inserted object', () => {
       // Setup
-      const item = dictionary.insert('item4', 4);
+      const item = dictionary.set('item4', 4);
 
       // Assert
       expect(item).toEqual(4);
@@ -145,28 +145,28 @@ describe('test dictionary operations', () => {
 
     test('replaces if the key already exists', () => {
       // Setup
-      dictionary.insert('item4', 4);
+      dictionary.set('item4', 4);
       let item = dictionary.get('item4');
       expect(item).toEqual(4);
 
       // Assert
-      dictionary.insert('item4', 'random');
+      dictionary.set('item4', 'random');
       item = dictionary.get('item4');
       expect(item).toEqual('random');
     });
 
     test('throws if the key is invalid', () => {
       // Assert
-      expect(() => dictionary.insert(null, 'random')).toThrow(TypeError);
-      expect(() => dictionary.insert(2 as any, 'random')).toThrow(TypeError);
+      expect(() => dictionary.set(null, 'random')).toThrow(TypeError);
+      expect(() => dictionary.set(2 as any, 'random')).toThrow(TypeError);
     });
   });
 
-  describe('Remove', () => {
-    test('removes the object', () => {
+  describe('Delete', () => {
+    test('deletes the object', () => {
       // Setup
       const originalCount = dictionary.count;
-      dictionary.remove('item3');
+      dictionary.delete('item3');
       const item = dictionary.get('item3');
 
       // Assert
@@ -174,9 +174,9 @@ describe('test dictionary operations', () => {
       expect(dictionary.count).toEqual(originalCount - 1);
     });
 
-    test('returns the removed object', () => {
+    test('returns the deleted object', () => {
       // Setup
-      const item = dictionary.remove('item1');
+      const item = dictionary.delete('item1');
 
       // Assert
       expect(item).toEqual(1);
@@ -184,17 +184,67 @@ describe('test dictionary operations', () => {
 
     test('throws if the doesn\'t exist', () => {
       // Assert
-      expect(() => dictionary.remove('item4')).toThrow(ReferenceError);
+      expect(() => dictionary.delete('item4')).toThrow(ReferenceError);
     });
 
     test('throws if the key is invalid', () => {
       // Assert
-      expect(() => dictionary.remove(null)).toThrow(TypeError);
-      expect(() => dictionary.remove(2 as any)).toThrow(TypeError);
+      expect(() => dictionary.delete(null)).toThrow(TypeError);
+      expect(() => dictionary.delete(2 as any)).toThrow(TypeError);
     });
   });
 
   describe('Clear', () => {
+    test('empties the dictionary', () => {
+      // Setup
+      dictionary.clear();
+      const item = dictionary.get('item4');
 
+      // Assert
+      expect(item).toBeUndefined();
+      expect(dictionary.count).toEqual(0);
+    });
+  });
+
+  describe('Keys', () => {
+    test('returns the keys in the dictionary', () => {
+      // Setup
+      const keys = dictionary.keys();
+
+      // Assert
+      expect(keys).toBeDefined();
+      expect(keys.next().value).toBe('item1');
+    });
+  });
+
+  describe('Values', () => {
+    test('returns the values in the dictionary', () => {
+      // Setup
+      const values = dictionary.values();
+
+      // Assert
+      expect(values).toBeDefined();
+      expect(values.next().value).toBe(1);
+    });
+  });
+
+  describe('Clone', () => {
+    test('returns a shallow copy of the dictonary', () => {
+      // Setup
+      const dictionaryCopy = dictionary.clone();
+
+      // Assert
+      expect(dictionaryCopy).toBeDefined();
+    });
+
+    test('ensure the copy is shallow', () => {
+      // Setup
+      const dictionaryCopy = dictionary.clone();
+      dictionaryCopy.set('item1', 10);
+
+      // Assert
+      expect(dictionaryCopy.get('item1')).toEqual(10);
+      expect(dictionary.get('item1')).toEqual(1);
+    });
   });
 });
