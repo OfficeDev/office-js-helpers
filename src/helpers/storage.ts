@@ -185,20 +185,6 @@ export class Storage<T> {
   }
 
   /**
-   * Number of items in the store.
-   *
-   * @return {number} Returns the number of items in the dictionary.
-   */
-  get count(): number {
-    try {
-      return this._storage.length;
-    }
-    catch (error) {
-      throw new Exception(`Unable to get size of localStorage`, error);
-    }
-  }
-
-  /**
    * Clear all storages.
    * Completely clears both the localStorage and sessionStorage.
    */
