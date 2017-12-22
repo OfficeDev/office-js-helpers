@@ -1,5 +1,5 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
-import { isObject, isNil, isString } from 'lodash-es';
+import { isObject, isNil, isString, isEmpty } from 'lodash-es';
 
 export interface KeyValuePair<T> {
   key: string,
@@ -42,10 +42,10 @@ export class Dictionary<T> {
   }
 
   *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
-    let key = null;
+    let key: IteratorResult<string> = null;
     while (key = this.keys().next()) {
-      const value = this.get(key);
-      yield ({ key, value });
+      const value = this.get(key.value);
+      yield ({ key: key.value, value });
     }
   }
 
@@ -144,11 +144,8 @@ export class Dictionary<T> {
   }
 
   private _validateKey(key: string): void {
-    if (!isString(key)) {
+    if (!isString(key) || isEmpty(key)) {
       throw new TypeError('Key needs to be a string');
-    }
-    if (key == null) {
-      throw new TypeError('Key cannot be null or undefined');
     }
   }
 }
