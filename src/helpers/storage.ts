@@ -1,8 +1,9 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { debounce, isEmpty, isString, keys, values } from 'lodash-es';
+import { debounce, isEmpty, isString, has } from 'lodash-es';
 import { Observable } from 'rxjs/Observable';
 import { Exception } from '../errors/exception';
+import { KeyValuePair } from './dictionary';
 
 const NOTIFICATION_DEBOUNCE = 300;
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
@@ -29,6 +30,7 @@ export interface Subscription {
 export class Storage<T> {
   private _storage: typeof localStorage | typeof sessionStorage;
   private _observable: Observable<string> = null;
+  private _containerRegex: RegExp = null;
 
   /**
    * @constructor
@@ -39,7 +41,18 @@ export class Storage<T> {
     public container: string,
     private _type: StorageType = StorageType.LocalStorage
   ) {
+    if (isEmpty(container) || !isString(container)) {
+      throw new TypeError('Container name needs to be a valid string');
+    }
+    this._containerRegex = new RegExp(`^@${this.container}\/`);
     this.switchStorage(this._type);
+  }
+
+  *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
+    for (let key of this.keys()) {
+      const value = this.get(key);
+      yield ({ key, value });
+    }
   }
 
   /**
@@ -51,7 +64,7 @@ export class Storage<T> {
   switchStorage(type: StorageType) {
     this._storage = type === StorageType.LocalStorage ? window.localStorage : window.sessionStorage;
     if (this._storage == null) {
-      throw new Error('Browser local or session storage is not supported.');
+      throw new Exception('Browser local or session storage is not supported.');
     }
     if (!this._storage.hasOwnProperty(this.container)) {
       this._storage[this.container] = null;
@@ -142,9 +155,13 @@ export class Storage<T> {
    *
    * @return {array} Returns all the keys.
    */
-  keys(): Array<string> {
+  *keys(): IterableIterator<string> {
     try {
-      return keys(this._storage);
+      for (let key in this._storage) {
+        if (this._containerRegex.test(key) && has(this._storage, key)) {
+          yield key.replace(this._containerRegex, '');
+        }
+      }
     }
     catch (error) {
       throw new Exception(`Unable to get keys from storage`, error);
@@ -156,12 +173,28 @@ export class Storage<T> {
    *
    * @return {array} Returns all the values.
    */
-  values(): Array<string> {
+  *values(): IterableIterator<T> {
     try {
-      return values(this._storage);
+      for (const key of this.keys()) {
+        yield this.get(key);
+      }
     }
     catch (error) {
       throw new Exception(`Unable to get values from storage`, error);
+    }
+  }
+
+  /**
+   * Number of items in the store.
+   *
+   * @return {number} Returns the number of items in the dictionary.
+   */
+  get count(): number {
+    try {
+      return this._storage.length;
+    }
+    catch (error) {
+      throw new Exception(`Unable to get size of localStorage`, error);
     }
   }
 
@@ -179,7 +212,6 @@ export class Storage<T> {
    * or if the collection is modified in a different tab.
    */
   notify(next: () => void, error?: (error: any) => void, complete?: () => void): Subscription {
-    const containerRegex = new RegExp(`^@${this.container}\/`);
     if (!(this._observable == null)) {
       return this._observable.subscribe(next, error, complete);
     }
@@ -189,7 +221,7 @@ export class Storage<T> {
       let debouncedUpdate = debounce((event: StorageEvent) => {
         try {
           // If the change is on the current container
-          if (containerRegex.test(event.key)) {
+          if (this._containerRegex.test(event.key)) {
             // Notify the listener of the change
             observer.next(event.key);
           }
