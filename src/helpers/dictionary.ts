@@ -1,6 +1,11 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 import { isObject, isNil, isString } from 'lodash-es';
 
+export interface KeyValuePair<T> {
+  key: string,
+  value: T
+}
+
 /**
  * Helper for creating and querying Dictionaries.
  * A wrapper around ES6 Maps.
@@ -33,6 +38,13 @@ export class Dictionary<T> {
     }
     else {
       throw new TypeError(`Invalid type of argument: ${typeof items}`);
+    }
+  }
+
+  *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
+    for (let key of this.keys()) {
+      const value = this.get(key);
+      yield ({ key, value });
     }
   }
 

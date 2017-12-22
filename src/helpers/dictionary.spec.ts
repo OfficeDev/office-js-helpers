@@ -212,4 +212,24 @@ describe('test dictionary operations', () => {
       expect(dictionary.get('item1')).toEqual(1);
     });
   });
+
+  describe('Count', () => {
+    test('returns the count of the dictonary', () => {
+      // Setup
+      const count = dictionary.count;
+
+      // Assert
+      expect(count).toEqual(3);
+    });
+  });
+
+  describe('Iterator', () => {
+    test('iterates through the key value pairs of items', () => {
+      for (let item of dictionary) {
+        expect(item.key).toEqual('item1');
+        expect(item.value).toEqual(1);
+        break;
+      }
+    });
+  });
 });
