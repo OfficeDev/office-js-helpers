@@ -88,41 +88,6 @@ describe('test dictionary operations', () => {
     });
   });
 
-  describe('Add', () => {
-    test('adds the object', () => {
-      // Setup
-      const originalCount = dictionary.count;
-      dictionary.add('item4', 4);
-      const item = dictionary.get('item4');
-
-      // Assert
-      expect(item).toEqual(4);
-      expect(dictionary.count).toEqual(originalCount + 1);
-    });
-
-    test('returns the added object', () => {
-      // Setup
-      const item = dictionary.add('item4', 4);
-
-      // Assert
-      expect(item).toEqual(4);
-    });
-
-    test('throws if the key already exists', () => {
-      // Setup
-      dictionary.add('item4', 4);
-
-      // Assert
-      expect(() => dictionary.add('item4', 'random')).toThrow(ReferenceError);
-    });
-
-    test('throws if the key is invalid', () => {
-      // Assert
-      expect(() => dictionary.add(null, 'random')).toThrow(TypeError);
-      expect(() => dictionary.add(2 as any, 'random')).toThrow(TypeError);
-    });
-  });
-
   describe('Set', () => {
     test('inserts the object', () => {
       // Setup
