@@ -40,25 +40,10 @@ export class Dictionary<T> {
    * Gets an item from the dictionary.
    *
    * @param {string} key The key of the item.
-   * @return {object} Returns an item if found, else returns null.
+   * @return {object} Returns an item if found.
    */
   get(key: string): T {
     return this._items.get(key);
-  }
-
-  /**
-   * Adds an item into the dictionary.
-   * If the key already exists, then it will throw.
-   *
-   * @param {string} key The key of the item.
-   * @param {object} value The item to be added.
-   * @return {object} Returns the added item.
-   */
-  add(key: string, value: T): T {
-    if (this.has(key)) {
-      throw new ReferenceError(`Key: ${key} already exists.`);
-    }
-    return this.set(key, value);
   }
 
   /**
@@ -94,7 +79,7 @@ export class Dictionary<T> {
   /**
    * Clears the dictionary.
    */
-  clear() {
+  clear(): void {
     this._items.clear();
   }
 
@@ -145,7 +130,7 @@ export class Dictionary<T> {
     return this._items.size;
   }
 
-  private _validateKey(key: string) {
+  private _validateKey(key: string): void {
     if (!isString(key)) {
       throw new TypeError('Key needs to be a string');
     }
