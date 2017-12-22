@@ -86,8 +86,8 @@ export class Storage<T> extends Dictionary<T> {
    * Add or Update an item.
    * Extends Dictionary's implementation of insert, with a save to the storage.
    */
-  insert(item: string, value: T): T {
-    super.insert(item, value);
+  set(item: string, value: T): T {
+    super.set(item, value);
     this._sync(item, value);
     return value;
   }
@@ -96,8 +96,8 @@ export class Storage<T> extends Dictionary<T> {
    * Remove an item.
    * Extends Dictionary's implementation with a save to the storage.
    */
-  remove(item: string) {
-    let value = super.remove(item);
+  delete(item: string) {
+    let value = super.delete(item);
     this._sync(item, null);
     return value;
   }

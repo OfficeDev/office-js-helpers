@@ -78,7 +78,7 @@ export class TokenStorage extends Storage<IToken> {
 
     let expired = TokenStorage.hasExpired(token);
     if (expired) {
-      super.remove(provider);
+      super.delete(provider);
       return null;
     }
     else {
@@ -98,6 +98,6 @@ export class TokenStorage extends Storage<IToken> {
   add(provider: string, value: IToken) {
     value.provider = provider;
     TokenStorage.setExpiry(value);
-    return super.insert(provider, value);
+    return super.set(provider, value);
   }
 }
