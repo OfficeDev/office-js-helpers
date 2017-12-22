@@ -1,6 +1,6 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { debounce, isEmpty, isString, has } from 'lodash-es';
+import { debounce, isEmpty, isString, has, isNil } from 'lodash-es';
 import { Observable } from 'rxjs/Observable';
 import { Exception } from '../errors/exception';
 import { KeyValuePair } from './dictionary';
@@ -41,18 +41,16 @@ export class Storage<T> {
     public container: string,
     private _type: StorageType = StorageType.LocalStorage
   ) {
-    if (isEmpty(container) || !isString(container)) {
-      throw new TypeError('Container name needs to be a valid string');
-    }
+    this._validateKey(container);
     this._containerRegex = new RegExp(`^@${this.container}\/`);
     this.switchStorage(this._type);
   }
 
   *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
-    let key = null;
+    let key: IteratorResult<string> = null;
     while (key = this.keys().next()) {
-      const value = this.get(key);
-      yield ({ key, value });
+      const value = this.get(key.value);
+      yield ({ key: key.value, value });
     }
   }
 
@@ -64,7 +62,7 @@ export class Storage<T> {
    */
   switchStorage(type: StorageType) {
     this._storage = type === StorageType.LocalStorage ? window.localStorage : window.sessionStorage;
-    if (this._storage == null) {
+    if (isNil(this._storage)) {
       throw new Exception('Browser local or session storage is not supported.');
     }
     if (!this._storage.hasOwnProperty(this.container)) {
@@ -176,9 +174,9 @@ export class Storage<T> {
    */
   *values(): IterableIterator<T> {
     try {
-      let key = null;
+      let key: IteratorResult<string> = null;
       while (key = this.keys().next()) {
-        yield this.get(key);
+        yield this.get(key.value);
       }
     }
     catch (error) {
@@ -246,11 +244,8 @@ export class Storage<T> {
   }
 
   private _validateKey(key: string): void {
-    if (!isString(key)) {
+    if (!isString(key) || isEmpty(key)) {
       throw new TypeError('Key needs to be a string');
-    }
-    if (key == null) {
-      throw new TypeError('Key cannot be null or undefined');
     }
   }
 
