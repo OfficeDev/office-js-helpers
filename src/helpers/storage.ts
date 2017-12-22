@@ -49,7 +49,8 @@ export class Storage<T> {
   }
 
   *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
-    for (let key of this.keys()) {
+    let key = null;
+    while (key = this.keys().next()) {
       const value = this.get(key);
       yield ({ key, value });
     }
@@ -175,7 +176,8 @@ export class Storage<T> {
    */
   *values(): IterableIterator<T> {
     try {
-      for (const key of this.keys()) {
+      let key = null;
+      while (key = this.keys().next()) {
         yield this.get(key);
       }
     }
