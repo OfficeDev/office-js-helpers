@@ -222,14 +222,4 @@ describe('test dictionary operations', () => {
       expect(count).toEqual(3);
     });
   });
-
-  describe('Iterator', () => {
-    test('iterates through the key value pairs of items', () => {
-      for (let item of dictionary) {
-        expect(item.key).toEqual('item1');
-        expect(item.value).toEqual(1);
-        break;
-      }
-    });
-  });
 });
