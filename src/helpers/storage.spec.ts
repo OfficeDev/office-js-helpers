@@ -1,13 +1,17 @@
 import { Storage, StorageType } from './storage';
 
 describe('it storage creation', () => {
+  beforeEach(() => {
+    localStorage.clear();
+  });
+
   it('creates a new empty storage with container', () => {
     // Setup
     const storage = new Storage('container');
 
     // Assert
     expect(storage).toBeDefined();
-    // expect(storage.count).toBe(0);
+    expect(storage.count).toBe(0);
   });
 
   it('sets the container correctly', () => {
@@ -46,7 +50,8 @@ describe('it storage creation', () => {
     const storage = new Storage('container', StorageType.SessionStorage);
 
     // Assert
-    // expect((storage.count)).toBe(1);
+    expect(storage.get('item1')).toBe('item1');
+    expect(storage.count).toBe(1);
   });
 });
 

@@ -1,9 +1,8 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { debounce, isEmpty, isString, has, isNil } from 'lodash-es';
+import { debounce, isEmpty, isString, isNil } from 'lodash-es';
 import { Observable } from 'rxjs/Observable';
 import { Exception } from '../errors/exception';
-import { KeyValuePair } from './dictionary';
 
 const NOTIFICATION_DEBOUNCE = 300;
 const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
@@ -44,14 +43,6 @@ export class Storage<T> {
     this._validateKey(container);
     this._containerRegex = new RegExp(`^@${this.container}\/`);
     this.switchStorage(this._type);
-  }
-
-  *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
-    let key: IteratorResult<string> = null;
-    while (key = this.keys().next()) {
-      const value = this.get(key.value);
-      yield ({ key: key.value, value });
-    }
   }
 
   /**
@@ -154,13 +145,9 @@ export class Storage<T> {
    *
    * @return {array} Returns all the keys.
    */
-  *keys(): IterableIterator<string> {
+  keys(): Array<string> {
     try {
-      for (let key in this._storage) {
-        if (this._containerRegex.test(key) && has(this._storage, key)) {
-          yield key.replace(this._containerRegex, '');
-        }
-      }
+      return Object.keys(this._storage).filter(key => this._containerRegex.test(key));
     }
     catch (error) {
       throw new Exception(`Unable to get keys from storage`, error);
@@ -172,15 +159,26 @@ export class Storage<T> {
    *
    * @return {array} Returns all the values.
    */
-  *values(): IterableIterator<T> {
+  values(): Array<T> {
     try {
-      let key: IteratorResult<string> = null;
-      while (key = this.keys().next()) {
-        yield this.get(key.value);
-      }
+      return this.keys().map(key => this.get(key));
     }
     catch (error) {
       throw new Exception(`Unable to get values from storage`, error);
+    }
+  }
+
+  /**
+   * Number of items in the store.
+   *
+   * @return {number} Returns the number of items in the dictionary.
+   */
+  get count(): number {
+    try {
+      return this.keys().length;
+    }
+    catch (error) {
+      throw new Exception(`Unable to get size of localStorage`, error);
     }
   }
 

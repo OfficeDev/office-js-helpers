@@ -181,7 +181,7 @@ describe('Dictionary operations', () => {
 
       // Assert
       expect(keys).toBeDefined();
-      expect(keys.next().value).toBe('item1');
+      expect(keys[0]).toBe('item1');
     });
   });
 
@@ -192,7 +192,7 @@ describe('Dictionary operations', () => {
 
       // Assert
       expect(values).toBeDefined();
-      expect(values.next().value).toBe(1);
+      expect(values[0]).toBe(1);
     });
   });
 
@@ -223,18 +223,6 @@ describe('Dictionary operations', () => {
 
       // Assert
       expect(count).toBe(3);
-    });
-  });
-
-  describe('Iterator', () => {
-    it('iterators over the key value pair of the dictionary', () => {
-      // Setup
-      for (const kvp of dictionary) {
-        // Assert
-        expect(kvp.key).toBe('item1');
-        expect(kvp.value).toBe(1);
-        break;
-      }
     });
   });
 });
