@@ -1,11 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 import { isObject, isNil, isString, isEmpty } from 'lodash-es';
 
-export interface KeyValuePair<T> {
-  key: string,
-  value: T
-}
-
 /**
  * Helper for creating and querying Dictionaries.
  * A wrapper around ES6 Maps.
@@ -38,14 +33,6 @@ export class Dictionary<T> {
     }
     else {
       throw new TypeError(`Invalid type of argument: ${typeof items}`);
-    }
-  }
-
-  *[Symbol.iterator](): IterableIterator<KeyValuePair<T>> {
-    let key: IteratorResult<string> = null;
-    while (key = this.keys().next()) {
-      const value = this.get(key.value);
-      yield ({ key: key.value, value });
     }
   }
 
@@ -112,8 +99,8 @@ export class Dictionary<T> {
    *
    * @return {array} Returns all the keys.
    */
-  keys(): IterableIterator<string> {
-    return this._items.keys();
+  keys(): Array<string> {
+    return Array.from(this._items.keys());
   }
 
   /**
@@ -121,8 +108,8 @@ export class Dictionary<T> {
    *
    * @return {array} Returns all the values.
    */
-  values(): IterableIterator<T> {
-    return this._items.values();
+  values(): Array<T> {
+    return Array.from(this._items.values());
   }
 
   /**
