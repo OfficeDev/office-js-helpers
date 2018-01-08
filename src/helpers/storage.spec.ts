@@ -37,7 +37,7 @@ describe('it storage creation', () => {
 
   it('switches to a different storage if storage type is passed', () => {
     // Setup
-    const storage = new Storage('container', sessionStorage);
+    const storage = new Storage('container', StorageType.SessionStorage);
 
     // Assert
     expect((storage as any)._storage).toBe(sessionStorage);
