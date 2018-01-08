@@ -3,6 +3,7 @@ const path = require('path');
 const DtsBundlePlugin = require('./generate-dts');
 const libraryName = 'OfficeHelpers';
 const fileName = 'office.helpers.js';
+const { version, name: companyName, license, author } = require('./package.json');
 
 module.exports = {
   entry: __dirname + '/src/index.ts',
@@ -46,6 +47,11 @@ module.exports = {
     extensions: ['.json', '.js', '.ts', '.html']
   },
   plugins: [
+    new webpack.BannerPlugin({
+      banner: `${companyName} v.${version}
+Copyright (c) ${author}. All rights reserved.
+Licensed under the ${license} license.`
+    }),
     new webpack.NamedModulesPlugin(),
     new DtsBundlePlugin()
   ]
