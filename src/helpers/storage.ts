@@ -68,13 +68,13 @@ export class Storage<T> {
    * @return {object} Returns an item if found.
    */
   get(key: string): T {
+    const scopedKey = this._scope(key);
+    const item = this._storage.getItem(scopedKey);
     try {
-      const scopedKey = this._scope(key);
-      const item = this._storage.getItem(scopedKey);
       return JSON.parse(item, this._reviver.bind(this));
     }
-    catch (error) {
-      throw new Exception(`Unable to deserialize value for: ${key} `, error);
+    catch (_error) {
+      return item as any;
     }
   }
 
