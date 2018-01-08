@@ -60,5 +60,4 @@ npm-debug.log
 dts/**
 dist/**
 config/**
-demo/**
 coverage/**

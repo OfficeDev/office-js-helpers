@@ -1,0 +1,74 @@
+<!doctype html>
+
+<html lang="en">
+
+<head>
+  <title>Office Helpers Demo</title>
+
+  <!-- Fabric for button styles -->
+  <link rel="stylesheet"
+        href="https://unpkg.com/office-ui-fabric-js@1.4.0/dist/css/fabric.min.css" />
+  <link rel="stylesheet"
+        href="https://unpkg.com/office-ui-fabric-js@1.4.0/dist/css/fabric.components.min.css" />
+
+  <!-- CSS styling -->
+  <style type="text/css">
+    #login-list {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
+    .login {
+      margin: 15px 4px;
+      width: 200px;
+    }
+
+    #output {
+      white-space: pre-line;
+      word-break: break-all;
+      width: calc(100% - 40px);
+      min-height: 150px;
+      background-color: #333;
+      color: #EFEFEF;
+      padding: 20px;
+    }
+  </style>
+</head>
+
+<body class="ms-font-m">
+  <h1 class="ms-font-su">Demo</h1>
+  <div id="login-list">
+    <h3 class="ms-font-l ms-fontWeight-semibold">Providers:</h3>
+
+    <!-- Login buttons-->
+    <button class="login ms-Button"
+            data-provider="Dropbox">
+      <span class="ms-Button-label">Sign into Dropbox</span>
+    </button>
+    <button class="login ms-Button"
+            data-provider="Microsoft">
+      <span class="ms-Button-label">Sign into Microsoft</span>
+    </button>
+
+    <!-- Output PRE -->
+    <h3 class="ms-font-l ms-fontWeight-semibold">Output:</h3>
+    <pre id="output"></pre>
+  </div>
+
+  <!-- JQuery library -->
+  <script src="https://unpkg.com/jquery@3.2.1/dist/jquery.js"></script>
+
+  <!-- SHIM library required by Office Helpers -->
+  <script src="https://unpkg.com/core-js@2.5.1/client/core.js"></script>
+
+  <!-- Office Helpers -->
+  <!-- Use local reference or latest version -->
+  <!-- <script src="https://unpkg.com/@microsoft/office-js-helpers/dist/office.helpers.js"></script> -->
+  <script src="../dist/office.helpers.js"></script>
+
+  <!-- Application Script -->
+  <script src="app.js"></script>
+</body>
+
+</html>
