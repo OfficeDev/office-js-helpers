@@ -37,21 +37,10 @@ describe('it storage creation', () => {
 
   it('switches to a different storage if storage type is passed', () => {
     // Setup
-    const storage = new Storage('container', StorageType.SessionStorage);
+    const storage = new Storage('container', sessionStorage);
 
     // Assert
     expect((storage as any)._storage).toBe(sessionStorage);
-  });
-
-  it('opens an existing container', () => {
-    // Setup
-    localStorage.clear();
-    localStorage.setItem('@container/item1', 'item1');
-    const storage = new Storage('container', StorageType.SessionStorage);
-
-    // Assert
-    expect(storage.get('item1')).toBe('item1');
-    expect(storage.count).toBe(1);
   });
 });
 
