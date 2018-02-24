@@ -9,7 +9,8 @@ const DATE_REGEX = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}Z$/;
 
 export enum StorageType {
   LocalStorage,
-  SessionStorage
+  SessionStorage,
+  InMemoryStorage
 }
 
 export interface Subscription {
@@ -52,7 +53,19 @@ export class Storage<T> {
    * @type {StorageType} type The desired storage to be used.
    */
   switchStorage(type: StorageType) {
-    this._storage = type === StorageType.LocalStorage ? window.localStorage : window.sessionStorage;
+    switch (type) {
+      case StorageType.LocalStorage:
+        this._storage = window.localStorage;
+        break;
+
+      case StorageType.SessionStorage:
+        this._storage = window.sessionStorage;
+        break;
+
+      case StorageType.InMemoryStorage:
+        this._storage = new InMemoryStorage() as any;
+        break;
+    }
     if (isNil(this._storage)) {
       throw new Exception('Browser local or session storage is not supported.');
     }
@@ -254,5 +267,49 @@ export class Storage<T> {
       return key;
     }
     return `@${this.container}/${key}`;
+  }
+}
+
+/**
+ * Creating a mock for folks who don't want to use localStorage.
+ * This will still allow them to use the APIs.
+*/
+class InMemoryStorage {
+  private _map: Map<string, string>;
+
+  constructor() {
+    console.warn(`Using non persistant storage. Data will be lost when browser is refreshed/closed`);
+    this._map = new Map();
+  }
+
+  get length(): number {
+    return this._map.size;
+  }
+
+  clear(): void {
+    this._map.clear();
+  }
+
+  getItem(key: string): string {
+    return this._map.get(key);
+  }
+
+  removeItem(key: string): boolean {
+    return this._map.delete(key);
+  }
+
+  setItem(key: string, data: string): void {
+    this._map.set(key, data);
+  }
+
+  key(index: number): string {
+    let result = undefined;
+    let ctr = 0;
+    this._map.forEach((_val, key) => {
+      if (++ctr === index) {
+        result = key;
+      }
+    });
+    return result;
   }
 }

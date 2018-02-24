@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { Storage } from '../helpers/storage';
+import { Storage, StorageType } from '../helpers/storage';
 
 export interface IToken {
   provider: string;
@@ -31,9 +31,9 @@ export interface IError {
 export class TokenStorage extends Storage<IToken> {
   /**
    * @constructor
-   */
-  constructor() {
-    super('OAuth2Tokens');
+  */
+  constructor(storageType = StorageType.LocalStorage) {
+    super('OAuth2Endpoints', storageType);
   }
 
   /**
