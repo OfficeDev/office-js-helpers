@@ -22,7 +22,7 @@
 
     // Create a new instance of Authenticator
     let authenticator = new OfficeHelpers.Authenticator();
-
+    
     // Register our providers accordingly
     authenticator.endpoints.registerMicrosoftAuth("f59e8034-6e3c-4ba6-9fb5-1342d27d0123");
     authenticator.endpoints.registerDropboxAuth("tkvf431lh8d9hci");

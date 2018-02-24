@@ -1,6 +1,6 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 import { Utilities } from '../helpers/utilities';
-import { Storage } from '../helpers/storage';
+import { Storage, StorageType } from '../helpers/storage';
 
 export const DefaultEndpoints = {
   Google: 'Google',
@@ -59,8 +59,8 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
   /**
    * @constructor
   */
-  constructor() {
-    super('OAuth2Endpoints');
+  constructor(storageType = StorageType.LocalStorage) {
+    super('OAuth2Endpoints', storageType);
   }
 
   /**
