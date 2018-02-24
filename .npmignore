@@ -1,8 +1,10 @@
 !dist/**
 !dts/**
+!demo/**
 src/**
 tests/**
 build/**
+coverage/**
 .gitattributes
 .gitignore
 .travis.yml
