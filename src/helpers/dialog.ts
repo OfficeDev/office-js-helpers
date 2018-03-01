@@ -87,7 +87,7 @@ export class Dialog<T> {
     return new Promise((resolve, reject) => {
       Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
         if (result.status === Office.AsyncResultStatus.Failed) {
-          throw new DialogError(result.error.message, result.error);
+		  reject(new DialogError(result.error.message, result.error));
         }
         else {
           let dialog = result.value as Office.DialogHandler;
