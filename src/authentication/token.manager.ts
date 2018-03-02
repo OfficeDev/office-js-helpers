@@ -33,7 +33,7 @@ export class TokenStorage extends Storage<IToken> {
    * @constructor
   */
   constructor(storageType = StorageType.LocalStorage) {
-    super('OAuth2Endpoints', storageType);
+    super('OAuth2Tokens', storageType);
   }
 
   /**
