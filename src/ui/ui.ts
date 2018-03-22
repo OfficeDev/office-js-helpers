@@ -42,6 +42,24 @@ export class UI {
    */
   static notify(error: Error, title: string);
 
+  /** Shows a basic notification at the top of the page
+   * @param message - The body of the notification
+   */
+  static notify(message: any);
+
+  /** Shows a basic notification with a custom title at the top of the page
+   * @param message - body of the notification
+   * @param title - title of the notification
+   */
+  static notify(message: any, title: string);
+
+  /** Shows a basic notification at the top of the page, with a background color set based on the type parameter
+   * @param message - body of the notification
+   * @param title - title of the notification
+   * @param type - type of the notification - see https://dev.office.com/fabric-js/Components/MessageBar/MessageBar.html#Variants
+   */
+  static notify(message: any, title: string, type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
+
   static notify(...args: any[]) {
     const params = _parseNotificationParams(args);
     if (params == null) {
@@ -151,7 +169,9 @@ export function _parseNotificationParams(params: any[]): IMessageBannerParams {
   }
   else {
     return {
-      type: 'default',
+      message: body.toString ? body.toString() : undefined,
+      title,
+      type: type || 'default',
       details: JSON.stringify(body, null, DEFAULT_WHITESPACE)
     };
   }

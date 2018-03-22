@@ -10,7 +10,6 @@ describe('_parseNotificationParams', () => {
     const messageText = 'Open the pod bay doors, HAL';
 
     let result = pnp([messageText]);
-    console.log(result);
     expect(result.message).toBe(messageText);
     expect(result.type).toBe('default');
 
@@ -25,5 +24,31 @@ describe('_parseNotificationParams', () => {
     const result = pnp([error]);
     expect(result.message).toBe(errorText);
     expect(result.type).toBe('error');
+  });
+
+  it('parses any', () => {
+    // Objects
+    const obj = { hello: 'world' };
+    let result = pnp([obj]);
+    expect(result.message).toBe(obj.toString());
+    expect(result.type).toBe('default');
+
+    // Numbers
+    result = pnp([5]);
+    expect(result.message).toBe((5).toString());
+    expect(result.type).toBe('default');
+
+    // With Title
+    const title = 'Untitled';
+    result = pnp([5, title]);
+    expect(result.message).toBe((5).toString());
+    expect(result.title).toBe(title);
+
+    // With Type
+    const type = 'success';
+    result = pnp([5, title, type]);
+    expect(result.message).toBe((5).toString());
+    expect(result.title).toBe(title);
+    expect(result.type).toBe(type);
   });
 });
