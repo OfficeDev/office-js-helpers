@@ -118,7 +118,7 @@ export class UI {
   }
 }
 
-function _parseNotificationParams(params: any[]): IMessageBannerParams {
+export function _parseNotificationParams(params: any[]): IMessageBannerParams {
   if (params == null) {
     return null;
   }
@@ -141,9 +141,9 @@ function _parseNotificationParams(params: any[]): IMessageBannerParams {
       details: details
     };
   }
-  else if (body instanceof String) {
+  else if (typeof body === 'string' || body instanceof String) {
     return {
-      message: body as string,
+      message: body.toString(),
       title,
       type: type || 'default',
       details: null

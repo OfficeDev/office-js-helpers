@@ -95,6 +95,9 @@
     "moduleFileExtensions": [
       "ts",
       "js"
-    ]
+    ],
+    "moduleNameMapper": {
+      "\\.html$": "<rootDir>/mocks/fileMock.js"
+    }
   }
 }
