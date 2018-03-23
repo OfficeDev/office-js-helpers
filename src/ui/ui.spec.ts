@@ -1,4 +1,5 @@
 import { _parseNotificationParams as pnp } from './ui';
+import stringify from '../util/stringify';
 
 describe('_parseNotificationParams', () => {
   it('returns null if given nothing', () => {
@@ -30,7 +31,7 @@ describe('_parseNotificationParams', () => {
     // Objects
     const obj = { hello: 'world' };
     let result = pnp([obj]);
-    expect(result.message).toBe(obj.toString());
+    expect(result.message).toBe(stringify(obj));
     expect(result.type).toBe('default');
 
     // Numbers
