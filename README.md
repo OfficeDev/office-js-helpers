@@ -1,9 +1,9 @@
 # Office JavaScript API Helpers
 
 [![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
-[![npm version](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers.svg)](https://img.shields.io/npm/v/@microsoft/office-js-helpers.svg)
+[![npm version](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
 [![dependencies](https://david-dm.org/officedev/office-js-helpers.svg)](https://david-dm.org/officedev/office-js-helpers)
-[![downloads](https://img.shields.io/npm/dt/@microsoft/office-js-helpers.svg)]()
+[![downloads](https://img.shields.io/npm/dt/@microsoft/office-js-helpers.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
 
 A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs. These helpers address features as Storage Management, Authentication, Dialogs and other helpful utilities etc.
 
