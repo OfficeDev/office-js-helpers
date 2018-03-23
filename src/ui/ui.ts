@@ -1,6 +1,7 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 import { Utilities, PlatformType } from '../helpers/utilities';
+import stringify from '../util/stringify';
 import html from './message-banner.html';
 
 const DEFAULT_WHITESPACE = 2;
@@ -159,20 +160,12 @@ export function _parseNotificationParams(params: any[]): IMessageBannerParams {
       details: details
     };
   }
-  else if (typeof body === 'string' || body instanceof String) {
+  else {
     return {
-      message: body.toString(),
+      message: stringify(body),
       title,
       type: type || 'default',
       details: null
-    };
-  }
-  else {
-    return {
-      message: body.toString ? body.toString() : undefined,
-      title,
-      type: type || 'default',
-      details: JSON.stringify(body, null, DEFAULT_WHITESPACE)
     };
   }
 }
