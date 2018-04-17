@@ -1,7 +1,7 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 import { Utilities, PlatformType } from '../helpers/utilities';
-import stringify from '../util/stringify';
+import { stringify } from '../util/stringify';
 import html from './message-banner.html';
 
 const DEFAULT_WHITESPACE = 2;

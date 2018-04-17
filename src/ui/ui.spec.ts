@@ -1,5 +1,5 @@
 import { _parseNotificationParams as pnp } from './ui';
-import stringify from '../util/stringify';
+import { stringify } from '../util/stringify';
 
 describe('_parseNotificationParams', () => {
   it('returns null if given nothing', () => {
