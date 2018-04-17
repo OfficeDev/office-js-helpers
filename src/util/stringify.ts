@@ -1,4 +1,4 @@
-export default function stringify(value: any): string {
+export function stringify(value: any): string {
   // JSON.stringify of undefined will return undefined rather than 'undefined'
   if (value === undefined) {
     return 'undefined';
