@@ -1,5 +1,5 @@
-import { _parseNotificationParams as pnp } from './ui';
-import { stringify } from '../util/stringify';
+import { parseNotificationParams as pnp } from './ui';
+import { Utilities } from '../helpers/utilities';
 
 describe('_parseNotificationParams', () => {
   it('returns null if given nothing', () => {
@@ -14,12 +14,12 @@ describe('_parseNotificationParams', () => {
     expect(result.message).toBe(messageText);
     expect(result.type).toBe('default');
 
-    result = pnp([new String(messageText)]);
+    result = pnp([messageText]);
     expect(result.message).toBe(messageText);
   });
 
   it('parses errors', () => {
-    const errorText = `I'm sorry, Dave. I'm afraid I can't do that.`
+    const errorText = `I'm sorry, Dave. I'm afraid I can't do that.`;
     const error = new Error(errorText);
 
     const result = pnp([error]);
@@ -31,7 +31,7 @@ describe('_parseNotificationParams', () => {
     // Objects
     const obj = { hello: 'world' };
     let result = pnp([obj]);
-    expect(result.message).toBe(stringify(obj));
+    expect(result.message).toBe(Utilities.stringify(obj));
     expect(result.type).toBe('default');
 
     // Numbers

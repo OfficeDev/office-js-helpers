@@ -1,7 +1,6 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 import { Utilities, PlatformType } from '../helpers/utilities';
-import { stringify } from '../util/stringify';
 import html from './message-banner.html';
 
 const DEFAULT_WHITESPACE = 2;
@@ -62,7 +61,7 @@ export class UI {
   static notify(message: any, title: string, type: 'default' | 'success' | 'error' | 'warning' | 'severe-warning');
 
   static notify(...args: any[]) {
-    const params = _parseNotificationParams(args);
+    const params = parseNotificationParams(args);
     if (params == null) {
       console.error(new Error('Invalid params. Cannot create a notification'));
       return null;
@@ -137,7 +136,7 @@ export class UI {
   }
 }
 
-export function _parseNotificationParams(params: any[]): IMessageBannerParams {
+export function parseNotificationParams(params: any[]): IMessageBannerParams {
   if (params == null) {
     return null;
   }
@@ -162,7 +161,7 @@ export function _parseNotificationParams(params: any[]): IMessageBannerParams {
   }
   else {
     return {
-      message: stringify(body),
+      message: Utilities.stringify(body),
       title,
       type: type || 'default',
       details: null
