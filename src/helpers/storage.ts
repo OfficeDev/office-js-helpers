@@ -1,7 +1,10 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
-import { debounce, isEmpty, isString, isNil } from 'lodash-es';
-import { Observable } from 'rxjs/Observable';
+import debounce from 'lodash-es/debounce';
+import isEmpty from 'lodash-es/isEmpty';
+import isString from 'lodash-es/isString';
+import isNil from 'lodash-es/isNil';
+import { Observable } from 'rxjs';
 import { Exception } from '../errors/exception';
 
 const NOTIFICATION_DEBOUNCE = 300;

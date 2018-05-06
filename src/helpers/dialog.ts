@@ -2,6 +2,7 @@
 
 import { Utilities } from './utilities';
 import { CustomError } from '../errors/custom.error';
+import * as microsoftTeams from '@microsoft/teams-js';
 
 interface DialogResult {
   parse: boolean,
