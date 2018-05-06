@@ -41,7 +41,7 @@ export class TokenStorage extends Storage<IToken> {
    */
   static setExpiry(token: IToken) {
     let expire = seconds => seconds == null ? null : new Date(new Date().getTime() + ~~seconds * 1000);
-    if (!(token == null) && token.expires_at == null) {
+    if (!(token == null) && token.expires_at == null && token.expires_in) {
       token.expires_at = expire(token.expires_in);
     }
   }
@@ -53,14 +53,12 @@ export class TokenStorage extends Storage<IToken> {
     if (token == null) {
       return true;
     }
-    if (token.expires_at == null) {
-      return false;
-    }
-    else {
+    else if (token.expires_at) {
       // If the token was stored, it's Date type property was stringified, so it needs to be converted back to Date.
       token.expires_at = token.expires_at instanceof Date ? token.expires_at : new Date(token.expires_at as any);
       return token.expires_at.getTime() - new Date().getTime() < 0;
     }
+    return false;
   }
 
   /**

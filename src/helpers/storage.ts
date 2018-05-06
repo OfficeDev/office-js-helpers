@@ -1,10 +1,15 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
-
-import debounce from 'lodash-es/debounce';
 import isEmpty from 'lodash-es/isEmpty';
 import isString from 'lodash-es/isString';
 import isNil from 'lodash-es/isNil';
-import { Observable } from 'rxjs';
+import { Observable } from 'rxjs/observable';
+import { fromEvent } from 'rxjs/observable/fromEvent';
+import { timer } from 'rxjs/observable/timer';
+import { empty } from 'rxjs/observable/empty';
+import { debounce } from 'rxjs/operators/debounce';
+import { map } from 'rxjs/operators/map';
+import { filter } from 'rxjs/operators/filter';
+import { catchError } from 'rxjs/operators/catchError';
 import { Exception } from '../errors/exception';
 
 const NOTIFICATION_DEBOUNCE = 300;
@@ -32,7 +37,7 @@ export interface Subscription {
  */
 export class Storage<T> {
   private _storage: typeof localStorage | typeof sessionStorage;
-  private _observable: Observable<string> = null;
+  private _storageEvents$: Observable<string> = null;
   private _containerRegex: RegExp = null;
 
   /**
@@ -212,35 +217,22 @@ export class Storage<T> {
    * or if the collection is modified in a different tab.
    */
   notify(next: () => void, error?: (error: any) => void, complete?: () => void): Subscription {
-    if (!(this._observable == null)) {
-      return this._observable.subscribe(next, error, complete);
+    if (!(this._storageEvents$ == null)) {
+      return this._storageEvents$.subscribe(next, error, complete);
     }
 
-    this._observable = new Observable<string>((observer) => {
-      // Debounced listener to storage events
-      let debouncedUpdate = debounce((event: StorageEvent) => {
-        try {
-          // If the change is on the current container
-          if (this._containerRegex.test(event.key)) {
-            // Notify the listener of the change
-            observer.next(event.key);
-          }
-        }
-        catch (e) {
-          observer.error(e);
-        }
-      }, NOTIFICATION_DEBOUNCE);
+    this._storageEvents$ = fromEvent(window, 'storage', { passive: true })
+      .pipe(
+        debounce(() => timer(NOTIFICATION_DEBOUNCE)),
+        filter((event: StorageEvent) => this._containerRegex.test(event.key)),
+        map(event => event.key),
+        catchError(() => {
+          this._storageEvents$ = null;
+          return empty<string>();
+        })
+      );
 
-      window.addEventListener('storage', debouncedUpdate, false);
-
-      // Teardown
-      return () => {
-        window.removeEventListener('storage', debouncedUpdate, false);
-        this._observable = null;
-      };
-    });
-
-    return this._observable.subscribe(next, error, complete);
+    return this._storageEvents$.subscribe(next, error, complete);
   }
 
   private _validateKey(key: string): void {

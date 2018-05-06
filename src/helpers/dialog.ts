@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
+/// <reference types="@microsoft/teams-js" />
 
 import { Utilities } from './utilities';
 import { CustomError } from '../errors/custom.error';
-import * as microsoftTeams from '@microsoft/teams-js';
 
 interface DialogResult {
   parse: boolean,
