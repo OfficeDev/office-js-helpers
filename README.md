@@ -14,6 +14,8 @@ The current version includes the following helpers:
 - Storage Helpers
 - Dictionary
 
+> **Please tag @casieber/@Zlatkovsky on issues.**
+
 ## Getting Started
 
 ### Installation
