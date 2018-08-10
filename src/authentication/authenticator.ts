@@ -85,7 +85,7 @@ export class Authenticator {
   static isAuthDialog(useMicrosoftTeams: boolean = false): boolean {
     // If the url doesn't contain and access_token, code or error then return false.
     // This is in scenarios where we don't want to automatically control what happens to the dialog.
-    if (!/(access_token|code|error|state)/gi.test(location.href)) {
+    if (!/(access_token|id_token|code|error|state)/gi.test(location.href)) {
       return false;
     }
 
