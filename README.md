@@ -168,7 +168,7 @@ authenticator
     .then(function (token) { /* Facebook Token */ })
     .catch(OfficeHelpers.Utilities.log);
 ```
-If the user, rejects the grant to the application then you will receive an error in the `catch` function.
+If the user rejects the grant to the application then you will receive an error in the `catch` function.
 
 #### Getting a cached token
 By default the tokens are cached to the LocalStorage and upon expiry the AuthDialog is invoked again. You can also pass the `force` parameter as `true` as the second input to `authenticator.authenticate()` to re-authenticate the user.
