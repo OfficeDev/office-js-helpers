@@ -193,7 +193,7 @@ authenticator
     .catch(OfficeHelpers.Utilities.log);
 
 // get the cached token if any. returns null otherwise.
-var token = authenticator.tokens.get('name of endpoint');
+var token = authenticator.tokens.getValidToken('name of endpoint');
 ```
 If a cached token expires, then the dialog is automatically launched to re-authenticate the user.
 > Note on Refresh Tokens: By default, Implicit OAuth does not support Token Refresh as a security measure. This is because Access Tokens cannot be securely stored inside of a JavaScript client.
