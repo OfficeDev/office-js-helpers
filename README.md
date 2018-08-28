@@ -126,7 +126,7 @@ authenticator.endpoints.registerGoogleAuth('client id here');
 authenticator.endpoints.registerFacebookAuth('client id here');
 
 // register any 3rd-Party OAuth Implicit Provider using
-authenticator.endpoints.add('Name of provider', { /* Endpoint Configuration */ })
+authenticator.endpoints.add('Name of provider', { /* Endpoint Configuration - see office-js-helpers/src/authentication/endpoint.manager.ts */ })
 
 // register Microsoft endpoint by overriding default values
 authenticator.endpoints.registerMicrosoftAuth('client id here', {
