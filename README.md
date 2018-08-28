@@ -37,7 +37,7 @@ You can also get the latest version from the [releases](https://github.com/Offic
 
 ### JavaScript
 
-Reference the library inside of your `.html` page using:
+Reference the library inside of your `.html` page using one of the following:
 ```html
 <!-- Office.js -->
 <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
@@ -61,7 +61,7 @@ Reference the library inside of your `.html` page using:
 
 > We will publish to DefinitelyTyped soon and then you can directly use `typings` to get access to the definitions.
 
-**If you are using any dependency loader** such as [RequireJS](http://requirejs.org/) or [SystemJS](https://github.com/systemjs/systemjs) or module bundler such as [browserify](http://browserify.org/), [webpack](https://webpack.github.io/), you can use TypeScript `import` syntax to import specific modules. For e.g.
+**If you are using any dependency loader** such as [RequireJS](http://requirejs.org/) or [SystemJS](https://github.com/systemjs/systemjs) or module bundler such as [browserify](http://browserify.org/), [webpack](https://webpack.github.io/), you can use TypeScript `import` syntax to import specific modules. For example, one of the following:
 
 ```typescript
 import * as OfficeHelpers from '@microsoft/office-js-helpers';
@@ -112,7 +112,11 @@ Create a new instance of `Authenticator` and register the endpoints. An endpoint
 
 ```javascript
 var authenticator = new OfficeHelpers.Authenticator();
+```
 
+Then use one of the following:
+
+```javascript
 // register Microsoft (Azure AD 2.0 Converged auth) endpoint using
 authenticator.endpoints.registerMicrosoftAuth('client id here');
 
@@ -126,7 +130,7 @@ authenticator.endpoints.registerGoogleAuth('client id here');
 authenticator.endpoints.registerFacebookAuth('client id here');
 
 // register any 3rd-Party OAuth Implicit Provider using
-authenticator.endpoints.add('Name of provider', { /* Endpoint Configuration */ })
+authenticator.endpoints.add('Name of provider', { /* Endpoint Configuration - see office-js-helpers/src/authentication/endpoint.manager.ts */ })
 
 // register Microsoft endpoint by overriding default values
 authenticator.endpoints.registerMicrosoftAuth('client id here', {
@@ -136,7 +140,7 @@ authenticator.endpoints.registerMicrosoftAuth('client id here', {
 ```
 
 #### Authentication
-To authenticate against the registered endpoint, do the following:
+To authenticate against the registered endpoint, do one of the following:
 
 ```javascript
 authenticator
