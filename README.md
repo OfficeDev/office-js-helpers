@@ -37,14 +37,17 @@ You can also get the latest version from the [releases](https://github.com/Offic
 
 ### JavaScript
 
-Reference the library inside of your `.html` page using one of the following:
+Ensure that the Office.js file is loaded inside of your `.html` page using:
 ```html
 <!-- Office.js -->
 <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
 <!-- ES6 Shim of your choice -->
 <script src="https://unpkg.com/core-js/client/core.min.js"></script>
+```
 
+Then reference the helpers library using one of the following:
+```html
 <!-- Office JavaScript API Helpers (via CDN) -->
 <script src="https://unpkg.com/@microsoft/office-js-helpers@1.0.0/dist/office.helpers.min.js"></script>
 
