@@ -64,29 +64,6 @@ export class TokenStorage extends Storage<IToken> {
   }
 
   /**
-   * Extends Storage's default get method
-   * Gets an OAuth Token after checking its expiry
-   *
-   * @param {string} provider Unique name of the corresponding OAuth Token.
-   * @return {object} Returns the token or null if its either expired or doesn't exist.
-   */
-  get(provider: string): IToken {
-    let token = super.get(provider);
-    if (token == null) {
-      return token;
-    }
-
-    let expired = TokenStorage.hasExpired(token);
-    if (expired) {
-      super.delete(provider);
-      return null;
-    }
-    else {
-      return token;
-    }
-  }
-
-  /**
    * Extends Storage's default add method
    * Adds a new OAuth Token after settings its expiry
    *
