@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license.
 
-import { EndpointStorage, IEndpointConfiguration } from './endpoint.manager';
-import { TokenStorage, IToken, ICode, IError } from './token.manager';
-import { Dialog } from '../helpers/dialog';
-import { CustomError } from '../errors/custom.error';
+import { EndpointStorage, IEndpointConfiguration } from "./endpoint.manager";
+import { TokenStorage, IToken, ICode, IError } from "./token.manager";
+import { Dialog } from "../helpers/dialog";
+import { CustomError } from "../errors/custom.error";
 
 /**
  * Custom error type to handle OAuth specific errors.
@@ -14,9 +14,9 @@ export class AuthError extends CustomError {
    *
    * @param message Error message to be propagated.
    * @param state OAuth state if available.
-  */
+   */
   constructor(message: string, public innerError?: Error) {
-    super('AuthError', message, innerError);
+    super("AuthError", message, innerError);
   }
 }
 
@@ -29,7 +29,7 @@ export class Authenticator {
    *
    * @param endpoints Depends on an instance of EndpointStorage.
    * @param tokens Depends on an instance of TokenStorage.
-  */
+   */
   constructor(
     public endpoints?: EndpointStorage,
     public tokens?: TokenStorage
@@ -101,46 +101,55 @@ export class Authenticator {
    * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
    * @return {object} Returns the extracted token.
    */
-  static getUrlParams(url: string = location.href, exclude: string = location.origin, delimiter: string = '#'): ICode | IToken | IError {
+  static getUrlParams(
+    url: string = location.href,
+    exclude: string = location.origin,
+    delimiter: string = "#"
+  ): ICode | IToken | IError {
     if (exclude) {
-      url = url.replace(exclude, '');
+      url = url.replace(exclude, "");
     }
 
     let [left, right] = url.split(delimiter);
     let tokenString = right == null ? left : right;
 
-    if (tokenString.indexOf('?') !== -1) {
-      tokenString = tokenString.split('?')[1];
+    if (tokenString.indexOf("?") !== -1) {
+      tokenString = tokenString.split("?")[1];
     }
 
     return Authenticator.extractParams(tokenString);
   }
 
   static extractParams(segment: string): any {
-    if (segment == null || segment.trim() === '') {
+    if (segment == null || segment.trim() === "") {
       return null;
     }
 
     let params: any = {};
-    let regex = /([^&=]+)=([^&]*)/g;
+    let regex = /[\/]?([^&=]+)=([^&]*)/g;
     let matchParts;
 
     while ((matchParts = regex.exec(segment)) !== null) {
-      // Fixes bugs when the state parameters contains a / before them
-      if (matchParts[1] === '/state') {
-        matchParts[1] = matchParts[1].replace('/', '');
-      }
-      params[decodeURIComponent(matchParts[1])] = decodeURIComponent(matchParts[2]);
+      params[decodeURIComponent(matchParts[1])] = decodeURIComponent(
+        matchParts[2]
+      );
     }
 
     return params;
   }
 
-  private async _openAuthDialog(provider: string, useMicrosoftTeams: boolean): Promise<IToken> {
+  private async _openAuthDialog(
+    provider: string,
+    useMicrosoftTeams: boolean
+  ): Promise<IToken> {
     // Get the endpoint configuration for the given provider and verify that it exists.
     let endpoint = this.endpoints.get(provider);
     if (endpoint == null) {
-      return Promise.reject(new AuthError(`No such registered endpoint: ${provider} could be found.`)) as any;
+      return Promise.reject(
+        new AuthError(
+          `No such registered endpoint: ${provider} could be found.`
+        )
+      ) as any;
     }
 
     // Set the authentication state to redirect and begin the auth flow.
@@ -148,7 +157,12 @@ export class Authenticator {
 
     // Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
     // url where we expect the call to isAuthDialog to be available.
-    let redirectUrl = await new Dialog<string>(url, 1024, 768, useMicrosoftTeams).result;
+    let redirectUrl = await new Dialog<string>(
+      url,
+      1024,
+      768,
+      useMicrosoftTeams
+    ).result;
 
     // Try and extract the result and pass it along.
     return this._handleTokenResult(redirectUrl, endpoint, state);
@@ -166,50 +180,57 @@ export class Authenticator {
    * @param {object} headers Headers to be sent to the tokenUrl.     *
    * @return {Promise<IToken>} Returns a promise of the token or error.
    */
-  private _exchangeCodeForToken(endpoint: IEndpointConfiguration, data: any, headers?: any): Promise<IToken> {
+  private _exchangeCodeForToken(
+    endpoint: IEndpointConfiguration,
+    data: any,
+    headers?: any
+  ): Promise<IToken> {
     return new Promise((resolve, reject) => {
       if (endpoint.tokenUrl == null) {
-        console.warn('We couldn\'t exchange the received code for an access_token. The value returned is not an access_token. Please set the tokenUrl property or refer to our docs.');
+        console.warn(
+          "We couldn't exchange the received code for an access_token. The value returned is not an access_token. Please set the tokenUrl property or refer to our docs."
+        );
         return resolve(data);
       }
 
       let xhr = new XMLHttpRequest();
-      xhr.open('POST', endpoint.tokenUrl);
+      xhr.open("POST", endpoint.tokenUrl);
 
-      xhr.setRequestHeader('Accept', 'application/json');
-      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.setRequestHeader("Accept", "application/json");
+      xhr.setRequestHeader("Content-Type", "application/json");
 
       for (let header in headers) {
-        if (header === 'Accept' || header === 'Content-Type') {
+        if (header === "Accept" || header === "Content-Type") {
           continue;
         }
 
         xhr.setRequestHeader(header, headers[header]);
       }
 
-      xhr.onerror = () => reject(new AuthError('Unable to send request due to a Network error'));
+      xhr.onerror = () =>
+        reject(new AuthError("Unable to send request due to a Network error"));
 
       xhr.onload = () => {
         try {
           if (xhr.status === 200) {
             let json = JSON.parse(xhr.responseText);
             if (json == null) {
-              return reject(new AuthError('No access_token or code could be parsed.'));
-            }
-            else if ('access_token' in json) {
+              return reject(
+                new AuthError("No access_token or code could be parsed.")
+              );
+            } else if ("access_token" in json) {
               this.tokens.add(endpoint.provider, json);
               return resolve(json as IToken);
-            }
-            else {
+            } else {
               return reject(new AuthError(json.error, json.state));
             }
+          } else if (xhr.status !== 200) {
+            return reject(new AuthError("Request failed. " + xhr.response));
           }
-          else if (xhr.status !== 200) {
-            return reject(new AuthError('Request failed. ' + xhr.response));
-          }
-        }
-        catch (e) {
-          return reject(new AuthError('An error occured while parsing the response'));
+        } catch (e) {
+          return reject(
+            new AuthError("An error occured while parsing the response")
+          );
         }
       };
 
@@ -217,21 +238,21 @@ export class Authenticator {
     });
   }
 
-  private _handleTokenResult(redirectUrl: string, endpoint: IEndpointConfiguration, state: number) {
+  private _handleTokenResult(
+    redirectUrl: string,
+    endpoint: IEndpointConfiguration,
+    state: number
+  ) {
     let result = Authenticator.getUrlParams(redirectUrl, endpoint.redirectUrl);
     if (result == null) {
-      throw new AuthError('No access_token or code could be parsed.');
-    }
-    else if (endpoint.state && +result.state !== state) {
-      throw new AuthError('State couldn\'t be verified');
-    }
-    else if ('code' in result) {
+      throw new AuthError("No access_token or code could be parsed.");
+    } else if (endpoint.state && +result.state !== state) {
+      throw new AuthError("State couldn't be verified");
+    } else if ("code" in result) {
       return this._exchangeCodeForToken(endpoint, result as ICode);
-    }
-    else if ('access_token' in result) {
+    } else if ("access_token" in result) {
       return this.tokens.add(endpoint.provider, result as IToken);
-    }
-    else {
+    } else {
       throw new AuthError((result as IError).error);
     }
   }
