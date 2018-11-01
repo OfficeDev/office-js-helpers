@@ -44,8 +44,8 @@ export class Authenticator {
 
   /**
    * Authenticate based on the given provider.
-   * Either uses DialogAPI or Window Popups based on where its being called from either Add-in or Web.
-   * If the token was cached, the it retrieves the cached token.
+   * Either uses DialogAPI or Window Popups based on where it's being called from (either Add-in or Web).
+   * If the token was cached, then it retrieves the cached token.
    * If the cached token has expired then the authentication dialog is displayed.
    *
    * NOTE: you have to manually check the expires_in or expires_at property to determine
@@ -53,7 +53,7 @@ export class Authenticator {
    *
    * @param {string} provider Link to the provider.
    * @param {boolean} force Force re-authentication.
-   * @return {Promise<IToken|ICode>} Returns a promise of the token or code or error.
+   * @return {Promise<IToken|ICode>} Returns a promise of the token, code, or error.
    */
   authenticate(
     provider: string,
@@ -71,7 +71,7 @@ export class Authenticator {
   }
 
   /**
-   * Check if the currrent url is running inside of a Dialog that contains an access_token or code or error.
+   * Check if the current url is running inside of a Dialog that contains an access_token, code, or error.
    * If true then it calls messageParent by extracting the token information, thereby closing the dialog.
    * Otherwise, the caller should proceed with normal initialization of their application.
    *
@@ -83,7 +83,7 @@ export class Authenticator {
    * or is not running inside of a dialog at all.
    */
   static isAuthDialog(useMicrosoftTeams: boolean = false): boolean {
-    // If the url doesn't contain and access_token, code or error then return false.
+    // If the url doesn't contain an access_token, code, or error then return false.
     // This is in scenarios where we don't want to automatically control what happens to the dialog.
     if (!/(access_token|code|error|state)/gi.test(location.href)) {
       return false;
@@ -97,7 +97,7 @@ export class Authenticator {
    * Extract the token from the URL
    *
    * @param {string} url The url to extract the token from.
-   * @param {string} exclude Exclude a particlaur string from the url, such as a query param or specific substring.
+   * @param {string} exclude Exclude a particular string from the url, such as a query param or specific substring.
    * @param {string} delimiter[optional] Delimiter used by OAuth provider to mark the beginning of token response. Defaults to #.
    * @return {object} Returns the extracted token.
    */
@@ -146,7 +146,7 @@ export class Authenticator {
     // Set the authentication state to redirect and begin the auth flow.
     let { state, url } = EndpointStorage.getLoginParams(endpoint);
 
-    // Launch the dialog and perform the OAuth flow. We Launch the dialog at the redirect
+    // Launch the dialog and perform the OAuth flow. We launch the dialog at the redirect
     // url where we expect the call to isAuthDialog to be available.
     let redirectUrl = await new Dialog<string>(url, 1024, 768, useMicrosoftTeams).result;
 
@@ -163,7 +163,7 @@ export class Authenticator {
    *
    * @param {Endpoint} endpoint Endpoint configuration.
    * @param {object} data Data to be sent to the tokenUrl.
-   * @param {object} headers Headers to be sent to the tokenUrl.     *
+   * @param {object} headers Headers to be sent to the tokenUrl.
    * @return {Promise<IToken>} Returns a promise of the token or error.
    */
   private _exchangeCodeForToken(endpoint: IEndpointConfiguration, data: any, headers?: any): Promise<IToken> {
@@ -209,7 +209,7 @@ export class Authenticator {
           }
         }
         catch (e) {
-          return reject(new AuthError('An error occured while parsing the response'));
+          return reject(new AuthError('An error occurred while parsing the response'));
         }
       };
 
