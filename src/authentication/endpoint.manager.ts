@@ -35,7 +35,7 @@ export interface IEndpointConfiguration {
   // Registered OAuth scope.
   scope?: string;
 
-  // Resource paramater for the OAuth provider.
+  // Resource parameter for the OAuth provider.
   resource?: string;
 
   // Automatically generate a state? defaults to false.

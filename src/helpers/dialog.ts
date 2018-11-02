@@ -138,7 +138,7 @@ export class Dialog<T> {
         }
       }
       catch (exception) {
-        return reject(new DialogError('Unexpected error occured while creating popup', exception));
+        return reject(new DialogError('Unexpected error occurred while creating popup', exception));
       }
     });
   }
@@ -158,7 +158,7 @@ export class Dialog<T> {
       catch (exception) {
         clearInterval(interval);
         localStorage.removeItem(Dialog.key);
-        return reject(new DialogError('Unexpected error occured in the dialog', exception));
+        return reject(new DialogError('Unexpected error occurred in the dialog', exception));
       }
     }, POLL_INTERVAL);
   }
@@ -166,7 +166,7 @@ export class Dialog<T> {
   /**
    * Close any open dialog by providing an optional message.
    * If more than one dialogs are attempted to be opened
-   * an expcetion will be created.
+   * an exception will be created.
    */
   static close(message?: any, useTeamsDialog: boolean = false) {
     let parse = false;
