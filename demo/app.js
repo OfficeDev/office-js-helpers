@@ -38,7 +38,7 @@
       // Authenticate with the chosen provider
       authenticator.authenticate(provider, true /* setting the force to true, always re-authenticates. This is just for demo purposes */)
         .then(function (token) {
-          // Consume the acess token
+          // Consume the access token
           output.text(prettify(token));
         })
         .catch(function (error) {
