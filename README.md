@@ -14,7 +14,7 @@ The current version includes the following helpers:
 - Storage Helpers
 - Dictionary
 
-> **Please tag @casieber/@Zlatkovsky on issues.**
+> **Please tag @sumurthy/@loumm on issues.**
 
 ## Getting Started
 
