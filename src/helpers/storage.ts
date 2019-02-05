@@ -150,7 +150,7 @@ export class Storage<T> {
    */
   has(key: string): boolean {
     this._validateKey(key);
-    return this.get(key) !== undefined;
+    return this.get(key) !== null;
   }
 
   /**
