@@ -123,7 +123,7 @@ export class Storage<T> {
   delete(key: string): T {
     try {
       let value = this.get(key);
-      if (value === null) {
+      if (value === null || value === undefined) {
         throw new ReferenceError(`Key: ${key} not found.`);
       }
       const scopedKey = this._scope(key);
@@ -150,7 +150,8 @@ export class Storage<T> {
    */
   has(key: string): boolean {
     this._validateKey(key);
-    return this.get(key) !== null;
+    let value = this.get(key);
+    return value !== null && value !== undefined;
   }
 
   /**
