@@ -1,3 +1,13 @@
+---
+topic: sample
+products:
+- Office 365
+languages:
+- TypeScript
+extensions:
+  contentType: samples
+  createdDate: 9/6/2016 11:04:28 AM
+---
 # Office JavaScript API Helpers
 
 [![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
