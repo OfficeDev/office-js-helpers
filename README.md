@@ -100,15 +100,15 @@ The Authentication helper is built for standards compliant OAuth Implicit Flow. 
 You need to meet the following requirements before you are able to successfully to use the Authenticator inside of Office Add-ins.
 
 1. You need to use `https`. This is important as we are using OAuth Implicit Flow and it is critical to secure the communication over the wire.
-2. Add the location of the provider in your `AppDomains`, example:
+2. Add the location of the provider in the [AppDomains](https://docs.microsoft.com/office/dev/add-ins/reference/manifest/appdomains) section of your add-in's manifest, as shown in the following example:
 
 ```xml
     <AppDomain>https://login.windows.net</AppDomain>
     <AppDomain>https://login.microsoftonline.com</AppDomain>
 ```
 
-#### Setup
-Inside of your `Office.initialize` function add the following check:
+#### Setup the authenticator
+Inside of your [Office.initialize](https://docs.microsoft.com/office/dev/add-ins/develop/understanding-the-javascript-api-for-office#initialize-with-officeinitialize) function add the following check:
 
 ```javascript
 if (OfficeHelpers.Authenticator.isAuthDialog()) return;
@@ -120,7 +120,7 @@ This to inform the Authenticator to automatically close the authentication dialo
 
 > Note: If using in an **AngularJS/Angular/React project** - please take a look https://github.com/OfficeDev/office-js-helpers/issues/19 for information around bootstrapping your application correctly.
 
-#### Initialize
+#### Initialize the authenticator
 Create a new instance of `Authenticator` and register the endpoints. An endpoint corresponds to a service that allows the user to authenticate with.
 
 ```javascript
