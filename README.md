@@ -92,7 +92,7 @@ import {Authenticator} from '@microsoft/office-js-helpers';
 
 The Authentication helper is built for standards compliant OAuth Implicit Flow. Out of the box it directly integrates with Microsoft, AzureAD, Google, and Facebook authentication.
 
-> Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School or Personal accounts.
+> Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School, or Personal accounts.
 
 > **Note on MSAL**: This helper isn't a replacement for MSAL. When MSAL for JavaScript is released publicly, the helper will use MSAL.
 
