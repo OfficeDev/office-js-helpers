@@ -100,7 +100,7 @@ The Authentication helper is built for standards compliant OAuth Implicit Flow. 
 You need to meet the following requirements before you are able to successfully to use the Authenticator inside of Office Add-ins.
 
 1. You need to use `https`. This is important as we are using OAuth Implicit Flow and it is critical to secure the communication over the wire.
-2. Add the location of the provider in your `AppDomains`, example:
+2. Add the location of the provider in the [AppDomains](https://docs.microsoft.com/office/dev/add-ins/reference/manifest/appdomains) section of your manifest, as shown in the following example.
 
 ```xml
     <AppDomain>https://login.windows.net</AppDomain>
