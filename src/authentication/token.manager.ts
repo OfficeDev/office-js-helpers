@@ -70,7 +70,7 @@ export class TokenStorage extends Storage<IToken> {
    * @param {string} provider Unique name of the corresponding OAuth Token.
    * @return {object} Returns the token or null if its either expired or doesn't exist.
    */
-  get(provider: string): IToken {
+  getValidToken(provider: string): IToken {
     let token = super.get(provider);
     if (token == null) {
       return token;
