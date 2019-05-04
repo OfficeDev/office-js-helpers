@@ -30,6 +30,7 @@
     "@types/microsoftteams": "^1.2.1",
     "@types/office-js": "^0.0.51",
     "core-js": "^2.5.3",
+    "localforage": "^1.7.3",
     "lodash-es": "^4.17.5",
     "rxjs": "^5.5.6"
   },

@@ -2,6 +2,7 @@
 
 import { Utilities } from './utilities';
 import { CustomError } from '../errors/custom.error';
+import localForage from 'localforage';
 
 interface DialogResult {
   parse: boolean,
@@ -144,23 +145,24 @@ export class Dialog<T> {
   }
 
   private _pollLocalStorageForToken(resolve: (value: T) => void, reject: (reason: DialogError) => void) {
-    localStorage.removeItem(Dialog.key);
-    const POLL_INTERVAL = 400;
-    let interval = setInterval(() => {
-      try {
-        const data = localStorage.getItem(Dialog.key);
-        if (!(data == null)) {
+    localForage.removeItem(Dialog.key).then(() => {
+      const POLL_INTERVAL = 400;
+      let interval = setInterval(() => {
+        localForage.getItem<string>(Dialog.key).then((data) => {
+          if (!(data == null)) {
+            clearInterval(interval);
+            localForage.removeItem(Dialog.key);
+            return resolve(this._safeParse(data));
+          }
+        }).catch((exception) => {
           clearInterval(interval);
-          localStorage.removeItem(Dialog.key);
-          return resolve(this._safeParse(data));
-        }
-      }
-      catch (exception) {
-        clearInterval(interval);
-        localStorage.removeItem(Dialog.key);
-        return reject(new DialogError('Unexpected error occurred in the dialog', exception));
-      }
-    }, POLL_INTERVAL);
+          localForage.removeItem(Dialog.key);
+          return reject(new DialogError('Unexpected error occurred in the dialog', exception));
+        });
+      }, POLL_INTERVAL);
+    }).catch((exception) => {
+      return reject(new DialogError('Unexpected error occurred in the dialog', exception));
+    });
   }
 
   /**
@@ -190,7 +192,7 @@ export class Dialog<T> {
       }
       else {
         if (Utilities.isIEOrEdge) {
-          localStorage.setItem(Dialog.key, JSON.stringify(<DialogResult>{ parse, value }));
+          localForage.setItem(Dialog.key, JSON.stringify(<DialogResult>{ parse, value }));
         }
         else if (window.opener) {
           window.opener.postMessage(JSON.stringify(<DialogResult>{ parse, value }), location.origin);
