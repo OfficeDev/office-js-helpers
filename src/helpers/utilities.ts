@@ -45,7 +45,13 @@ function getHostInfo(): {
   // when queried from within an add-in.
   // If the platform already exposes that info, then just return it
   // (but only after massaging it to fit the return types expected by this function)
-  const context: IContext = ((window as any).Office && (window as any).Office.context) || useHostInfoFallbackLogic();
+  const isHostExposedNatively =
+    (window as any).Office &&
+    (window as any).Office.context &&
+    (window as any).Office.context.host;
+  const context: IContext = isHostExposedNatively
+    ? (window as any).Office.context
+    : useHostInfoFallbackLogic();
   return {
     host: convertHostValue(context.host),
     platform: convertPlatformValue(context.platform)
