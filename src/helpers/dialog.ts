@@ -125,8 +125,11 @@ export class Dialog<T> {
       try {
         const options = 'width=' + this.size.width + ',height=' + this.size.height + this._windowFeatures;
         window.open(this.url, this.url, options);
-        if (Utilities.isIEOrEdge) {
+        if (Utilities.isIE) {
           this._pollLocalStorageForToken(resolve, reject);
+        }
+        else if (Utilities.isEdge) {
+          this._pollLocalForageForToken(resolve, reject);
         }
         else {
           const handler = event => {
@@ -145,6 +148,26 @@ export class Dialog<T> {
   }
 
   private _pollLocalStorageForToken(resolve: (value: T) => void, reject: (reason: DialogError) => void) {
+    localStorage.removeItem(Dialog.key);
+    const POLL_INTERVAL = 400;
+    let interval = setInterval(() => {
+      try {
+        const data = localStorage.getItem(Dialog.key);
+        if (!(data == null)) {
+          clearInterval(interval);
+          localStorage.removeItem(Dialog.key);
+          return resolve(this._safeParse(data));
+        }
+      }
+      catch (exception) {
+        clearInterval(interval);
+        localStorage.removeItem(Dialog.key);
+        return reject(new DialogError('Unexpected error occurred in the dialog', exception));
+      }
+    }, POLL_INTERVAL);
+  }
+
+  private _pollLocalForageForToken(resolve: (value: T) => void, reject: (reason: DialogError) => void) {
     localForage.removeItem(Dialog.key).then(() => {
       const POLL_INTERVAL = 400;
       let interval = setInterval(() => {
@@ -191,7 +214,10 @@ export class Dialog<T> {
         Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
       }
       else {
-        if (Utilities.isIEOrEdge) {
+        if (Utilities.isIE) {
+          localStorage.setItem(Dialog.key, JSON.stringify(<DialogResult>{ parse, value }));
+        }
+        else if (Utilities.isEdge) {
           localForage.setItem(Dialog.key, JSON.stringify(<DialogResult>{ parse, value }));
         }
         else if (window.opener) {
