@@ -1,3 +1,13 @@
+---
+topic: sample
+products:
+- Office 365
+languages:
+- TypeScript
+extensions:
+  contentType: samples
+  createdDate: 9/6/2016 11:04:28 AM
+---
 # Office JavaScript API Helpers
 
 [![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
@@ -5,7 +15,7 @@
 [![dependencies](https://david-dm.org/officedev/office-js-helpers.svg)](https://david-dm.org/officedev/office-js-helpers)
 [![downloads](https://img.shields.io/npm/dt/@microsoft/office-js-helpers.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
 
-A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs. These helpers address features as Storage Management, Authentication, Dialogs and other helpful utilities etc.
+A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs. These helpers address features such as Storage Management, Authentication, Dialogs and other helpful utilities etc.
 
 The current version includes the following helpers:
 - [Authentication](#authentication)
@@ -80,25 +90,25 @@ import {Authenticator} from '@microsoft/office-js-helpers';
 
 ### Authentication
 
-The Authentication helper is built for standards compliant OAuth Implicit Flow. Out of the box it directly integrates with Microsoft, AzureAD, Google and Facebook authentication.
+The Authentication helper is built for standards compliant OAuth Implicit Flow. Out of the box it directly integrates with Microsoft, AzureAD, Google, and Facebook authentication.
 
-> Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School or Personal accounts.
+> Microsoft integration uses the AzureAD AppModel v2 endpoints which uses Converged Authentication. It enables users to login using their Work, School, or Personal accounts.
 
-> Note on MSAL. This helper isn't a replacement for MSAL. When MSAL for JavaScript is released publicly, the helper will use MSAL.
+> **Note on MSAL**: This helper isn't a replacement for MSAL. When MSAL for JavaScript is released publicly, the helper will use MSAL.
 
 #### For Office Add-ins
-You need to meet the following requirements before you are able to successfully to use the Authenticator inside of Office Add-ins.
+You need to meet the following requirements before you are able to successfully use the Authenticator inside Office Add-ins.
 
 1. You need to use `https`. This is important as we are using OAuth Implicit Flow and it is critical to secure the communication over the wire.
-2. Add the location of the provider in your `AppDomains`, example:
+2. Add the location of the provider in the [AppDomains](https://docs.microsoft.com/office/dev/add-ins/reference/manifest/appdomains) section of your add-in's manifest, as shown in the following example:
 
 ```xml
     <AppDomain>https://login.windows.net</AppDomain>
     <AppDomain>https://login.microsoftonline.com</AppDomain>
 ```
 
-#### Setup
-Inside of your `Office.initialize` function add the following check:
+#### Setup the authenticator
+Inside of your [Office.initialize](https://docs.microsoft.com/office/dev/add-ins/develop/understanding-the-javascript-api-for-office#initialize-with-officeinitialize) function add the following check:
 
 ```javascript
 if (OfficeHelpers.Authenticator.isAuthDialog()) return;
@@ -106,11 +116,11 @@ if (OfficeHelpers.Authenticator.isAuthDialog()) return;
 
 This to inform the Authenticator to automatically close the authentication dialog once the authentication is complete.
 
-> Note: This code needs to be run in the page that is redirected to from the provider. By default we assume the root url of your website. The code ensures that if an access_token, code or error was received inside of the dialog, then it will parse it and close the dialog automatically. Also as an additional step it ensures that the `state` sent to the provider is the same as what was returned, to prevent [Cross Site Request Forgery (CSRF)](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html).
+> **Note**: This code needs to be run in the page that is redirected to from the provider. By default we assume the root url of your website. The code ensures that if an access_token, code, or error was received inside of the dialog, then it will parse it and close the dialog automatically. Also as an additional step it ensures that the `state` sent to the provider is the same as what was returned, to prevent [Cross Site Request Forgery (CSRF)](http://www.twobotechnologies.com/blog/2014/02/importance-of-state-in-oauth2.html).
 
-> Note: If using in an **AngularJS/Angular/React project** - please take a look https://github.com/OfficeDev/office-js-helpers/issues/19 for information around bootstrapping your application correctly.
+> **Note**: If using in an **AngularJS/Angular/React project**, please take a look https://github.com/OfficeDev/office-js-helpers/issues/19 for information around bootstrapping your application correctly.
 
-#### Initialize
+#### Initialize the authenticator
 Create a new instance of `Authenticator` and register the endpoints. An endpoint corresponds to a service that allows the user to authenticate with.
 
 ```javascript
@@ -203,7 +213,7 @@ authenticator
 var token = authenticator.tokens.get('name of endpoint');
 ```
 If a cached token expires, then the dialog is automatically launched to re-authenticate the user.
-> Note on Refresh Tokens: By default, Implicit OAuth does not support Token Refresh as a security measure. This is because Access Tokens cannot be securely stored inside of a JavaScript client.
+> **Note on Refresh Tokens**: By default, Implicit OAuth does not support Token Refresh as a security measure. This is because Access Tokens cannot be securely stored inside a JavaScript client.
 
 ## Contributing
 
@@ -217,4 +227,4 @@ We use [SemVer](http://semver.org/) for versioning. For the versions available, 
 
 ## License
 
-This project is licensed under the MIT License - see the [License](LICENSE) file for details
+This project is licensed under the MIT License - see the [License](LICENSE) file for details.
