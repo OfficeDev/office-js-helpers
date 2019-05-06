@@ -67,7 +67,7 @@ export class Authenticator {
       return Promise.resolve(token);
     }
 
-    if (hasTokenExpired) {
+    if (token && hasTokenExpired) {
       this.tokens.delete(provider);
     }
 
