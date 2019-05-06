@@ -1,6 +1,6 @@
 # Contribute to this helper
 
-Thank you for your interest in our library
+Thank you for your interest in our library.
 
 * [Ways to contribute](#ways-to-contribute)
 * [To contribute using Git](#to-contribute-using-git)

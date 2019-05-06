@@ -205,7 +205,7 @@ export class Storage<T> {
   }
 
   /**
-   * Returns an observable that triggers everytime there's a Storage Event
+   * Returns an observable that triggers every time there's a Storage Event
    * or if the collection is modified in a different tab.
    */
   notify(next: () => void, error?: (error: any) => void, complete?: () => void): Subscription {
@@ -278,7 +278,7 @@ class InMemoryStorage {
   private _map: Map<string, string>;
 
   constructor() {
-    console.warn(`Using non persistant storage. Data will be lost when browser is refreshed/closed`);
+    console.warn(`Using non persistent storage. Data will be lost when browser is refreshed/closed`);
     this._map = new Map();
   }
 
