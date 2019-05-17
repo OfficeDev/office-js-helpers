@@ -47,6 +47,12 @@ export interface IEndpointConfiguration {
   // OAuth responseType.
   responseType?: string;
 
+  // Enable PKCE if responseType is code
+  pkce?: boolean;
+
+  // PKCE Code Challenge, defaults to S256
+  pkceMethod?: string;
+
   // Additional object for query parameters.
   // Will be appending them after encoding the values.
   extraQueryParameters?: { [index: string]: string };
@@ -206,12 +212,14 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
    */
   static getLoginParams(endpointConfig: IEndpointConfiguration): {
     url: string,
-    state: number
+    state: number,
+    codeVerifier?: string
   } {
     let scope = (endpointConfig.scope) ? encodeURIComponent(endpointConfig.scope) : null;
     let resource = (endpointConfig.resource) ? encodeURIComponent(endpointConfig.resource) : null;
     let state = endpointConfig.state && Utilities.generateCryptoSafeRandom();
     let nonce = endpointConfig.nonce && Utilities.generateCryptoSafeRandom();
+    let codeVerifier = endpointConfig.pkce ? this._generateRandomString(43) : null;
 
     let urlSegments = [
       `response_type=${endpointConfig.responseType}`,
@@ -231,6 +239,16 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
     if (nonce) {
       urlSegments.push(`nonce=${nonce}`);
     }
+    if (codeVerifier) {
+      if (endpointConfig.pkceMethod === 'plain') {
+        urlSegments.push(`code_challenge=${codeVerifier}`);
+        urlSegments.push(`code_challenge_method=plain`);
+      }
+      else {
+        urlSegments.push(`code_challenge=${Utilities.codeChallenge(codeVerifier)}`);
+        urlSegments.push(`code_challenge_method=S256`);
+      }
+    }
     if (endpointConfig.extraQueryParameters) {
       for (let param of Object.keys(endpointConfig.extraQueryParameters)) {
         urlSegments.push(`${param}=${encodeURIComponent(endpointConfig.extraQueryParameters[param])}`);
@@ -239,7 +257,32 @@ export class EndpointStorage extends Storage<IEndpointConfiguration> {
 
     return {
       url: `${endpointConfig.baseUrl}${endpointConfig.authorizeUrl}?${urlSegments.join('&')}`,
-      state: state
+      state: state,
+      codeVerifier: codeVerifier
     };
+  }
+
+  static getTokenExchangeParams(endpointConfig: IEndpointConfiguration, data: any, codeVerifier?: string): string {
+    let segments = [
+      `grant_type=authorization_code`,
+      `code=${data.code}`,
+      `redirect_uri=${endpointConfig.redirectUrl}`,
+      `client_id=${endpointConfig.clientId}`
+    ];
+
+    if (codeVerifier) {
+      segments.push(`code_verifier=${codeVerifier}`);
+    }
+
+    return segments.join('&');
+  }
+
+  private static _generateRandomString(length) {
+    let text = '';
+    const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    for (let i = 0; i < length; i++) {
+      text += possible.charAt(Math.floor(Math.random() * possible.length));
+    }
+    return text;
   }
 }
