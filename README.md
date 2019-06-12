@@ -53,7 +53,7 @@ Ensure that the Office.js file is loaded inside of your `.html` page using:
 <script src="https://appsforoffice.microsoft.com/lib/1/hosted/office.js"></script>
 
 <!-- ES6 Shim of your choice -->
-<script src="https://unpkg.com/core-js/client/core.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/es6-shim/0.35.5/es6-shim.min.js"></script>
 ```
 
 Then reference the helpers library using one of the following:
