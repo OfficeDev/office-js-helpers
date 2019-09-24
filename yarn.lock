@@ -1041,7 +1041,7 @@ cache-base@^0.8.4:
     has-value "^0.3.1"
     isobject "^3.0.0"
     lazy-cache "^2.0.1"
-    set-value "^0.4.2"
+    set-value ">=2.0.1"
     to-object-path "^0.3.0"
     union-value "^0.2.3"
     unset-value "^0.1.1"
@@ -4099,8 +4099,8 @@ set-immediate-shim@^1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/set-immediate-shim/-/set-immediate-shim-1.0.1.tgz#4b2b1b27eb808a9f8dcc481a58e5e56f599f3f61"
 
-set-value@^0.4.2, set-value@^0.4.3:
-  version "0.4.3"
+set-value@^2.0.1, set-value@^2.0.1:
+  version "2.0.1"
   resolved "https://registry.yarnpkg.com/set-value/-/set-value-0.4.3.tgz#7db08f9d3d22dc7f78e53af3c3bf4666ecdfccf1"
   dependencies:
     extend-shallow "^2.0.1"
