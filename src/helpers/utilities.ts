@@ -1,5 +1,6 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 import { CustomError } from '../errors/custom.error';
+import * as CryptoJS from 'crypto-js';
 
 interface IContext {
   host: string;
@@ -189,6 +190,14 @@ export class Utilities {
    */
   static get isIEOrEdge() {
     return /Edge\/|Trident\//gi.test(window.navigator.userAgent);
+  }
+
+  static base64URL(string) {
+    return CryptoJS.enc.Base64.stringify(string).replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+  }
+
+  static codeChallenge(codeVerifier) {
+    return this.base64URL(CryptoJS.SHA256(codeVerifier));
   }
 
   /**

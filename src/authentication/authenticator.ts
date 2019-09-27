@@ -144,14 +144,14 @@ export class Authenticator {
     }
 
     // Set the authentication state to redirect and begin the auth flow.
-    let { state, url } = EndpointStorage.getLoginParams(endpoint);
+    let { state, url, codeVerifier } = EndpointStorage.getLoginParams(endpoint);
 
     // Launch the dialog and perform the OAuth flow. We launch the dialog at the redirect
     // url where we expect the call to isAuthDialog to be available.
     let redirectUrl = await new Dialog<string>(url, 1024, 768, useMicrosoftTeams).result;
 
     // Try and extract the result and pass it along.
-    return this._handleTokenResult(redirectUrl, endpoint, state);
+    return this._handleTokenResult(redirectUrl, endpoint, state, codeVerifier);
   }
 
   /**
@@ -166,7 +166,7 @@ export class Authenticator {
    * @param {object} headers Headers to be sent to the tokenUrl.
    * @return {Promise<IToken>} Returns a promise of the token or error.
    */
-  private _exchangeCodeForToken(endpoint: IEndpointConfiguration, data: any, headers?: any): Promise<IToken> {
+  private _exchangeCodeForToken(endpoint: IEndpointConfiguration, data: any, headers?: any, codeVerifier?: string): Promise<IToken> {
     return new Promise((resolve, reject) => {
       if (endpoint.tokenUrl == null) {
         console.warn('We couldn\'t exchange the received code for an access_token. The value returned is not an access_token. Please set the tokenUrl property or refer to our docs.');
@@ -177,7 +177,7 @@ export class Authenticator {
       xhr.open('POST', endpoint.tokenUrl);
 
       xhr.setRequestHeader('Accept', 'application/json');
-      xhr.setRequestHeader('Content-Type', 'application/json');
+      xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
 
       for (let header in headers) {
         if (header === 'Accept' || header === 'Content-Type') {
@@ -213,11 +213,11 @@ export class Authenticator {
         }
       };
 
-      xhr.send(JSON.stringify(data));
+      xhr.send(EndpointStorage.getTokenExchangeParams(endpoint, data, codeVerifier));
     });
   }
 
-  private _handleTokenResult(redirectUrl: string, endpoint: IEndpointConfiguration, state: number) {
+  private _handleTokenResult(redirectUrl: string, endpoint: IEndpointConfiguration, state: number, codeVerifier?: string) {
     let result = Authenticator.getUrlParams(redirectUrl, endpoint.redirectUrl);
     if (result == null) {
       throw new AuthError('No access_token or code could be parsed.');
@@ -226,7 +226,7 @@ export class Authenticator {
       throw new AuthError('State couldn\'t be verified');
     }
     else if ('code' in result) {
-      return this._exchangeCodeForToken(endpoint, result as ICode);
+      return this._exchangeCodeForToken(endpoint, result as ICode, [], codeVerifier);
     }
     else if ('access_token' in result) {
       return this.tokens.add(endpoint.provider, result as IToken);
