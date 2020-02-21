@@ -1,7 +1,8 @@
 > # ❗️ Deprecation Notice ❗️ [![No Maintenance Intended](badge.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
 >**Thank you** for all your efforts and contributions!
 > ``` office-js-helpers ``` is a community-driven package of sample code that encapsulates a set of convenience functions. The package was initially developed as an example abstraction to common patterns found by developers.
-> The community has been great at submitting ideas, issues, and fixes. As part of our latest campaign to ensure developers can quickly discover content and code, we are consolidating the many locations we post patterns and practices. To ensure we can focus our attention on the quality of content, we will be deprecating the ```office-js-helpers``` package and archiving this repository.
+> The community has been great at submitting ideas, issues, and fixes. As part of our latest campaign to ensure developers can quickly discover content and code, we are consolidating the many locations we post patterns and practices. To ensure we can focus our attention on the quality of content, we have deprecated the ```office-js-helpers``` package and archived this repository.
+
 > ## Can I still use this code?
 > If you find these samples, patterns, and convenience functions useful, we encourage you to take the code under your wing, improve them, and use it on your own. Even though Microsoft will no longer be supporting this content going forward, you may use the code at your convenience, external to the package.
 > ## What will happen next?
