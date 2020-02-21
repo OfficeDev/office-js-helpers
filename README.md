@@ -1,21 +1,18 @@
----
-page_type: sample
-products:
-- office-365
-languages:
-- typescript
-extensions:
-  contentType: samples
-  createdDate: 9/6/2016 11:04:28 AM
----
+> # ❗️ Deprecation Notice ❗️ [![No Maintenance Intended](badge.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
+>**Thank you** for all your efforts and contributions!
+> ``` office-js-helpers ``` is a community-driven package of sample code that encapsulates a set of convenience functions. The package was initially developed as an example abstraction to common patterns found by developers.
+> The community has been great at submitting ideas, issues, and fixes. As part of our latest campaign to ensure developers can quickly discover content and code, we are consolidating the many locations we post patterns and practices. To ensure we can focus our attention on the quality of content, we have deprecated the ```office-js-helpers``` package and archived this repository.
+
+> ## Can I still use this code?
+> **Security vulnerabilities may exist in the project, or its dependencies.** If you plan to reuse or run any code from this repo, be sure to perform appropriate security checks on the code or dependencies first.
+> If you find these samples, patterns, and convenience functions useful, we encourage you to take the code under your wing, improve them, and use it on your own. Even though Microsoft will no longer be supporting this content going forward, you may use the code at your convenience, external to the package.
+
+> ## What will happen next?
+> 
+> To ensure that the community has some content and solutions for the common patterns and practices for Office Add-in, we have consolidated the content and will be providing additional material here soon.
+
 # Office JavaScript API Helpers
-
-[![Build Status](https://travis-ci.org/OfficeDev/office-js-helpers.svg?branch=master)](https://travis-ci.org/OfficeDev/office-js-helpers)
-[![npm version](https://badge.fury.io/js/%40microsoft%2Foffice-js-helpers.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
-[![dependencies](https://david-dm.org/officedev/office-js-helpers.svg)](https://david-dm.org/officedev/office-js-helpers)
-[![downloads](https://img.shields.io/npm/dt/@microsoft/office-js-helpers.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
-
-A collection of helpers to simplify development of Office Add-ins & Microsoft Teams Tabs. These helpers address features such as Storage Management, Authentication, Dialogs and other helpful utilities etc.
+[![No Maintenance Intended](badge.svg)](https://www.npmjs.com/package/@microsoft/office-js-helpers)
 
 The current version includes the following helpers:
 - [Authentication](#authentication)
@@ -23,8 +20,6 @@ The current version includes the following helpers:
 - Error Logging
 - Storage Helpers
 - Dictionary
-
-> **Please tag @casieber/@Zlatkovsky on issues.**
 
 ## Getting Started
 

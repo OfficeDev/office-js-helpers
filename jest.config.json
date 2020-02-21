@@ -1,0 +1,31 @@
+{
+  "transform": {
+    "^.+\\.js$": "babel-jest",
+    "^.+\\.ts$": "ts-jest"
+  },
+  "collectCoverage": true,
+  "testPathIgnorePatterns": [
+    "/node_modules/",
+    "/dist/"
+  ],
+  "transformIgnorePatterns": [
+    "<rootDir>/node_modules/babel-jest(^.+\\.(js|jsx|mjs)$)",
+    "<rootDir>/node_modules/(?!lodash-es/)"
+  ],
+  "setupFiles": [
+    "jest-localstorage-mock"
+  ],
+  "testRegex": "\\.spec.ts$",
+  "moduleDirectories": [
+    "node_modules",
+    "src"
+  ],
+  "moduleFileExtensions": [
+    "ts",
+    "js"
+  ],
+  "moduleNameMapper": {
+    "\\.html$": "<rootDir>/mocks/fileMock.js",
+    "^lodash-es$": "lodash"
+  }
+}

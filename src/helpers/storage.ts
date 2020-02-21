@@ -1,7 +1,7 @@
 /* Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. */
 
 import { debounce, isEmpty, isString, isNil } from 'lodash-es';
-import { Observable } from 'rxjs/Observable';
+import { Observable } from 'rxjs';
 import { Exception } from '../errors/exception';
 
 const NOTIFICATION_DEBOUNCE = 300;
@@ -25,7 +25,7 @@ export interface Subscription {
 /**
  * Helper for creating and querying Local Storage or Session Storage.
  * Uses {@link Dictionary} so all the data is encapsulated in a single
- * storage namespace. Writes update the actual storage.
+ *  storage namespace. Writes update the actual storage.
  */
 export class Storage<T> {
   private _storage: typeof localStorage | typeof sessionStorage;
