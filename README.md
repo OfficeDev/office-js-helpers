@@ -4,7 +4,9 @@
 > The community has been great at submitting ideas, issues, and fixes. As part of our latest campaign to ensure developers can quickly discover content and code, we are consolidating the many locations we post patterns and practices. To ensure we can focus our attention on the quality of content, we have deprecated the ```office-js-helpers``` package and archived this repository.
 
 > ## Can I still use this code?
+> **Security vulnerabilities may exist in the project, or its dependencies.** If you plan to reuse or run any code from this repo, be sure to perform appropriate security checks on the code or dependencies first.
 > If you find these samples, patterns, and convenience functions useful, we encourage you to take the code under your wing, improve them, and use it on your own. Even though Microsoft will no longer be supporting this content going forward, you may use the code at your convenience, external to the package.
+
 > ## What will happen next?
 > 
 > To ensure that the community has some content and solutions for the common patterns and practices for Office Add-in, we have consolidated the content and will be providing additional material here soon.
