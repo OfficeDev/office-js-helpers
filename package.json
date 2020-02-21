@@ -14,7 +14,7 @@
     "build": "yarn build:lib && yarn build:min",
     "prestart": "yarn clean",
     "start": "yarn build:lib --watch",
-    "test": "jest",
+    "test": "jest --config jest.config.json",
     "version": "yarn build",
     "beta": "npm version prerelease && npm publish --tag beta"
   },
@@ -27,36 +27,40 @@
     "dts/"
   ],
   "dependencies": {
-    "@types/microsoftteams": "^1.2.1",
-    "@types/office-js": "^0.0.51",
-    "core-js": "^2.5.3",
-    "lodash-es": "^4.17.5",
-    "rxjs": "^5.5.6"
+    "core-js": "^3.6.3",
+    "lodash-es": "^4.17.15",
+    "npm-dts-webpack-plugin": "^1.2.0",
+    "rxjs": "^6.5.4"
   },
   "devDependencies": {
-    "@types/jest": "22.1.3",
-    "@types/lodash": "4.14.104",
-    "@types/node": "9.4.6",
-    "@types/webpack": "3.8.8",
-    "awesome-typescript-loader": "3.4.1",
-    "babel-core": "6.26.0",
-    "babel-jest": "22.4.1",
-    "babel-plugin-lodash": "3.3.2",
-    "babel-preset-env": "1.6.1",
-    "crypto-js": "3.1.9-1",
-    "dts-builder": "1.1.4",
-    "html-loader": "0.5.5",
-    "jest": "22.4.2",
-    "jest-cli": "22.4.2",
-    "jest-localstorage-mock": "2.2.0",
-    "rimraf": "2.6.2",
-    "ts-jest": "22.0.4",
-    "tslint": "5.9.1",
-    "tslint-eslint-rules": "5.0.0",
-    "tslint-loader": "3.5.3",
-    "typescript": "2.7.2",
-    "uglify-js": "3.3.12",
-    "webpack": "3.11.0"
+    "@types/jest": "^24.0.25",
+    "@types/lodash": "^4.14.149",
+    "@types/microsoftteams": "^1.2.2",
+    "@types/node": "^12.12.24",
+    "@types/office-js": "0.0.51",
+    "@types/tapable": "^1.0.5",
+    "@types/webpack": "^4.41.2",
+    "awesome-typescript-loader": "^5.2.1",
+    "babel-core": "^6.26.3",
+    "babel-jest": "^24.9.0",
+    "babel-plugin-lodash": "^3.3.4",
+    "babel-preset-env": "^1.7.0",
+    "crypto-js": "^3.1.9-1",
+    "dts-builder": "^1.1.7",
+    "html-loader": "^0.5.5",
+    "jest": "^24.9.0",
+    "jest-cli": "^24.9.0",
+    "jest-localstorage-mock": "^2.4.0",
+    "rimraf": "^3.0.0",
+    "ts-jest": "^24.3.0",
+    "ts-loader": "^6.2.1",
+    "tslint": "^5.20.1",
+    "tslint-eslint-rules": "^5.4.0",
+    "tslint-loader": "^3.5.4",
+    "typescript": "^3.7.4",
+    "uglify-js": "^3.7.5",
+    "webpack": "^4.41.5",
+    "webpack-cli": "^3.3.10"
   },
   "keywords": [
     "Office Add-ins",
@@ -70,34 +74,5 @@
   "bugs": {
     "url": "https://github.com/OfficeDev/office-js-helpers/issues"
   },
-  "homepage": "https://github.com/OfficeDev/office-js-helpers#readme",
-  "jest": {
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "^.+\\.ts$": "ts-jest"
-    },
-    "collectCoverage": true,
-    "testPathIgnorePatterns": [
-      "/node_modules/",
-      "/dist/"
-    ],
-    "transformIgnorePatterns": [
-      "<rootDir>/node_modules/(?!lodash-es/)"
-    ],
-    "setupFiles": [
-      "jest-localstorage-mock"
-    ],
-    "testRegex": "\\.spec.ts$",
-    "moduleDirectories": [
-      "node_modules",
-      "src"
-    ],
-    "moduleFileExtensions": [
-      "ts",
-      "js"
-    ],
-    "moduleNameMapper": {
-      "\\.html$": "<rootDir>/mocks/fileMock.js"
-    }
-  }
+  "homepage": "https://github.com/OfficeDev/office-js-helpers#readme"
 }

@@ -1,6 +1,6 @@
 const webpack = require('webpack');
 const path = require('path');
-const DtsBundlePlugin = require('./generate-dts');
+//const DtsBundlePlugin = require('./generate-dts');
 const libraryName = 'OfficeHelpers';
 const fileName = 'office.helpers.js';
 const { version, name: companyName, license, author } = require('./package.json');
@@ -32,10 +32,10 @@ module.exports = {
       {
         test: /\.ts$/,
         exclude: /\.spec\.ts$/,
-        loader: 'awesome-typescript-loader',
-        options: {
+        loader: 'ts-loader'
+        /*,options: {
           configFileName: 'tsconfig.webpack.json'
-        }
+        }*/
       }
     ]
   },
@@ -51,8 +51,8 @@ module.exports = {
       banner: `${companyName} v.${version}
 Copyright (c) ${author}. All rights reserved.
 Licensed under the ${license} license.`
-    }),
-    new webpack.NamedModulesPlugin(),
-    new DtsBundlePlugin()
+    })
+    , new webpack.NamedModulesPlugin()
+    //, new DtsBundlePlugin()
   ]
 };

@@ -1,7 +1,7 @@
 const path = require('path');
 const fs = require('fs');
 const rimraf = require('rimraf');
-const timeout = 2000;
+const timeout = 10000;
 
 function DtsBundlePlugin(options) { }
 
