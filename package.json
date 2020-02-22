@@ -16,7 +16,9 @@
     "start": "yarn build:lib --watch",
     "test": "jest --config jest.config.json",
     "version": "yarn build",
-    "beta": "npm version prerelease && npm publish --tag beta"
+    "beta": "npm version prerelease && npm publish --tag beta",
+    "preinstall": "echo ********* This package has been deprecated and the officedev/office-js-helpers repo has been archived. *********",
+    "postinstall": "echo ********* This package has been deprecated and the officedev/office-js-helpers repo has been archived. *********"
   },
   "main": "./dist/office.helpers.js",
   "jsnext:main": "./dist/office.helpers.js",
