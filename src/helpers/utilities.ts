@@ -181,14 +181,28 @@ export class Utilities {
    * Utility to check if the code is running inside of an add-in.
    */
   static get isAddin() {
-    return Utilities.host !== HostType.WEB;
+    return Utilities.host !== HostType.WEB && !Utilities.isEdge;
+  }
+
+  /**
+   * Utility to check if the browser is IE11.
+   */
+  static get isIE() {
+    return /Trident\//gi.test(window.navigator.userAgent);
+  }
+
+  /**
+   * Utility to check if the browser is Edge.
+   */
+  static get isEdge() {
+    return /Edge\//gi.test(window.navigator.userAgent);
   }
 
   /**
    * Utility to check if the browser is IE11 or Edge.
    */
   static get isIEOrEdge() {
-    return /Edge\/|Trident\//gi.test(window.navigator.userAgent);
+    return Utilities.isIE || Utilities.isEdge;
   }
 
   /**

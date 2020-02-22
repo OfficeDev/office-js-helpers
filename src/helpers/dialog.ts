@@ -74,6 +74,9 @@ export class Dialog<T> {
       else if (Utilities.isAddin) {
         this._result = this._addinDialog();
       }
+      else if (Utilities.isEdge) {
+        this._result = this._edgeDialog();
+      }
       else {
         this._result = this._webDialog();
       }
@@ -124,7 +127,7 @@ export class Dialog<T> {
       try {
         const options = 'width=' + this.size.width + ',height=' + this.size.height + this._windowFeatures;
         window.open(this.url, this.url, options);
-        if (Utilities.isIEOrEdge) {
+        if (Utilities.isIE) {
           this._pollLocalStorageForToken(resolve, reject);
         }
         else {
@@ -140,6 +143,19 @@ export class Dialog<T> {
       catch (exception) {
         return reject(new DialogError('Unexpected error occurred while creating popup', exception));
       }
+    });
+  }
+
+  private _edgeDialog(): Promise<T> {
+    return new Promise((resolve, reject) => {
+      Office.context.ui.displayDialogAsync(this.url, { width: this.size.width$, height: this.size.height$ }, (result: Office.AsyncResult) => {
+        if (result.status === Office.AsyncResultStatus.Failed) {
+          reject(new DialogError(result.error.message, result.error));
+        }
+        else {
+          this._pollLocalStorageForToken(resolve, reject);
+        }
+      });
     });
   }
 
