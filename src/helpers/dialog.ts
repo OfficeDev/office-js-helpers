@@ -153,7 +153,16 @@ export class Dialog<T> {
           reject(new DialogError(result.error.message, result.error));
         }
         else {
-          this._pollLocalStorageForToken(resolve, reject);
+          const dialog = result.value as Office.DialogHandler;
+          const onToken = token => {
+            if (dialog) {
+              dialog.close();
+            }
+
+            return resolve(token);
+          };
+
+          this._pollLocalStorageForToken(onToken, reject);
         }
       });
     });
