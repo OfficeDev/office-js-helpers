@@ -210,11 +210,11 @@ export class Dialog<T> {
         microsoftTeams.initialize();
         microsoftTeams.authentication.notifySuccess(JSON.stringify(<DialogResult>{ parse, value }));
       }
-      else if (Utilities.isAddin) {
+      else if (Utilities.isAddin || Utilities.isEdge) {
         Office.context.ui.messageParent(JSON.stringify(<DialogResult>{ parse, value }));
       }
       else {
-        if (Utilities.isIEOrEdge) {
+        if (Utilities.isIE) {
           localStorage.setItem(Dialog.key, JSON.stringify(<DialogResult>{ parse, value }));
         }
         else if (window.opener) {
