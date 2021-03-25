@@ -154,15 +154,17 @@ export class Dialog<T> {
         }
         else {
           const dialog = result.value as Office.DialogHandler;
-          const onToken = token => {
-            if (dialog) {
-              dialog.close();
-            }
 
-            return resolve(token);
-          };
+          dialog.addEventHandler(Office.EventType.DialogMessageReceived, args => {
+            let result = this._safeParse(args.message) as T;
+            resolve(result);
+            dialog.close();
+          });
 
-          this._pollLocalStorageForToken(onToken, reject);
+          dialog.addEventHandler(Office.EventType.DialogEventReceived, args => {
+            reject(new DialogError(args.message, args.error));
+            dialog.close();
+          });
         }
       });
     });
